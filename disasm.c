@@ -78,7 +78,8 @@ static const char *conditioncode[16] = {
 	"gt", "le", "al", "nv"
 };
 
-#define COND(c)	conditioncode[c]
+#define COND(c)	conditioncode[c & 15]
+#define IVCOND(c)	conditioncode[(c ^ 1) & 15]
 
 static inline int64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
@@ -103,6 +104,24 @@ rotate(int bitwidth, uint64_t v, int n)
 {
 	n &= (bitwidth - 1);
 	return (v << (bitwidth - n)) | (v >> n);
+}
+
+static bool
+MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
+{
+	const int width = (sf == 0) ? 32 : 64;
+
+	if ((sf != 0) && (n == 0))
+		return false;
+	if ((sf == 0) && ((n != 0) || (immr > 0x1f)))
+		return false;
+	if (imms < 16) {
+		return ((-immr & 15) <= (15 - imms));
+	}
+	if (imms >= (uint64_t)(width - 15)) {
+		return ((immr & 15) <= (imms - (width - 15)));
+	}
+	return false;
 }
 
 static bool
@@ -414,7 +433,22 @@ static void
 OPFUNC_DECL(op_cinc, sf, Rm, cond, Rn, Rd, UNUSED5)
 {
 	/* ALIAS: cset,csinc */
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
+		PRINTF("%12lx:\t%08x \tcinc	%s, %s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    IVCOND(cond));
+	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
+		PRINTF("%12lx:\t%08x \tcset	%s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    IVCOND(cond));
+	} else {
+		PRINTF("%12lx:\t%08x \tcsinc	%s, %s, %s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    ZREGNAME(sf, Rn),
+		    IVCOND(cond));
+	}
 }
 
 static void
@@ -1090,18 +1124,33 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 		return;
 	}
 
-	/* ALIAS: orr_imm */
-	PRINTF("%12lx:\t%08x \torr	%s, %s, #0x%lx\n", pc, insn,
-	    SREGNAME(sf, Rd),
-	    ZREGNAME(sf, Rn),
-	    DecodeBitMasks(sf, n, immr, imms));
+	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
+		PRINTF("%12lx:\t%08x \tmov	%s, #0x%lx\n", pc, insn,
+		    SREGNAME(sf, Rd),
+		    DecodeBitMasks(sf, n, immr, imms));
+	} else {
+		/* ALIAS: orr_imm */
+		PRINTF("%12lx:\t%08x \torr	%s, %s, #0x%lx\n", pc, insn,
+		    SREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    DecodeBitMasks(sf, n, immr, imms));
+	}
 }
 
 static void
 OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
 	/* ALIAS: movn */
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if ((hw == 0) || (imm16 == 0)) {
+		PRINTF("%12lx:\t%08x \tmov	%s, #0x%lx\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZeroExtend(16, ~imm16, 1));
+	} else {
+		const int shift = hw * 16;
+		PRINTF("%12lx:\t%08x \tmovw	%s, #0x%lx, lsl #%d\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZeroExtend(16, ~imm16, 1), shift);
+	}
 }
 
 static void
@@ -1143,7 +1192,6 @@ OPFUNC_DECL(op_mov_wimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, imm16, 1), shift);
 	}
-
 }
 
 static void

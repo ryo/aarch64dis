@@ -58,7 +58,7 @@ static const char *s_wregs[32] = {
 	 "w0",  "w1",  "w2",  "w3",  "w4",  "w5",  "w6",  "w7",  "w8",  "w9",
 	"w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19",
 	"w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29",
-	"w30", "sp"
+	"w30", "wsp"
 };
 
 static const char *s_xregs[32] = {
@@ -312,7 +312,8 @@ OPFUNC_DECL(op_at, op1, CRn, CRm, op2, Rt, UNUSED5)
 static void
 OPFUNC_DECL(op_b, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tb	%lx\n", pc, insn,
+	    SignExtend(26, imm26, 4) + pc);
 }
 
 static void
@@ -352,13 +353,15 @@ OPFUNC_DECL(op_bl, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_blr, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tblr	%s\n", pc, insn,
+	    ZREGNAME(1, Rn));
 }
 
 static void
 OPFUNC_DECL(op_br, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tbr	%s\n", pc, insn,
+	    ZREGNAME(1, Rn));
 }
 
 static void
@@ -457,7 +460,7 @@ OPFUNC_DECL(op_cmp_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 		    SHIFTOP2(shift, "", ", lsl #12"));
 	} else {
 		PRINTF("%12lx:\t%08x \tsubs	%s, %s, #0x%lx%s\n", pc, insn,
-		    SREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
 		    SignExtend(12, imm12, 1),
 		    SHIFTOP2(shift, "", ", lsl #12"));
@@ -468,7 +471,33 @@ static void
 OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: negs,subs_shiftreg */
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (Rd == 31) {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x \tcmp	%s, %s\n", pc, insn,
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x \tcmp	%s, %s, %s #%lu\n", pc, insn,
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm),
+			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
+			    imm6);
+		}
+	} else {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x \tsubs	%s, %s, %s\n", pc, insn,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x \tsubs	%s, %s, %s, %s #%lu\n", pc, insn,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm),
+			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
+			    imm6);
+		}
+	}
 }
 
 static void
@@ -602,8 +631,30 @@ OPFUNC_DECL(op_extr, sf, n, Rm, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
+	const uint64_t op = CRm << 3 | op2;
+
 	/* ALIAS: nop,sev,sevl,wfe,wfi,yield */
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	switch (op) {
+	case 0:
+	default:
+		PRINTF("%12lx:\t%08x \tnop\n", pc, insn);
+		break;
+	case 1:
+		PRINTF("%12lx:\t%08x \tyield\n", pc, insn);
+		break;
+	case 2:
+		PRINTF("%12lx:\t%08x \twfe\n", pc, insn);
+		break;
+	case 3:
+		PRINTF("%12lx:\t%08x \twfi\n", pc, insn);
+		break;
+	case 4:
+		PRINTF("%12lx:\t%08x \tsev\n", pc, insn);
+		break;
+	case 5:
+		PRINTF("%12lx:\t%08x \tsevl\n", pc, insn);
+		break;
+	}
 }
 
 static void
@@ -675,19 +726,31 @@ OPFUNC_DECL(op_ldnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 static void
 OPFUNC_DECL(op_ldp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tldp	%s, %s, [%s], #%ld\n", pc, insn,
+	    ZREGNAME(sf, Rt),
+	    ZREGNAME(sf, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
 static void
 OPFUNC_DECL(op_ldp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tldp	%s, %s, [%s,#%ld]!\n", pc, insn,
+	    ZREGNAME(sf, Rt),
+	    ZREGNAME(sf, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
 static void
 OPFUNC_DECL(op_ldp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tldp	%s, %s, [%s,#%ld]\n", pc, insn,
+	    ZREGNAME(sf, Rt),
+	    ZREGNAME(sf, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
 static void
@@ -711,22 +774,34 @@ OPFUNC_DECL(op_ldpsw_signed, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldr_immpostidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tldr	%s, [%s], #%ld\n", pc, insn,
+	    ZREGNAME(size, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, (size == 0) ? 4 : 8));
 }
 
 static void
 OPFUNC_DECL(op_ldr_immpreidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tldr	%s, [%s, #%ld]!\n", pc, insn,
+	    ZREGNAME(size, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, (size == 0) ? 4 : 8));
 }
 
 static void
 OPFUNC_DECL(op_ldr_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \tldr	%s, [%s,#%ld]\n", pc, insn,
-	    ZREGNAME(size, Rt),
-	    SREGNAME(size, Rn),
-	    SignExtend(12, imm12, (size == 0) ? 4 : 8));
+	if (imm12 == 0) {
+		PRINTF("%12lx:\t%08x \tldr	%s, [%s]\n", pc, insn,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%12lx:\t%08x \tldr	%s, [%s,#%ld]\n", pc, insn,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(1, Rn),
+		    SignExtend(12, imm12, (size == 0) ? 4 : 8));
+	}
 }
 
 static void
@@ -756,7 +831,16 @@ OPFUNC_DECL(op_ldrb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm12 == 0) {
+		PRINTF("%12lx:\t%08x \tldrb	%s, [%s]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%12lx:\t%08x \tldrb	%s, [%s,#%ld]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZeroExtend(12, imm12, 1));
+	}
 }
 
 static void
@@ -1011,8 +1095,6 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 	    SREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
 	    DecodeBitMasks(sf, n, immr, imms));
-
-//	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
 }
 
 static void
@@ -1051,13 +1133,27 @@ static void
 OPFUNC_DECL(op_mov_wimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
 	/* ALIAS: movz */
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if ((hw == 0) || (imm16 == 0)) {
+		PRINTF("%12lx:\t%08x \tmov	%s, #0x%lx\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZeroExtend(16, imm16, 1));
+	} else {
+		const int shift = hw * 16;
+		PRINTF("%12lx:\t%08x \tmovz	%s, #0x%lx, lsl #%d\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZeroExtend(16, imm16, 1), shift);
+	}
+
 }
 
 static void
 OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	const int shift = hw * 16;
+
+	PRINTF("%12lx:\t%08x \tmovk	%s, #0x%lx, lsl #%d\n", pc, insn,
+	    ZREGNAME(sf, Rd),
+	    ZeroExtend(16, imm16, 1), shift);
 }
 
 static void
@@ -1139,7 +1235,7 @@ OPFUNC_DECL(op_rbit, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ret, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tret\n", pc, insn);
 }
 
 static void
@@ -1245,7 +1341,11 @@ OPFUNC_DECL(op_stnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 static void
 OPFUNC_DECL(op_stp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tstp	%s, %s, [%s], #%ld\n", pc, insn,
+	    ZREGNAME(sf, Rt),
+	    ZREGNAME(sf, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
 static void
@@ -1254,7 +1354,7 @@ OPFUNC_DECL(op_stp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 	PRINTF("%12lx:\t%08x \tstp	%s, %s, [%s,#%ld]!\n", pc, insn,
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
-	    SREGNAME(sf, Rn),
+	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
@@ -1264,26 +1364,41 @@ OPFUNC_DECL(op_stp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 	PRINTF("%12lx:\t%08x \tstp	%s, %s, [%s,#%ld]\n", pc, insn,
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
-	    SREGNAME(sf, Rn),
+	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
 static void
 OPFUNC_DECL(op_str_postidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tstr	%s, [%s], #%ld\n", pc, insn,
+	    ZREGNAME(size, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void
 OPFUNC_DECL(op_str_preidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x \tstr	%s, [%s,#%ld]!\n", pc, insn,
+	    ZREGNAME(size, Rt),
+	    SREGNAME(size, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void
 OPFUNC_DECL(op_str_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm12 == 0) {
+		PRINTF("%12lx:\t%08x \tstr	%s, [%s]\n", pc, insn,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(size, Rn));
+	} else {
+		PRINTF("%12lx:\t%08x \tstr	%s, [%s,#%ld]\n", pc, insn,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(size, Rn),
+		    SignExtend(12, imm12, (size == 0) ? 4 : 8));
+	}
 }
 
 static void
@@ -1295,7 +1410,16 @@ OPFUNC_DECL(op_str_reg, size, Rm, option, shift, Rn, Rt)
 static void
 OPFUNC_DECL(op_strb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm12 == 0) {
+		PRINTF("%12lx:\t%08x \tstrb	%s, [%s]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%12lx:\t%08x \tstrb	%s, [%s,#%ld]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZeroExtend(12, imm12, 1));
+	}
 }
 
 static void

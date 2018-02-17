@@ -1,0 +1,273 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+my @insns;
+while (<>) {
+	chop;
+	next if (m/^\s*#/);
+	s/\s*#.*//;
+	next if (m/^$/);
+
+	my ($sym, $defs) = split(/\s*:\s*/, $_, 2);
+
+	my $insn = parse_defs($sym, $defs);
+	push(@insns, $insn);
+}
+
+#print Dumper(\@insns);
+
+
+my %fmts;
+for my $insn (@insns) {
+	my @fmt;
+
+	for (@{$insn->{fragments}}) {
+		if (exists($_->{name})) {
+			my $name = $_->{name};
+			push(@fmt, $name);
+		}
+	}
+	my $fmt = $#fmt + 1 . " / " . join(" / ", @fmt);
+
+	my $sym = join("_", map { uc($_) } @fmt);
+	$sym =~ s/\[\d+,\d+\]//sg;
+	$sym = "NOARG" if ($sym eq '');
+	$insn->{symbol} = $sym;
+
+	$fmts{$fmt}++;
+}
+
+# detect alias
+{
+	my %maskcode2sym;
+	for my $insn (sort {$a->{sym} cmp $b->{sym}} @insns) {
+		push(@{$maskcode2sym{$insn->{maskcode}}}, $insn->{sym});
+	}
+	for (@insns) {
+		my $sym = $_->{sym};
+		my @x = grep { $_ ne $sym } @{$maskcode2sym{$_->{maskcode}}};
+		@{$_->{alias}} = @x;
+	}
+}
+
+#print Dumper(\%fmts); exit;
+#print Dumper(\@insns); exit;
+
+# main
+{
+	my %opcode_alias;
+	my %fmt_seen;
+
+	my @fmt_output;
+	my @table_output;
+	my @decl_output;
+	for my $insn (sort {$b->{mask} <=> $a->{mask}} @insns) {
+
+		my $alias;
+		my $opcode_pattern = sprintf("%08x/%08x", $insn->{mask}, $insn->{code});
+		if (exists($opcode_alias{$opcode_pattern})) {
+			$alias = $opcode_alias{$opcode_pattern};
+		} else {
+			$opcode_alias{$opcode_pattern} = $insn->{sym};
+		}
+
+		unless (exists($fmt_seen{$insn->{symbol}})) {
+			$fmt_seen{$insn->{symbol}}++;
+			push(@fmt_output, insn_fragment_fmt($insn));
+		}
+
+		unless (defined($alias)) {
+			push(@decl_output, insn_decl($insn));
+
+			push(@table_output, sprintf(" { 0x%08x, 0x%08x, FMT_%-27s op_%s },\n",
+			    $insn->{mask},
+			    $insn->{code},
+			    $insn->{symbol} . ",",
+			    $insn->{sym})
+			);
+		}
+	}
+
+
+#print sort @decl_output;
+
+
+print "/* define code format  { {bitpos, bitwidth}, ... (maximum 6 args) } */\n";
+print @fmt_output;
+print "\n";
+
+print <<__HEADER__;
+struct aarch64_insn_info insn_tables[] = {
+ /* mask,      pattern,    opcode format,                  opfunc             */
+ /* ---------  ----------  ------------------------------  ------------------ */
+__HEADER__
+
+	print @table_output;
+
+	print " { 0x00000000, 0x00000000, FMT_NOARG,                      op_undefined }\n";
+	print "};\n";
+
+	print "\n\n\n\n\n";
+}
+
+
+
+exit;
+
+sub insn_decl {
+	my $insn = shift;
+	my @output;
+	my @vars;
+
+	my @fragments = @{$insn->{fragments}};
+	for (@fragments) {
+		if (exists($_->{name})) {
+			my $var = $_->{name};
+			$var =~ s/\[.*//;
+			push(@vars, $var);
+		}
+	}
+
+	push(@output, "static void\n");
+	push(@output, sprintf("OPFUNC_DECL(op_%s, ", $insn->{sym}));
+
+	for (($#vars + 1) .. 5) {
+		push(@vars, join(", ", sprintf("UNUSED%d", $_)));
+	}
+	push(@output, join(", ", @vars));
+
+	push(@output, ")");
+
+
+	push(@output, "\n{\n");
+
+	my @alias = @{$insn->{alias}};
+	if ($#alias >= 0) {
+		push(@output, sprintf("\t/* ALIAS: %s */\n", join(",", @alias)));
+	}
+
+	push(@output, q'	printf("%12x:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);' . "\n");
+
+
+	push(@output, "}\n");
+	push(@output, "\n");
+	join("", @output);
+}
+
+
+sub insn_fragment_fmt {
+	my $insn = shift;
+
+	my $fmt = $insn->{symbol};
+
+	my @bitinfo;
+	my @fragments = @{$insn->{fragments}};
+
+	for (@fragments) {
+		if (exists($_->{name})) {
+			push(@bitinfo, sprintf("{%2d,%2d}", $_->{end}, $_->{width}));
+		}
+	}
+	push(@bitinfo, "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}");
+	splice(@bitinfo, 6);
+
+	my $len = length("FMT_$fmt");
+	my $tab = '';
+	$tab = "\t" if (($len & 7) != 0);
+	$len = ($len + 7) & -8;
+	$tab .= "\t" x ((32 - $len) / 8);
+
+	sprintf "#define FMT_%s%s\\\n\t{ %s }\n", $fmt, $tab, join(", ", @bitinfo);
+}
+
+sub dump_insn {
+	my $insn = shift;
+
+	my $sym = $insn->{symbol};
+
+	my $buf = '';
+	my @fragments = @{$insn->{fragments}};
+
+	for (@fragments) {
+		if (exists($_->{value})) {
+			$buf .= $_->{value};
+		} elsif (exists($_->{name})) {
+			$buf .= sprintf(" %s<%d> ", $_->{name}, $_->{width});
+		}
+	}
+
+	sprintf "%s	%s\n", $sym, $buf;
+}
+
+sub parse_defs {
+	my $sym = shift;
+	my $defs = shift;
+
+	my @fields;
+	my $bits = 0;
+	my $pattern = '';
+	my $code = 0;
+	my $mask = 0;
+
+	my %name_seen;
+
+	my @frags = split(/\s+/, $defs);
+	for (@frags) {
+		if (m/^[01]+$/) {
+			for (split(//, $_)) {
+				$bits++;
+				$pattern .= $_;
+
+				$code <<= 1;
+				$code |= $_;
+				$mask <<= 1;
+				$mask |= 1;
+
+				push(@fields, {
+					width => 1,
+					value => $_,
+				});
+			}
+		} elsif (m/^(\w+)<(\d+)>$/) {
+			$pattern .= '?' x $2;
+			my $name = $1;
+			my $width = $2;
+			my $start = 32 - $bits - 1;
+			my $end = $start - $width + 1;
+			$bits += $width;
+
+			$code <<= $width;
+			$code |= 0;
+			$mask <<= $width;
+			$mask |= 0;
+
+
+			# duplicate name check
+			if (exists($name_seen{$name})) {
+				die "$sym: $name is already used\n";
+			}
+			$name_seen{$name}++;
+
+
+			push(@fields, {
+				width => $width,
+				name => "${name}[$start,$end]",
+				start => $start,
+				end => $end,
+			});
+		} else {
+			warn "$sym: $defs: illegal format: $_\n";
+		}
+	}
+
+	if ($bits != 32) {
+		warn "$sym: $defs: illegal bit width: $bits\n";
+	}
+
+
+	my $maskcode = sprintf("%08x/%08x", $mask, $code);
+	{ sym => $sym, fragments => \@fields, pattern => $pattern, code => $code, mask => $mask, maskcode => $maskcode }
+}

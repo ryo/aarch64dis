@@ -1,0 +1,6 @@
+
+abs(scalar)	:	0 1	0	11110	size<2>	10000	01011	10	Rn<5>	Rd<5>
+abs(vector)	:	0 Q<1>	0	01110	size<2>	10000	01011	10	Rn<5>	Rd<5>
+
+add(scalar)	:	0 1	0	11110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>
+add(vector)	:	0 Q<1>	0	01110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>

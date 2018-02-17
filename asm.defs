@@ -1,0 +1,384 @@
+#--------------------------------------------------------------------------          16|15          -------------------------
+
+adc		:	sf<1>	00		11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>
+adcs		:	sf<1>	01		11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>
+
+add_extreg	:	sf<1>	00		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+add_imm		:	sf<1>	00		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+add_shiftreg	:	sf<1>	00		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+adds_extreg	:	sf<1>	01		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+adds_imm	:	sf<1>	01		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+adds_shiftreg	:	sf<1>	01		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+adr		:	0	immlo<2>	10000 immhi<19>								Rd<5>
+adrp		:	1	immlo<2>	10000 immhi<19>								Rd<5>
+
+and_imm		:	sf<1>	00		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+and_shiftreg	:	sf<1>	00		01010 shift<2> 0	Rm<5>		imms<6>			Rn<5>	Rd<5>
+
+ands_imm	:	sf<1>	11		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+ands_shiftreg	:	sf<1>	11		01010 shift<2> 0	Rm<5>		imm6<6>			Rn<5>	Rd<5>
+
+asr_reg		:	sf<1>	00		11010 11		0	Rm<5>	0010	10		Rn<5>	Rd<5>	# =asrv
+asr_imm		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+asrv		:	sf<1>	00		11010 11		0	Rm<5>	0010	10		Rn<5>	Rd<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+at		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+
+b_cond		:	0	10		10100		imm19<19>					0	cond<4>
+b		:	0	00		101				imm26<26>				
+
+bfi		:	sf<1>	01		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =bfm
+bfm		:	sf<1>	01		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+bfxil		:	sf<1>	01		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =bfi
+
+bic_shiftreg	:	sf<1>	00		01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+bics_shiftreg	:	sf<1>	11		01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+bl		:	1	00		101				imm26<26>				
+blr		:	1	10		10110 0		01		11111	000000			Rn<5>	00000
+br		:	1	10		10110 0		00		11111	000000			Rn<5>	00000
+
+brk		:	1	10		10100 001			imm16<16>				00000
+
+cbnz		:	sf<1>	01		1010 1		imm19<19>						Rt<5>
+cbz		:	sf<1>	01		1010 0		imm19<19>						Rt<5>
+
+ccmn_imm	:	sf<1>	01		1101 0 010			imm5<5>	cond<4> 10		Rn<5>	0 nzcv<4>
+ccmn_reg	:	sf<1>	01		1101 0 010			Rm<5>	cond<4> 00		Rn<5>	0 nzcv<4>
+
+ccmp_imm	:	sf<1>	11		1101 0 010			imm5<5>	cond<4> 10		Rn<5>	0 nzcv<4>
+ccmp_reg	:	sf<1>	11		1101 0 010			Rm<5>	cond<4> 00		Rn<5>	0 nzcv<4>
+
+cinc		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
+cinv		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
+
+clrex		:	1	10		10101 00		0 00 011	0011	CRm<4>	010		11111
+
+cls		:	sf<1>	10		11010 110			00000	00010 1			Rn<5> Rd<5>
+clz		:	sf<1>	10		11010 110			00000	00010 0			Rn<5> Rd<5>
+
+cmn_extreg	:	sf<1>	01		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+cmn_imm		:	sf<1>	01		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+cmn_shiftreg	:	sf<1>	01		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+cmp_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+cmp_imm		:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+cmp_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+cneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
+
+crc32b		:	sf<1>	00		1101 0 110			Rm<5>	010	0	00	Rn<5>	Rd<5>
+crc32h		:	sf<1>	00		1101 0 110			Rm<5>	010	0	01	Rn<5>	Rd<5>
+crc32w		:	sf<1>	00		1101 0 110			Rm<5>	010	0	10	Rn<5>	Rd<5>
+crc32x		:	sf<1>	00		1101 0 110			Rm<5>	010	0	11	Rn<5>	Rd<5>
+
+crc32cb		:	sf<1>	00		1101 0 110			Rm<5>	010	1	00	Rn<5>	Rd<5>
+crc32ch		:	sf<1>	00		1101 0 110			Rm<5>	010	1	01	Rn<5>	Rd<5>
+crc32cw		:	sf<1>	00		1101 0 110			Rm<5>	010	1	10	Rn<5>	Rd<5>
+crc32cx		:	sf<1>	00		1101 0 110			Rm<5>	010	1	11	Rn<5>	Rd<5>
+
+csel		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
+cset		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# = csinc
+csetm		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>	# = csinv
+csinc		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
+csinv		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
+csneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
+
+dc		:	1	10		10101 00		0 01 op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
+
+dcps1		:	1	10		10100 101			imm16<16>				00001
+dcps2		:	1	10		10100 101			imm16<16>				00010
+dcps3		:	1	10		10100 101			imm16<16>				00011
+
+dmb		:	1	10		10101 00		0 00 011	0011	CRm<4>	101		11111
+dsb		:	1	10		10101 00		0 00 011	0011	CRm<4>	100		11111
+
+drps		:	1	10		10110 10		1 11 111	0000	00	11111		00000
+eret		:	1	10		10110 10		0 11 111	0000	00	11111		00000
+
+eon_shiftreg	:	sf<1>	10		01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+eor_imm		:	sf<1>	10		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+eor_shiftreg	:	sf<1>	10		01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+extr		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imms<6>			Rn<5>	Rd<5>
+
+hint		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =nop
+
+hlt		:	1	10		10100 010			imm16<16>				00000
+hvc		:	1	10		10100 000			imm16<16>				00010
+
+ic		:	1	10		10101 00		0 01 op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>	# = dc
+
+isb		:	1	10		10101 00		0 00 011	0011	CRm<4>	110		11111
+
+ldar		:	1 size<1> 0		01000 11		0 11 111	1	11111		Rn<5>	Rt<5>
+ldarb		:	0 0 0			01000 11		0 11 111	1	11111		Rn<5>	Rt<5>
+ldarh		:	0 1 0			01000 11		0 11 111	1	11111		Rn<5>	Rt<5>
+ldaxp		:	1 size<1> 0		01000 01		1 11 111	1	Rt2<5>		Rn<5>	Rt<5>
+ldaxr		:	1 size<1> 0		01000 01		0 11 111	1	11111		Rn<5>	Rt<5>
+ldaxb		:	0 0 0			01000 01		0 11 111	1	11111		Rn<5>	Rt<5>
+ldaxh		:	0 1 0			01000 01		0 11 111	1	11111		Rn<5>	Rt<5>
+
+ldnp		:	sf<1>	01		01000 01			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+
+ldp_postidx	:	sf<1>	01		01000 11			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+ldp_preidx	:	sf<1>	01		01001 11			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+ldp_signed	:	sf<1>	01		01001 01			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+
+ldpsw_postidx	:	0	11		01000 11			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+ldpsw_preidx	:	0	11		01001 11			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+ldpsw_signed	:	0	11		01001 01			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+ldr_immpostidx	:	1 size<1>	111 0 00 01			0 imm9<9> 01			Rn<5>	Rt<5>
+ldr_immpreidx	:	1 size<1>	111 0 00 01			0 imm9<9> 11			Rn<5>	Rt<5>
+ldr_immunsign	:	1 size<1>	111 0 01 01			imm12<12>			Rn<5>	Rt<5>
+ldr_literal	:	0 size<1>	011 0 00		imm19<19>						Rt<5>
+ldr_reg		:	1 size<1>	111 0 00 01 1		Rm<5>			option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldrb_immpostidx	:	0 0		1	11000 01			0 imm9<9> 01			Rn<5>	Rt<5>
+ldrb_immpreidx	:	0 0		1	11000 01			0 imm9<9> 11			Rn<5>	Rt<5>
+ldrb_immunsign	:	0 0		1	11001 01			imm12<12>			Rn<5>	Rt<5>
+ldrb_reg	:	0 0		1	11000 01	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldrh_immpostidx	:	0 1		1	11000 01			0 imm9<9> 01			Rn<5>	Rt<5>
+ldrh_immpreidx	:	0 1		1	11000 01			0 imm9<9> 11			Rn<5>	Rt<5>
+ldrh_immunsign	:	0 1		1	11001 01			imm12<12>			Rn<5>	Rt<5>
+ldrh_reg	:	0 1		1	11000 01	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldrsb_immpostidx:	0 0		1	11000 1 opc<1>			0 imm9<9> 01			Rn<5>	Rt<5>
+ldrsb_immpreidx	:	0 0		1	11000 1 opc<1>			0 imm9<9> 11			Rn<5>	Rt<5>
+ldrsb_immunsign	:	0 0		1	11001 1 opc<1>			imm12<12>			Rn<5>	Rt<5>
+ldrsb_reg	:	0 0		1	11000 1 opc<1>	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldrsh_immpostidx:	0 1		1	11000 1 opc<1>			0 imm9<9> 01			Rn<5>	Rt<5>
+ldrsh_immpreidx	:	0 1		1	11000 1 opc<1>			0 imm9<9> 11			Rn<5>	Rt<5>
+ldrsh_immunsign	:	0 1		1	11001 1 opc<1>			imm12<12>			Rn<5>	Rt<5>
+ldrsh_reg	:	0 1		1	11000 1 opc<1>	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldrsw_immpostidx:	1 0		1	11000 10			0 imm9<9> 01			Rn<5>	Rt<5>
+ldrsw_immpreidx	:	1 0		1	11000 10			0 imm9<9> 11			Rn<5>	Rt<5>
+ldrsw_immunsign	:	1 0		1	11001 10			imm12<12>			Rn<5>	Rt<5>
+ldrsw_literal	:	1 0		0	11000		imm19<19>						Rt<5>
+ldrsw_reg	:	1 0		1	11000 10	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+ldtr		:	1 size<1>	1	11000 01			0 imm9<9> 10			Rn<5>	Rt<5>
+ldtrb		:	0 0		1	11000 01			0 imm9<9> 10			Rn<5>	Rt<5>
+ldtrh		:	0 1		1	11000 01			0 imm9<9> 10			Rn<5>	Rt<5>
+
+ldtrsb		:	0 0		1	11000 1 opc<1>			0 imm9<9> 10			Rn<5>	Rt<5>
+ldtrsh		:	0 1		1	11000 1 opc<1>			0 imm9<9> 10			Rn<5>	Rt<5>
+ldtrsw		:	1 0		1	11000 1 0			0 imm9<9> 10			Rn<5>	Rt<5>
+
+ldur		:	1 size<1>	1	11000 0 1			0 imm9<9> 00			Rn<5>	Rt<5>
+ldurb		:	0 0		1	11000 0 1			0 imm9<9> 00			Rn<5>	Rt<5>
+ldurh		:	0 1		1	11000 0 1			0 imm9<9> 00			Rn<5>	Rt<5>
+
+ldursb		:	0 0		1	11000 1 opc<1>			0 imm9<9> 00			Rn<5>	Rt<5>
+ldursh		:	0 1		1	11000 1 opc<1>			0 imm9<9> 00			Rn<5>	Rt<5>
+ldursw		:	1 0		1	11000 1 0			0 imm9<9> 00			Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+ldxp		:	1 size<1>	0	01000 0 1			1 11111 0	Rt2<5>		Rn<5>	Rt<5>
+ldxr		:	1 size<1>	0	01000 0 1			0 11111 0	11111		Rn<5>	Rt<5>
+
+ldxrb		:	0 0 		0	01000 0 1			0 11111 0	11111		Rn<5>	Rt<5>
+ldxrh		:	0 1 		0	01000 0 1			0 11111 0	11111		Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+lsl_reg		:	sf<1> 0		0	11010 1 1			0 Rm<5> 0	01000		Rn<5> Rd<5>
+lsl_imm		:	sf<1> 1		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm
+lslv		:	sf<1> 0		0	11010 1 1			0 Rm<5> 0	01000		Rn<5>	Rd<5>	# =lsl
+
+lsr_reg		:	sf<1> 0		0	11010 1 1			0 Rm<5> 0	01001		Rn<5>	Rd<5>
+lsr_imm		:	sf<1> 1		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm
+lsrv		:	sf<1> 0		0	11010 1 1			0 Rm<5> 0	01001		Rn<5>	Rd<5>
+
+
+madd		:	sf<1> 0		0	11011 0 0			0 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =mul
+mneg		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =msub
+
+
+mov_imm		:	sf<1> 0		0	10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# =add
+
+mov_iwimm	:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>
+mov_wimm	:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>
+mov_bmimm	:	sf<1> 0		1	10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+
+mov_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =orr
+
+movk		:	sf<1> 1		1	10010 1 hw<2>			imm16<16>				Rd<5>
+movn		:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>
+movz		:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+mrs		:	1	10		10101 00	0 0 o0<1> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
+msr_imm		:	1	10		10101 00	0 0 0     op1<3>	0100	CRm<4>	op2<3>		11111
+msr		:	1	10		10101 00	0 1 o0<1> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
+
+msub		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =mneg
+mul		:	sf<1> 0		0	11011 0 0			0 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =madd
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+mvn		:	sf<1> 0		1	01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =orn
+neg		:	sf<1> 1		0	01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =sub
+negs		:	sf<1> 1		1	01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =subs
+ngc		:	sf<1> 1		0	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =sbc
+ngcs		:	sf<1> 1		1	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =sbcs
+
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+nop		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+
+
+orn		:	sf<1> 0		1	01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mvn
+orr_imm		:	sf<1> 0		1	10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =mov(bmimm)
+orr_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mov(reg)
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+prfm_imm	:	11 111 001 10						imm12<12>			Rn<5>	Rd<5>
+prfm_literal	:	11 011 000						imm19<19>				Rt<5>
+prfm_reg	:	11 111 000 01	1				Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+prfum		:	11 111 000 10						0 imm9<9>	00		Rn<5>	Rt<5>
+
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+rbit		:	sf<1> 1 0	11010110	00000				0000	00		Rn<5>	Rd<5>
+ret		:	1101011 00 10 11111						000000			Rn<5>	00000
+
+rev		:	sf<1> 1 0	11010110	00000				0000	1 x<1>		Rn<5>	Rd<5>
+rev16		:	sf<1> 1 0	11010110	00000				0000	0 1		Rn<5>	Rd<5>
+rev32		:	1     1 0	11010110	00000				0000	1 0		Rn<5>	Rd<5>
+
+
+ror_imm		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =extr
+ror_reg		:	sf<1>	00		11010 1 1		0	Rm<5>	0010	11		Rn<5>	Rd<5>	# =rorv
+rorv		:	sf<1>	00		11010 1 1		0	Rm<5>	0010	11		Rn<5>	Rd<5>	# =ror(reg)
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+sbc		:	sf<1> 1		0	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngc
+sbcs		:	sf<1> 1		1	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngcs
+
+sbfiz		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =sbfm
+sbfm		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+sbfx		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+sdiv		:	sf<1> 0		0	11010 11		0	Rm<5>	0000	11		Rn<5>	Rd<5>
+
+sev		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+sevl		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+
+smaddl		:	1	0	0	11011 0 0			1 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =smull
+
+
+smc		:	1	10		10100 000			imm16<16>				00011
+
+smnegl		:	1	0	0	11011 0 0			1 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =smsubl
+smsubl		:	1	0	0	11011 0 0			1 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =smnegl
+
+smulh		:	1	0	0	11011 0 1			0 Rm<5> 0	11111		Rn<5>	Rd<5>	# =smnegl
+smull		:	1	0	0	11011 0 0			1 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =smaddl
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+stlr		:	1 size<1>	0	01000 10		0 11 111	1	11111		Rn<5>	Rt<5>
+stlrb		:	0 0		0	01000 10		0 11 111	1	11111		Rn<5>	Rt<5>
+stlrh		:	0 0		0	01000 10		0 11 111	1	11111		Rn<5>	Rt<5>
+
+stlxp		:	1 size<1>	0	01000 00		1	Rs<5>	1	Rt2<5>		Rn<5>	Rt<5>
+stlxr		:	1 size<1>	0	01000 00		0	Rs<5>	1	11111		Rn<5>	Rt<5>
+stlxrb		:	0 0		0	01000 00		0	Rs<5>	1	11111		Rn<5>	Rt<5>
+stlxrh		:	0 1		0	01000 00		0	Rs<5>	1	11111		Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+stnp		:	sf<1> 0 101 0 000 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+stp_postidx	:	sf<1> 0 101 0 001 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+stp_preidx	:	sf<1> 0 101 0 011 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+stp_signed	:	sf<1> 0 101 0 010 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+
+str_postidx	:	1 size<1>	111 0 00 00			0 imm9<9> 01			Rn<5>	Rt<5>
+str_preidx	:	1 size<1>	111 0 00 00			0 imm9<9> 11			Rn<5>	Rt<5>
+str_immunsign	:	1 size<1>	111 0 01 00			imm12<12>			Rn<5>	Rt<5>
+str_reg		:	1 size<1>	111 0 00 00		1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+strb_postidx	:	0 0		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
+strb_preidx	:	0 0		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
+strb_immunsign	:	0 0		1	11001 00			imm12<12>			Rn<5>	Rt<5>
+strb_reg	:	0 0		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+strh_imm	:	0 1		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
+strh_immpreidx	:	0 1		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
+strh_immunsign	:	0 1		1	11001 00			imm12<12>			Rn<5>	Rt<5>
+strh_reg	:	0 1		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+
+sttr		:	1 size<1>	1	11000 00			0 imm9<9> 10			Rn<5>	Rt<5>
+sttrb		:	0 0		1	11000 00			0 imm9<9> 10			Rn<5>	Rt<5>
+sttrh		:	0 1		1	11000 00			0 imm9<9> 10			Rn<5>	Rt<5>
+
+stur		:	1 size<1>	1	11000 00			0 imm9<9> 00			Rn<5>	Rt<5>
+sturb		:	0 0		1	11000 00			0 imm9<9> 00			Rn<5>	Rt<5>
+sturh		:	0 1		1	11000 00			0 imm9<9> 00			Rn<5>	Rt<5>
+
+stxp		:	1 size<1>	0	01000 00			1 Rs<5> 0	Rt2<5>		Rn<5>	Rt<5>
+stxr		:	1 size<1>	0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
+stxrb		:	0 0		0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
+stxrh		:	0 1		0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+sub_extreg	:	sf<1>	10		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+sub_imm		:	sf<1>	10		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+sub_shiftreg	:	sf<1>	10		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+subs_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+subs_imm	:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
+subs_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+svc		:	1	10		10100 000			imm16<16>				00001
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+sxtb		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+sxth		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+sxtw		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+sys		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+sysl		:	1	10		10101 00	1 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+tbnz		:	b5<1>	01		10111 b4<5>			imm14<14>				Rt<5>
+tbz		:	b5<1>	01		10110 b4<5>			imm14<14>				Rt<5>
+
+tlbi		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+tst_imm		:	sf<1>	11		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
+tst_shiftreg	:	sf<1>	11		01010 shift<2> 0	Rm<5>		imm6<6>			Rn<5>	Rd<5>
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+ubfiz		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
+ubfm		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
+ubfx		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+udiv		:	sf<1>	00		11010 11	0		Rm<5>	00001	0		Rn<5>	Rd<5>
+umaddl		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umull
+umnegl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl
+umsubl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl
+umulh		:	1	00		11011 11	0		Rm<5>	0	11111		Rn<5>	Rd<5>
+umull		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umaddl
+
+uxtb		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxth
+uxth		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxtb
+
+#--------------------------------------------------------------------------          16|15          -------------------------
+wfe		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+wfi		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+yield		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+

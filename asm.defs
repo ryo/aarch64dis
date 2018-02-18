@@ -215,7 +215,7 @@ movn		:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>
 movz		:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-mrs		:	1	10		10101 00	0 0 o0<1> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
+mrs		:	1	10		10101 00	1 1 o0<1> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
 msr_imm		:	1	10		10101 00	0 0 0     op1<3>	0100	CRm<4>	op2<3>		11111
 msr		:	1	10		10101 00	0 1 o0<1> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
 
@@ -241,7 +241,7 @@ orr_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mov(reg)
 #--------------------------------------------------------------------------          16|15          -------------------------
 prfm_imm	:	11 111 001 10						imm12<12>			Rn<5>	Rd<5>
 prfm_literal	:	11 011 000						imm19<19>				Rt<5>
-prfm_reg	:	11 111 000 01	1				Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+prfm_reg	:	11 111 000 10	1				Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
 prfum		:	11 111 000 10						0 imm9<9>	00		Rn<5>	Rt<5>
 
 
@@ -302,17 +302,17 @@ stp_signed	:	sf<1> 0 101 0 010 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 
-str_postidx	:	1 size<1>	111 0 00 00			0 imm9<9> 01			Rn<5>	Rt<5>
-str_preidx	:	1 size<1>	111 0 00 00			0 imm9<9> 11			Rn<5>	Rt<5>
+str_immpostidx	:	1 size<1>	111 0 00 00			0 imm9<9> 01			Rn<5>	Rt<5>
+str_immpreidx	:	1 size<1>	111 0 00 00			0 imm9<9> 11			Rn<5>	Rt<5>
 str_immunsign	:	1 size<1>	111 0 01 00			imm12<12>			Rn<5>	Rt<5>
 str_reg		:	1 size<1>	111 0 00 00		1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
 
-strb_postidx	:	0 0		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
-strb_preidx	:	0 0		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
+strb_immpostidx	:	0 0		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
+strb_immpreidx	:	0 0		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
 strb_immunsign	:	0 0		1	11001 00			imm12<12>			Rn<5>	Rt<5>
 strb_reg	:	0 0		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
 
-strh_imm	:	0 1		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
+strh_immpostidx	:	0 1		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
 strh_immpreidx	:	0 1		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
 strh_immunsign	:	0 1		1	11001 00			imm12<12>			Rn<5>	Rt<5>
 strh_reg	:	0 1		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>

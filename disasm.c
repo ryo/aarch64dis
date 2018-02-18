@@ -77,9 +77,17 @@ static const char *conditioncode[16] = {
 	"hi", "ls", "ge", "lt", 
 	"gt", "le", "al", "nv"
 };
+#define COND(c)	conditioncode[(c) & 15]
+#define IVCOND(c)	conditioncode[((c) ^ 1) & 15]
 
-#define COND(c)	conditioncode[c & 15]
-#define IVCOND(c)	conditioncode[(c ^ 1) & 15]
+static const char *barrierop[16] = {
+	 "#0", "oshld", "oshst", "osh",
+	 "#4", "nshld", "nshst", "nsh",
+	 "#8", "ishld", "ishst", "ish",
+	"#12",    "ld",    "st",  "sy"
+};
+#define BARRIER(op)	barrierop[(op) & 15]
+
 
 static inline int64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
@@ -469,19 +477,27 @@ OPFUNC_DECL(op_cinv, sf, Rm, cond, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_clrex, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (CRm == 15) {
+		PRINTF("%12lx:\t%08x 	clrex\n", pc, insn);
+	} else {
+		PRINTF("%12lx:\t%08x 	clrex	#d\n", pc, insn, CRm);
+	}
 }
 
 static void
 OPFUNC_DECL(op_cls, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x 	cls	%s, %s\n", pc, insn,
+	    ZREGNAME(sf, Rd),
+	    ZREGNAME(sf, Rn));
 }
 
 static void
 OPFUNC_DECL(op_clz, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x 	clz	%s, %s\n", pc, insn,
+	    ZREGNAME(sf, Rd),
+	    ZREGNAME(sf, Rn));
 }
 
 static void
@@ -624,7 +640,7 @@ OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_dmb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x 	dmb	%s\n", pc, insn, BARRIER(CRm));
 }
 
 static void
@@ -636,7 +652,7 @@ OPFUNC_DECL(op_drps, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x 	dsb	%s\n", pc, insn, BARRIER(CRm));
 }
 
 static void
@@ -1343,7 +1359,9 @@ OPFUNC_DECL(op_prfum, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_rbit, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x 	rbit	%s, %s\n", pc, insn,
+	    ZREGNAME(sf, Rd),
+	    ZREGNAME(sf, Rn));
 }
 
 static void
@@ -1689,7 +1707,12 @@ OPFUNC_DECL(op_sysl, op1, CRn, CRm, op2, Rt, UNUSED5)
 static void
 OPFUNC_DECL(op_tbnz, b5, b4, imm14, Rt, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x 	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	uint64_t bit = (b5 << 4) + b4;
+
+	PRINTF("%12lx:\t%08x 	tbnz	%s, #%lu, %lx\n", pc, insn,
+	    ZREGNAME(b5, Rt),
+	    bit,
+	    SignExtend(14, imm14, 4) + pc);
 }
 
 static void

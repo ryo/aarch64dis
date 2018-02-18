@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <ctype.h>
+#include <stdbool.h>
 
 #include "disasm.h"
 
@@ -40,21 +42,86 @@ chomp(char *p)
 	return -1;
 }
 
+static bool
+ishex(char c)
+{
+	if (isdigit(c) ||
+	     (('a' <= c) && (c <= 'f')) ||
+	     (('A' <= c) && (c <= 'F')))
+		return true;
+	return false;
+}
+
+static char *
+fetch_hex(char *p, uint64_t *hex)
+{
+	char tmpbuf[1024];
+	char *d;
+
+	d = tmpbuf;
+	while (ishex(*p)) {
+		*d++ = *p++;
+	}
+	if (d == tmpbuf)
+		return NULL;
+
+	*d++ = '\0';
+
+	*hex = strtoul(tmpbuf, NULL, 16);
+	return p;
+}
+
 static void
 parse_disasm(char *p)
 {
 	uint64_t loc;
-	uint32_t insn;
+	uint64_t insn;
 	char *origline;
 	char asmbuf[1024];
 
-	loc = strtol(p + 3, NULL, 16);
-	insn = strtol(p + 14, NULL, 16);
-	origline = p + 24;
+	origline = p;
+
+	p = fetch_hex(p, &loc);
+	if (p == NULL) {
+		printf("ERROR: fetch addr: %s\n", origline);
+		return;
+	}
+
+	if (*p != ':') {
+		printf("ERROR: skip colon: %s\n", origline);
+		return;
+	}
+	p++;
+
+	if (*p != '\t') {
+		printf("ERROR: skip tab: %s\n", origline);
+		return;
+	}
+	p++;
+
+	p = fetch_hex(p, &insn);
+	if (p == NULL) {
+		printf("ERROR: fetch insn: %s\n", origline);
+		return;
+	}
+
+	if (*p != ' ') {
+		printf("ERROR: skip space: %s\n", origline);
+		return;
+	}
+	p++;
+
+	if (*p != '\t') {
+		printf("ERROR: skip tab: %s\n", origline);
+		return;
+	}
+	p++;
+
+	origline = p;
 
 	disasm(loc, &insn, asmbuf, sizeof(asmbuf));
 
-	printf("%lx:	%08x	%s\n", loc, insn, origline);
+	printf("%lx:	%08x	%s\n", loc, (uint32_t)insn, origline);
 	printf("%s", asmbuf);
 	printf("\n");
 }
@@ -63,20 +130,29 @@ int
 main(int argc, char *argv[])
 {
 	char buf[1024];
-	char *p;
+	char *p, *q, c;
 
 	while ((p = fgets(buf, sizeof(buf), stdin)) != NULL) {
+		bool disasmline = false;
 		chomp(p);
 
-		if ((strncmp(p, "   ", 3) == 0) &&
-		    (p[12] == ':') &&
-		    (p[13] == '\t') &&
-		    (p[22] == ' ') &&
-		    (p[23] == '\t')) {
+		while (*p == ' ')
+			p++;
 
+		c = *p;
+		if (ishex(c)) {
+			q = p;
+			while (ishex(*q))
+				q++;
+			if (*q == ':') {
+				disasmline = true;
+			}
+		}
+
+		if (disasmline) {
 			parse_disasm(p);
 		} else {
-			printf("%s\n", buf);
+			printf("#	%s\n", buf);
 		}
 	}
 }

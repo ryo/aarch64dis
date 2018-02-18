@@ -1257,7 +1257,7 @@ OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 		    ZeroExtend(16, ~imm16, 1) & mask);
 	} else {
 		const int shift = hw * 16;
-		PRINTF("%12lx:\t%08x	movw	%s, #0x%lx, lsl #%d\n", pc, insn,
+		PRINTF("%12lx:\t%08x	movn	%s, #0x%lx, lsl #%d\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, ~imm16, 1) & mask, shift);
 	}

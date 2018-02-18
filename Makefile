@@ -58,3 +58,6 @@ cleandir: clean
 
 test:
 	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/work.evbarm64-el/tree/sbin/init | ./disasm_test | less -r
+
+testn:
+	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | less -r

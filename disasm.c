@@ -541,6 +541,18 @@ OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
 			    imm6);
 		}
+	} else if (Rn == 31) {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x	negs	%s, %s\n", pc, insn,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x	negs	%s, %s, %s #%lu\n", pc, insn,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rm),
+			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
+			    imm6);
+		}
 	} else {
 		if (imm6 == 0) {
 			PRINTF("%12lx:\t%08x	subs	%s, %s, %s\n", pc, insn,

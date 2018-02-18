@@ -101,7 +101,7 @@
 	{ {31, 1}, {22, 2}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0} }
 #define FMT_SF_IMM19_RT			\
 	{ {31, 1}, { 5,19}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0} }
-#define FMT_B5_B4_IMM14_RT		\
+#define FMT_B5_B40_IMM14_RT		\
 	{ {31, 1}, {19, 5}, { 5,14}, { 0, 5}, { 0, 0}, { 0, 0} }
 
 struct aarch64_insn_info insn_tables[] = {
@@ -301,8 +301,8 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7f000000, 0x34000000, FMT_SF_IMM19_RT,                op_cbz },
  { 0x7f000000, 0x71000000, FMT_SF_SHIFT_IMM12_RN_RD,       op_cmp_imm },
  { 0x7f000000, 0x51000000, FMT_SF_SHIFT_IMM12_RN_RD,       op_sub_imm },
- { 0x7f000000, 0x37000000, FMT_B5_B4_IMM14_RT,             op_tbnz },
- { 0x7f000000, 0x36000000, FMT_B5_B4_IMM14_RT,             op_tbz },
+ { 0x7f000000, 0x37000000, FMT_B5_B40_IMM14_RT,            op_tbnz },
+ { 0x7f000000, 0x36000000, FMT_B5_B40_IMM14_RT,            op_tbz },
  { 0x00000000, 0x00000000, FMT_NOARG,                      op_undefined }
 };
 

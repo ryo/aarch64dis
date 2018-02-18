@@ -71,7 +71,7 @@ fetch_hex(char *p, uint64_t *hex)
 	return p;
 }
 
-static void
+static bool
 parse_disasm(char *p)
 {
 	uint64_t loc;
@@ -83,37 +83,37 @@ parse_disasm(char *p)
 
 	p = fetch_hex(p, &loc);
 	if (p == NULL) {
-		printf("ERROR: fetch addr: %s\n", origline);
-		return;
+		printf("ERROR: fetch addr: \"%s\"\n", origline);
+		return false;
 	}
 
 	if (*p != ':') {
-		printf("ERROR: skip colon: %s\n", origline);
-		return;
+		printf("ERROR: skip colon: \"%s\"\n", origline);
+		return false;
 	}
 	p++;
 
 	if (*p != '\t') {
-		printf("ERROR: skip tab: %s\n", origline);
-		return;
+		printf("ERROR: skip tab: \"%s\"\n", origline);
+		return false;
 	}
 	p++;
 
 	p = fetch_hex(p, &insn);
 	if (p == NULL) {
-		printf("ERROR: fetch insn: %s\n", origline);
-		return;
+		printf("ERROR: fetch insn: \"%s\"\n", origline);
+		return false;
 	}
 
 	if (*p != ' ') {
-		printf("ERROR: skip space: %s\n", origline);
-		return;
+		printf("ERROR: skip space: \"%s\"\n", origline);
+		return false;
 	}
 	p++;
 
 	if (*p != '\t') {
-		printf("ERROR: skip tab: %s\n", origline);
-		return;
+		printf("ERROR: skip tab: \"%s\"\n", origline);
+		return false;
 	}
 	p++;
 
@@ -121,9 +121,10 @@ parse_disasm(char *p)
 
 	disasm(loc, &insn, asmbuf, sizeof(asmbuf));
 
-	printf("%lx:	%08x	%s\n", loc, (uint32_t)insn, origline);
+	printf("   %lx:	%08x	%s\n", loc, (uint32_t)insn, origline);
 	printf("%s", asmbuf);
 	printf("\n");
+	return true;
 }
 
 int
@@ -149,10 +150,11 @@ main(int argc, char *argv[])
 			}
 		}
 
-		if (disasmline) {
-			parse_disasm(p);
-		} else {
+		if (disasmline)
+			disasmline = parse_disasm(p);
+
+		if (!disasmline)
 			printf("#	%s\n", buf);
-		}
+
 	}
 }

@@ -72,7 +72,7 @@ static const char *s_xregs[32] = {
 #define SREGNAME(s, n)	((s == 0) ? s_wregs[(n) & 31] : s_xregs[(n) & 31])
 
 static const char *conditioncode[16] = {
-	"eq", "ne", "hs", "lo",
+	"eq", "ne", "cs", "cc",
 	"mi", "pl", "vs", "vc", 
 	"hi", "ls", "ge", "lt", 
 	"gt", "le", "al", "nv"

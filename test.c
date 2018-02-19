@@ -76,10 +76,11 @@ parse_disasm(char *p)
 {
 	uint64_t loc;
 	uint64_t insn;
-	size_t len;
 	char *origline;
 	char origbuf[1024];
+	char origbuf_cmp[1024];
 	char asmbuf[1024];
+	char asmbuf_cmp[1024];
 
 	origline = p;
 
@@ -122,17 +123,31 @@ parse_disasm(char *p)
 	origline = p;
 
 	disasm(loc, &insn, asmbuf, sizeof(asmbuf));
-
 	snprintf(origbuf, sizeof(origbuf), "%12lx:	%08x	%s", loc, (uint32_t)insn, origline);
+	strncpy(asmbuf_cmp, asmbuf, sizeof(asmbuf_cmp));
+	strncpy(origbuf_cmp, origbuf, sizeof(origbuf_cmp));
 
-	len = strlen(asmbuf) - 1;
-	if (strncmp(origbuf, asmbuf, len) == 0) {
+	/* cut " <symbol...>" */
+	p = strstr(origbuf_cmp, " <");
+	if (p != NULL)
+		*p = '\0';
+
+	/* cut "\t# comment" */
+	chomp(asmbuf_cmp);
+	p = strstr(asmbuf_cmp, "\t#");
+	if (p != NULL)
+		*p = '\0';
+
+	if (strcmp(origbuf_cmp, asmbuf_cmp) == 0) {
+#if 1
 		printf("%s\n", origbuf);
 		printf("%s\n", asmbuf);
+#endif
 	} else {
 		printf("ORIG	%s\n", origbuf);
 		printf("ERR?	%s\n", asmbuf);
 	}
+
 	return true;
 }
 

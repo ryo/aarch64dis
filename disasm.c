@@ -2211,13 +2211,6 @@ OPFUNC_DECL(op_umulh, Rm, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 	    ZREGNAME(1, Rm));
 }
 
-//static void
-//OPFUNC_DECL(op_uxtb, immr, imms, Rn, Rd, UNUSED4, UNUSED5)
-//{
-//	/* ALIAS: uxth */
-//	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
-//}
-
 #include "table.h"
 
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))

@@ -104,8 +104,8 @@ static const char *conditioncode[16] = {
 	"hi", "ls", "ge", "lt", 
 	"gt", "le", "al", "nv"
 };
-#define COND(c)	conditioncode[(c) & 15]
-#define IVCOND(c)	conditioncode[((c) ^ 1) & 15]
+#define CONDNAME(c)	conditioncode[(c) & 15]
+#define IVCONDNAME(c)	conditioncode[((c) ^ 1) & 15]
 
 static const char *barrierop[16] = {
 	 "#0", "oshld", "oshst", "osh",
@@ -113,7 +113,7 @@ static const char *barrierop[16] = {
 	 "#8", "ishld", "ishst", "ish",
 	"#12",    "ld",    "st",  "sy"
 };
-#define BARRIER(op)	barrierop[(op) & 15]
+#define BARRIERNAME(op)	barrierop[(op) & 15]
 
 static const char *prefetchop[32] = {
 	"pldl1keep", "pldl1strm", "pldl2keep", "pldl2strm",
@@ -125,7 +125,7 @@ static const char *prefetchop[32] = {
 	      "#24",       "#25",       "#26",       "#27",
 	      "#28",       "#29",       "#30",       "#31"
 };
-#define PREFETCH(op)	prefetchop[(op) & 31]
+#define PREFETCHNAME(op)	prefetchop[(op) & 31]
 
 static int64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
@@ -446,7 +446,7 @@ static void
 OPFUNC_DECL(op_b_cond, imm19, cond, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	PRINTF("%12lx:\t%08x	b.%s	%lx\n", pc, insn,
-	    COND(cond),
+	    CONDNAME(cond),
 	    SignExtend(19, imm19, 4) + pc);
 }
 
@@ -520,7 +520,7 @@ OPFUNC_DECL(op_ccmn_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
 	    ZREGNAME(sf, Rn),
 	    imm5,
 	    nzcv,
-	    COND(cond));
+	    CONDNAME(cond));
 }
 
 static void
@@ -530,7 +530,7 @@ OPFUNC_DECL(op_ccmn_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
 	    ZREGNAME(sf, Rn),
 	    ZREGNAME(sf, Rm),
 	    nzcv,
-	    COND(cond));
+	    CONDNAME(cond));
 }
 
 static void
@@ -540,7 +540,7 @@ OPFUNC_DECL(op_ccmp_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
 	    ZREGNAME(sf, Rn),
 	    imm5,
 	    nzcv,
-	    COND(cond));
+	    CONDNAME(cond));
 }
 
 static void
@@ -550,7 +550,7 @@ OPFUNC_DECL(op_ccmp_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
 	    ZREGNAME(sf, Rn),
 	    ZREGNAME(sf, Rm),
 	    nzcv,
-	    COND(cond));
+	    CONDNAME(cond));
 }
 
 static void
@@ -561,17 +561,17 @@ OPFUNC_DECL(op_cinc, sf, Rm, cond, Rn, Rd, UNUSED5)
 		PRINTF("%12lx:\t%08x	cinc	%s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    IVCOND(cond));
+		    IVCONDNAME(cond));
 	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
 		PRINTF("%12lx:\t%08x	cset	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    IVCOND(cond));
+		    IVCONDNAME(cond));
 	} else {
 		PRINTF("%12lx:\t%08x	csinc	%s, %s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    ZREGNAME(sf, Rm),
-		    COND(cond));
+		    CONDNAME(cond));
 	}
 }
 
@@ -583,17 +583,17 @@ OPFUNC_DECL(op_cinv, sf, Rm, cond, Rn, Rd, UNUSED5)
 		PRINTF("%12lx:\t%08x	cinv	%s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    IVCOND(cond));
+		    IVCONDNAME(cond));
 	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
 		PRINTF("%12lx:\t%08x	csetm	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    IVCOND(cond));
+		    IVCONDNAME(cond));
 	} else {
 		PRINTF("%12lx:\t%08x	csinv	%s, %s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    ZREGNAME(sf, Rm),
-		    COND(cond));
+		    CONDNAME(cond));
 	}
 }
 
@@ -701,13 +701,13 @@ OPFUNC_DECL(op_cneg, sf, Rm, cond, Rn, Rd, UNUSED5)
 		PRINTF("%12lx:\t%08x	cneg	%s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    IVCOND(cond));
+		    IVCONDNAME(cond));
 	} else {
 		PRINTF("%12lx:\t%08x	csneg	%s, %s, %s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    ZREGNAME(sf, Rm),
-		    COND(cond));
+		    CONDNAME(cond));
 	}
 }
 
@@ -766,7 +766,7 @@ OPFUNC_DECL(op_csel, sf, Rm, cond, Rn, Rd, UNUSED5)
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
 	    ZREGNAME(sf, Rm),
-	    COND(cond));
+	    CONDNAME(cond));
 }
 
 static void
@@ -805,7 +805,7 @@ OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_dmb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	dmb	%s\n", pc, insn, BARRIER(CRm));
+	PRINTF("%12lx:\t%08x	dmb	%s\n", pc, insn, BARRIERNAME(CRm));
 }
 
 static void
@@ -817,7 +817,7 @@ OPFUNC_DECL(op_drps, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	dsb	%s\n", pc, insn, BARRIER(CRm));
+	PRINTF("%12lx:\t%08x	dsb	%s\n", pc, insn, BARRIERNAME(CRm));
 }
 
 static void
@@ -1678,11 +1678,11 @@ OPFUNC_DECL(op_prfm_imm, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
 	if (imm12 == 0) {
 		PRINTF("%12lx:\t%08x	prfm	%s, [%s]\n", pc, insn,
-		    PREFETCH(Rt),
+		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn));
 	} else {
 		PRINTF("%12lx:\t%08x	prfm	%s, [%s,#%ld]\n", pc, insn,
-		    PREFETCH(Rt),
+		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm12, 8));
 	}
@@ -1692,7 +1692,7 @@ static void
 OPFUNC_DECL(op_prfm_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	PRINTF("%12lx:\t%08x	prfm	%s, %lx\n", pc, insn,
-	    PREFETCH(Rt),
+	    PREFETCHNAME(Rt),
 	    SignExtend(19, imm19, 4) + pc);
 }
 
@@ -1707,11 +1707,11 @@ OPFUNC_DECL(op_prfum, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
 	if (imm9 == 0) {
 		PRINTF("%12lx:\t%08x	prfum	%s, [%s]\n", pc, insn,
-		    PREFETCH(Rt),
+		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn));
 	} else {
 		PRINTF("%12lx:\t%08x	prfum	%s, [%s,#%ld]\n", pc, insn,
-		    PREFETCH(Rt),
+		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}

@@ -33,8 +33,6 @@
 	{ {15, 7}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_IMM12_RN_RT			\
 	{ {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0} }
-#define FMT_IMM12_RN_RD			\
-	{ {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0} }
 #define FMT_IMMR_IMMS_RN_RD		\
 	{ {16, 6}, {10, 6}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_OPC_IMM9_RN_RT		\
@@ -181,7 +179,7 @@ struct aarch64_insn_info insn_tables[] = {
  { 0xffc00000, 0x39400000, FMT_IMM12_RN_RT,                op_ldrb_immunsign },
  { 0xffc00000, 0x79400000, FMT_IMM12_RN_RT,                op_ldrh_immunsign },
  { 0xffc00000, 0xb9800000, FMT_IMM12_RN_RT,                op_ldrsw_immunsign },
- { 0xffc00000, 0xf9800000, FMT_IMM12_RN_RD,                op_prfm_imm },
+ { 0xffc00000, 0xf9800000, FMT_IMM12_RN_RT,                op_prfm_imm },
  { 0xffc00000, 0x39000000, FMT_IMM12_RN_RT,                op_strb_immunsign },
  { 0xffc00000, 0x79000000, FMT_IMM12_RN_RT,                op_strh_immunsign },
  { 0xffc00000, 0x53000000, FMT_IMMR_IMMS_RN_RD,            op_uxtb },

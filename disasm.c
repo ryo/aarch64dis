@@ -942,7 +942,7 @@ OPFUNC_DECL(op_ldrh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 	PRINTF("%12lx:\t%08x	ldrh	%s, [%s],#%ld\n", pc, insn,
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
-	    SignExtend(9, imm9, 2));
+	    SignExtend(9, imm9, 1));
 }
 
 static void
@@ -1629,7 +1629,7 @@ OPFUNC_DECL(op_strh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 	PRINTF("%12lx:\t%08x	strh	%s, [%s],#%ld\n", pc, insn,
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
-	    SignExtend(9, imm9, 2));
+	    SignExtend(9, imm9, 1));
 }
 
 static void

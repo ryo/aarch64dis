@@ -34,8 +34,6 @@
 
 #include "disasm.h"
 
-struct aarch64_insn_info;
-
 static int test_printf(char const *fmt, ...);
 #define PRINTF	test_printf
 
@@ -45,7 +43,7 @@ func(uint64_t pc, uint32_t insn,		\
      uint64_t a, uint64_t b, uint64_t c,	\
      uint64_t d, uint64_t e, uint64_t f)
 
-struct bitinfo {
+struct bitpos {
 	uint8_t pos;
 	uint8_t width;
 };
@@ -54,7 +52,7 @@ struct aarch64_insn_info {
 	uint32_t mask;
 	uint32_t code;
 #define INSN_MAXARG	6
-	struct bitinfo bitinfo[INSN_MAXARG];
+	struct bitpos bitinfo[INSN_MAXARG];
 	OPFUNC_DECL(void (*opfunc),,,,,,);
 };
 

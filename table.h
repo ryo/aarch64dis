@@ -33,8 +33,6 @@
 	{ {15, 7}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_IMM12_RN_RT			\
 	{ {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0} }
-#define FMT_IMMR_IMMS_RN_RD		\
-	{ {16, 6}, {10, 6}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_OPC_IMM9_RN_RT		\
 	{ {22, 1}, {12, 9}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_OPC_RM_OPTION_SHIFT_RN_RT	\
@@ -182,7 +180,6 @@ struct aarch64_insn_info insn_tables[] = {
  { 0xffc00000, 0xf9800000, FMT_IMM12_RN_RT,                op_prfm_imm },
  { 0xffc00000, 0x39000000, FMT_IMM12_RN_RT,                op_strb_immunsign },
  { 0xffc00000, 0x79000000, FMT_IMM12_RN_RT,                op_strh_immunsign },
- { 0xffc00000, 0x53000000, FMT_IMMR_IMMS_RN_RD,            op_uxtb },
  { 0xffa00c00, 0x38800400, FMT_OPC_IMM9_RN_RT,             op_ldrsb_immpostidx },
  { 0xffa00c00, 0x38800c00, FMT_OPC_IMM9_RN_RT,             op_ldrsb_immpreidx },
  { 0xffa00c00, 0x38a00800, FMT_OPC_RM_OPTION_SHIFT_RN_RT,  op_ldrsb_reg },

@@ -374,8 +374,8 @@ umsubl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl
 umulh		:	1	00		11011 11	0		Rm<5>	0	11111		Rn<5>	Rd<5>
 umull		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umaddl
 
-uxtb		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxth
-uxth		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxtb
+#uxtb		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxth=ubfm
+#uxth		:	0	10		10011 00		immr<6>		imms<6>			Rn<5>	Rd<5>	# =uxtb=ubfm
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 wfe		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint

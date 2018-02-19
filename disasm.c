@@ -176,8 +176,13 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 #define SHIFTOP2(s, op1, op2)		((const char *[]){ op1, op2 })[(s)]
 #define SHIFTOP4(s, op1, op2, op3, op4)	((const char *[]){ op1, op2, op3, op4 })[(s)]
 
+#if 1
 #define UNDEFINED(pc, insn, comment)	\
 	PRINTF("%12lx:\t%08x	.word	0x%08x	# \e[31m%s\e[m\n", pc, insn, insn, comment);
+#else
+#define UNDEFINED(pc, insn, comment)	\
+	PRINTF("%12lx:\t%08x	.word	0x%08x\n", pc, insn, insn);
+#endif
 
 
 static void
@@ -634,19 +639,34 @@ OPFUNC_DECL(op_csel, sf, Rm, cond, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_dcps1, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm16 == 0) {
+		PRINTF("%12lx:\t%08x	dpcs1\n", pc, insn);
+	} else {
+		PRINTF("%12lx:\t%08x	dpcs1	#0x%lx\n", pc, insn,
+		    imm16);
+	}
 }
 
 static void
 OPFUNC_DECL(op_dcps2, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm16 == 0) {
+		PRINTF("%12lx:\t%08x	dpcs2\n", pc, insn);
+	} else {
+		PRINTF("%12lx:\t%08x	dpcs2	#0x%lx\n", pc, insn,
+		    imm16);
+	}
 }
 
 static void
 OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (imm16 == 0) {
+		PRINTF("%12lx:\t%08x	dpcs3\n", pc, insn);
+	} else {
+		PRINTF("%12lx:\t%08x	dpcs3	#0x%lx\n", pc, insn,
+		    imm16);
+	}
 }
 
 static void
@@ -658,7 +678,7 @@ OPFUNC_DECL(op_dmb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_drps, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	drps\n", pc, insn);
 }
 
 static void
@@ -1743,7 +1763,8 @@ OPFUNC_DECL(op_sub_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_svc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	svc	#0x%lx\n", pc, insn,
+	    imm16);
 }
 
 static void

@@ -65,3 +65,6 @@ testn:
 testb:
 	aarch64--netbsd-objdump -Dr bin.o | ./disasm_test | less -r
 
+testc:
+	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/work.evbarm64-el/tree/lib/libc.so | ./disasm_test | less -r
+

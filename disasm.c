@@ -127,7 +127,7 @@ static const char *prefetchop[32] = {
 };
 #define PREFETCH(op)	prefetchop[(op) & 31]
 
-static inline int64_t
+static int64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 {
 	const uint64_t signbit = (1 << (bitwidth - 1));
@@ -138,14 +138,14 @@ SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 	return imm * multiply;
 }
 
-static inline uint64_t
+static uint64_t
 ZeroExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 {
 	return imm * multiply;
 }
 
-/* rotate right */
-static inline uint64_t
+/* rotate right. if n < 0, rotate left. */
+static uint64_t
 rotate(int bitwidth, uint64_t v, int n)
 {
 	n &= (bitwidth - 1);
@@ -205,7 +205,7 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 
 	result = rotate(bitwidth, (1ULL << (imms + 1)) - 1, immr);
 	while (esize < bitwidth) {
-		result |= (result << esize);
+		result |= (result >> esize);
 		esize <<= 1;
 	}
 	return (result & ((1UL << bitwidth) - 1));
@@ -1426,19 +1426,19 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 	}
 
 #if 0
-	/* indistinguishable from mov_iwimm...? */
+	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
+#else
+	/* same as objdump... */
+	(void)MoveWidePreferred;
+	if (Rn == 31) {
+#endif
 		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    DecodeBitMasks(sf, n, immr, imms));
-	} else
-#else
-	/* same as objdump */
-	(void)MoveWidePreferred;
-#endif
-	{
+	} else {
 		/* ALIAS: orr_imm */
-		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx\n", pc, insn,
+		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx	#XXX\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, immr, imms));

@@ -202,7 +202,7 @@ madd		:	sf<1> 0		0	11011 0 0			0 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =mul
 mneg		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =msub
 
 
-mov_imm		:	sf<1> 0		0	10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# =add
+mov_tofromsp	:	sf<1> 0		0	10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# =add
 
 mov_iwimm	:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>
 mov_wimm	:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>

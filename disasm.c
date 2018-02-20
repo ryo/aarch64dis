@@ -276,7 +276,7 @@ OPFUNC_DECL(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
 static void
 OPFUNC_DECL(op_add_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 {
-	/* ALIAS: mov_tofrom_sp */
+	/* ALIAS: mov_tofromsp */
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
 		return;

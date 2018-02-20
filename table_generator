@@ -56,6 +56,25 @@ for my $insn (@insns) {
 #print Dumper(\%fmts); exit;
 #print Dumper(\@insns); exit;
 
+if (0) {
+	# detect unintended
+	for my $target (@insns) {
+		my @alias;
+		for my $insn (@insns) {
+			my $target_code = $target->{code} & $target->{mask};
+			if (($insn->{code} & $insn->{mask}) == ($target_code & $insn->{mask})) {
+				if ($insn->{sym} ne $target->{sym}) {
+					push(@alias, $insn->{sym});
+				}
+			}
+		}
+		if ($#alias >= 0) {
+			printf("%s	is alias of %s\n", $target->{sym}, join(", ", @alias));
+		}
+	}
+	exit;
+}
+
 # main
 {
 	my %opcode_alias;

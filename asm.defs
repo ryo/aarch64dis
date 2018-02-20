@@ -15,7 +15,7 @@ adr		:	0	immlo<2>	10000 immhi<19>								Rd<5>
 adrp		:	1	immlo<2>	10000 immhi<19>								Rd<5>
 
 and_imm		:	sf<1>	00		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
-and_shiftreg	:	sf<1>	00		01010 shift<2> 0	Rm<5>		imms<6>			Rn<5>	Rd<5>
+and_shiftreg	:	sf<1>	00		01010 shift<2> 0	Rm<5>		imm6<6>			Rn<5>	Rd<5>
 
 ands_imm	:	sf<1>	11		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
 ands_shiftreg	:	sf<1>	11		01010 shift<2> 0	Rm<5>		imm6<6>			Rn<5>	Rd<5>

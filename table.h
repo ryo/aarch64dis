@@ -91,8 +91,6 @@
 	{ {31, 1}, {21, 2}, { 5,16}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_SF_SHIFT_RM_IMM6_RN_RD	\
 	{ {31, 1}, {22, 2}, {16, 5}, {10, 6}, { 5, 5}, { 0, 5} }
-#define FMT_SF_SHIFT_RM_IMMS_RN_RD	\
-	{ {31, 1}, {22, 2}, {16, 5}, {10, 6}, { 5, 5}, { 0, 5} }
 #define FMT_SF_SHIFT_IMM12_RN_RD	\
 	{ {31, 1}, {22, 2}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0} }
 #define FMT_SF_IMM19_RT			\
@@ -280,7 +278,7 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7f800000, 0x72800000, FMT_SF_HW_IMM16_RD,             op_movk },
  { 0x7f200000, 0x0b000000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_add_shiftreg },
  { 0x7f200000, 0x2b000000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_adds_shiftreg },
- { 0x7f200000, 0x0a000000, FMT_SF_SHIFT_RM_IMMS_RN_RD,     op_and_shiftreg },
+ { 0x7f200000, 0x0a000000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_and_shiftreg },
  { 0x7f200000, 0x6a000000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_ands_shiftreg },
  { 0x7f200000, 0x0a200000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_bic_shiftreg },
  { 0x7f200000, 0x6a200000, FMT_SF_SHIFT_RM_IMM6_RN_RD,     op_bics_shiftreg },

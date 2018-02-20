@@ -1528,12 +1528,12 @@ OPFUNC_DECL(op_lsl_imm, sf, n, immr, imms, Rn, Rd)
 		PRINTF("%12lx:\t%08x	lsl	%s, %s, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    imms);
+		    bitwidth - immr);
 	} else if (imms == (bitwidth - 1)) {
 		PRINTF("%12lx:\t%08x	lsr	%s, %s, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    imms);
+		    immr);
 	} else if (imms < immr) {
 		PRINTF("%12lx:\t%08x	ubfiz	%s, %s, #%lu, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),

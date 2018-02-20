@@ -238,6 +238,12 @@ BFXPreferred(uint64_t sf, uint64_t opc, uint64_t imms, uint64_t immr)
 #define SHIFTOP8(s, op1, op2, op3, op4, op5, op6, op7, op8)	\
 	((const char *[]){ op1, op2, op3, op4, op5, op6, op7, op8 })[(s) & 7]
 
+static const char *
+DecodeShift(uint64_t shift)
+{
+	return SHIFTOP4(shift, "lsl", "lsr", "asr", "ror");
+}
+
 #if 1
 #define UNDEFINED(pc, insn, comment)	\
 	PRINTF("%12lx:\t%08x	.word	0x%08x	# \e[31m%s\e[m\n", pc, insn, insn, comment);
@@ -303,6 +309,63 @@ extendreg_common(const char *op, const char *z_op,
 }
 
 static void
+shiftreg_common(const char *dnm_op, const char *dzm_op, const char *znm_op,
+                uint64_t pc, uint32_t insn, uint64_t sf, uint64_t shift,
+                uint64_t Rm, uint64_t imm6, uint64_t Rn, uint64_t Rd)
+{
+	if ((sf == 0) && (imm6 >= 32)) {
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if ((dzm_op != NULL) && (Rn == 31)) {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x	%s	%s, %s\n", pc, insn,
+			    dzm_op,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x	%s	%s, %s, %s #%lu\n", pc, insn,
+			    dzm_op,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rm),
+			    DecodeShift(shift),
+			    imm6);
+		}
+	} else if ((znm_op != NULL) && (Rd == 31)) {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x	%s	%s, %s\n", pc, insn,
+			    znm_op,
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x	%s	%s, %s, %s #%lu\n", pc, insn,
+			    znm_op,
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm),
+			    DecodeShift(shift),
+			    imm6);
+		}
+	} else {
+		if (imm6 == 0) {
+			PRINTF("%12lx:\t%08x	%s	%s, %s, %s\n", pc, insn,
+			    dnm_op,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm));
+		} else {
+			PRINTF("%12lx:\t%08x	%s	%s, %s, %s, %s #%lu\n", pc, insn,
+			    dnm_op,
+			    ZREGNAME(sf, Rd),
+			    ZREGNAME(sf, Rn),
+			    ZREGNAME(sf, Rm),
+			    DecodeShift(shift),
+			    imm6);
+		}
+	}
+}
+
+static void
 OPFUNC_DECL(op_undefined, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	UNDEFINED(pc, insn, "undefined");
@@ -350,14 +413,18 @@ OPFUNC_DECL(op_add_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 		    SREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
 		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
+		    SHIFTOP4(shift, "", ", lsl #12", "?", "?"));
 	}
 }
 
 static void
 OPFUNC_DECL(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if (shift == 3) {
+		UNDEFINED(pc, insn, "illegal shift");
+		return;
+	}
+	shiftreg_common("add", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -393,8 +460,12 @@ OPFUNC_DECL(op_adds_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
+	if (shift == 3) {
+		UNDEFINED(pc, insn, "illegal shift");
+		return;
+	}
 	/* ALIAS: cmn_shiftreg */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("adds", NULL, "cmn", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -432,9 +503,9 @@ OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imms, Rn, Rd)
+OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("and", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -462,7 +533,7 @@ static void
 OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("ands", NULL, "tst", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -568,13 +639,13 @@ OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("bic", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("bics", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -759,46 +830,13 @@ OPFUNC_DECL(op_cmp_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	/* ALIAS: negs,subs_shiftreg */
-	if (Rd == 31) {
-		if (imm6 == 0) {
-			PRINTF("%12lx:\t%08x	cmp	%s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	cmp	%s, %s, %s #%lu\n", pc, insn,
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
-			    imm6);
-		}
-	} else if (Rn == 31) {
-		if (imm6 == 0) {
-			PRINTF("%12lx:\t%08x	negs	%s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	negs	%s, %s, %s #%lu\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
-			    imm6);
-		}
-	} else {
-		if (imm6 == 0) {
-			PRINTF("%12lx:\t%08x	subs	%s, %s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	subs	%s, %s, %s, %s #%lu\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, "lsl", "lsr", "asr", ""),
-			    imm6);
-		}
+	if (shift == 3) {
+		UNDEFINED(pc, insn, "illegal shift");
+		return;
 	}
+
+	/* ALIAS: negs,subs_shiftreg */
+	shiftreg_common("subs", "negs", "cmp", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -931,7 +969,7 @@ OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("eon", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -951,7 +989,7 @@ OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("eor", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1634,19 +1672,7 @@ OPFUNC_DECL(op_mov_reg, sf, shift, Rm, imm6, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rm));
 	} else {
-		if (imm6 == 0) {
-			PRINTF("%12lx:\t%08x	orr	%s, %s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	orr	%s, %s, %s, %s #%lu\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, "lsl", "lsr", "asr", "ror"),
-			    imm6);
-		}
+		shiftreg_common("orr", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 	}
 }
 
@@ -1711,40 +1737,14 @@ static void
 OPFUNC_DECL(op_mvn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: orn */
-	if (Rn == 31) {
-		if (shift == 0) {
-			PRINTF("%12lx:\t%08x	mvn	%s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	mvn	%s, %s, %s #lu\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, ",lsl", ", lsr", ", asr", ", ror"),
-			    shift);
-		}
-	} else {
-		if (shift == 0) {
-			PRINTF("%12lx:\t%08x	orn	%s, %s, %s\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm));
-		} else {
-			PRINTF("%12lx:\t%08x	orn	%s, %s, %s, %s #lu\n", pc, insn,
-			    ZREGNAME(sf, Rd),
-			    ZREGNAME(sf, Rn),
-			    ZREGNAME(sf, Rm),
-			    SHIFTOP4(shift, ",lsl", ", lsr", ", asr", ", ror"),
-			    shift);
-		}
-	}
+	shiftreg_common("orn", "mvn", NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_neg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: sub_shiftreg */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	shiftreg_common("sub", "neg", NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void

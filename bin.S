@@ -10,27 +10,10 @@ knownbugs:
 
 
 testpattern:
-	ubfx	x0, x1, #0, #1
-	ubfx	x0, x1, #0, #2
-	ubfx	x0, x1, #0, #3
-	ubfx	x0, x1, #0, #4
-	ubfx	x0, x1, #0, #5
-	ubfx	x0, x1, #0, #6
-	ubfx	x0, x1, #0, #7
-	nop
-	ubfx	x0, x1, #1, #5
-	ubfx	x0, x1, #2, #5
-	ubfx	x0, x1, #3, #5
-	ubfx	x0, x1, #4, #5
-	ubfx	x0, x1, #5, #5
-	ubfx	x0, x1, #6, #5
-	ubfx	x0, x1, #7, #5
-	nop
-	nop
-	nop
-	uxtb	w0, w1
-	uxth	w2, w3
-
+	bfm	w2, w3, #10, #12
+	bfm	x0, x1, #3, #4
+	bfi	x1, x2, #3, #4
+	bfxil	x1, x2, #3, #4
 
 
 

@@ -410,8 +410,46 @@ OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 static void
 OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
 {
+	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
+
 	/* ALIAS: sbfiz,sbfm,sbfx,sxtb,sxth,sxtw */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	if ((imms != (bitwidth - 1)) && ((imms + 1) == immr)) {
+		PRINTF("%12lx:\t%08x	asr	%s, %s, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    imms);
+	} else if (imms == (bitwidth - 1)) {
+		PRINTF("%12lx:\t%08x	asr	%s, %s, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    imms);
+	} else if (imms < immr) {
+		PRINTF("%12lx:\t%08x	sbfiz	%s, %s, #%lu, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    (bitwidth - immr) & (bitwidth - 1),
+		    (imms + 1) & (bitwidth - 1));
+	} else if (BFXPreferred(sf, 1, imms, immr)) {
+		PRINTF("%12lx:\t%08x	sbfx	%s, %s, #%lu, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    immr,
+		    (imms -immr + 1) & (bitwidth - 1));
+	} else if ((immr == 0) && (imms == 7)) {
+		PRINTF("%12lx:\t%08x	sxtb	%s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn));
+	} else if ((immr == 0) && (imms == 15)) {
+		PRINTF("%12lx:\t%08x	sxth	%s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn));
+	} else if ((immr == 0) && (imms == 31)) {
+		PRINTF("%12lx:\t%08x	sxtw	%s, %s\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn));
+	} else {
+		UNDEFINED(pc, insn, "unknown");
+	}
 }
 
 static void
@@ -451,8 +489,23 @@ OPFUNC_DECL(op_b_cond, imm19, cond, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
 {
+	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
+
 	/* ALIAS: bfm,bfxil */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	/* it is not disassembled as bfm */
+	if (imms < immr) {
+		PRINTF("%12lx:\t%08x	bfi	%s, %s, #%lu, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    (bitwidth - immr) & (bitwidth - 1),
+		    (imms + 1) & (bitwidth - 1));
+	} else {
+		PRINTF("%12lx:\t%08x	bfxil	%s, %s, #%lu, #%lu\n", pc, insn,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    immr,
+		    (imms -immr + 1) & (bitwidth - 1));
+	}
 }
 
 static void

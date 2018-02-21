@@ -1397,7 +1397,37 @@ OPFUNC_DECL(op_ldr_literal, size, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	uint64_t r, amount;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if (shift == 0) {
+		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s%s]\n", pc, insn,
+		    PREFETCHNAME(Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+	} else {
+		amount = 2 + size;
+		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    PREFETCHNAME(Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    amount);
+	}
 }
 
 static void

@@ -132,11 +132,27 @@ parse_disasm(char *p)
 	if (p != NULL)
 		*p = '\0';
 
-	/* cut "\t# comment" */
+	/*
+	 * cut "\t# comment"
+	 */
 	chomp(asmbuf_cmp);
-	p = strstr(asmbuf_cmp, "\t#");
-	if (p != NULL)
-		*p = '\0';
+	p = asmbuf_cmp;
+	/* XXX: cannot remove comment from opcode only line. e.g. "nop	#comment" */
+	for (int i = 0; i < 3; i++) {
+		p = index(p, '\t');
+		if ((i != 2) && (p == NULL)) {
+			printf("ERROR: not found %dth tab after opcode: \"%s\"\n", i, origline);
+			return false;
+		}
+		if (p != NULL)
+			p += 1;
+	}
+	if (p != NULL) {
+		p = strstr(p + 1, "\t#");
+		if (p != NULL)
+			*p = '\0';
+	}
+
 
 	if (strcmp(origbuf_cmp, asmbuf_cmp) == 0) {
 #if 1

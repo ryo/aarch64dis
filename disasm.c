@@ -1457,18 +1457,6 @@ OPFUNC_DECL(op_ldarh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldaxb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
-{
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
-}
-
-static void
-OPFUNC_DECL(op_ldaxh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
-{
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
-}
-
-static void
 OPFUNC_DECL(op_ldaxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 {
 	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
@@ -1476,6 +1464,18 @@ OPFUNC_DECL(op_ldaxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 
 static void
 OPFUNC_DECL(op_ldaxr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+{
+	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+}
+
+static void
+OPFUNC_DECL(op_ldaxrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+{
+	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+}
+
+static void
+OPFUNC_DECL(op_ldaxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
 }

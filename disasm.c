@@ -429,6 +429,165 @@ shiftreg_common(const char *dnm_op, const char *dzm_op, const char *znm_op,
 }
 
 static void
+regoffset_b_common(const char *op,
+                   uint64_t pc, uint32_t insn,
+                   uint64_t Rm, uint64_t option, uint64_t shift,
+                   uint64_t Rn, uint64_t Rt)
+{
+	uint64_t r;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if (shift == 0) {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s%s]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+	} else {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    0);
+	}
+}
+
+static void
+regoffset_h_common(const char *op,
+                   uint64_t pc, uint32_t insn,
+                   uint64_t Rm, uint64_t option, uint64_t shift,
+                   uint64_t Rn, uint64_t Rt)
+{
+	uint64_t r;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if ((shift == 0) && (option == 3)) {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm));
+	} else {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    shift);
+	}
+}
+
+static void
+regoffset_w_common(const char *op,
+                   uint64_t pc, uint32_t insn,
+                   uint64_t Rm, uint64_t option, uint64_t shift,
+                   uint64_t Rn, uint64_t Rt)
+{
+	uint64_t r;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if ((shift == 0) && (option == 3)) {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm));
+	} else {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    op,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    shift * 2);
+	}
+}
+
+static void
+regoffset_x_common(const char *op,
+                   uint64_t pc, uint32_t insn,
+                   uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
+                   uint64_t Rn, uint64_t Rt)
+{
+	uint64_t r, amount;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if (shift == 0) {
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s%s]\n", pc, insn,
+		    op,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+	} else {
+		amount = 2 + size;
+		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    op,
+		    ZREGNAME(size, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    amount);
+	}
+}
+
+static void
 OPFUNC_DECL(op_undefined, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	UNDEFINED(pc, insn, "undefined");
@@ -1397,37 +1556,7 @@ OPFUNC_DECL(op_ldr_literal, size, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
-	uint64_t r, amount;
-
-	switch (option) {
-	case 2:
-	case 6:
-		r = 0;
-		break;
-	case 3:
-	case 7:
-		r = 1;
-		break;
-	default:
-		UNDEFINED(pc, insn, "illegal imm6");
-		return;
-	}
-
-	if (shift == 0) {
-		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s%s]\n", pc, insn,
-		    ZREGNAME(size, Rt),
-		    SREGNAME(1, Rn),
-		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
-	} else {
-		amount = 2 + size;
-		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s,%s #%lu]\n", pc, insn,
-		    ZREGNAME(size, Rt),
-		    SREGNAME(1, Rn),
-		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
-		    amount);
-	}
+	regoffset_x_common("ldr", pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1463,36 +1592,7 @@ OPFUNC_DECL(op_ldrb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrb_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	uint64_t r;
-
-	switch (option) {
-	case 2:
-	case 6:
-		r = 0;
-		break;
-	case 3:
-	case 7:
-		r = 1;
-		break;
-	default:
-		UNDEFINED(pc, insn, "illegal imm6");
-		return;
-	}
-
-	if (shift == 0) {
-		PRINTF("%12lx:\t%08x	ldrb	%s, [%s,%s%s]\n", pc, insn,
-		    ZREGNAME(0, Rt),
-		    SREGNAME(1, Rn),
-		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
-	} else {
-		PRINTF("%12lx:\t%08x	ldrb	%s, [%s,%s,%s #%lu]\n", pc, insn,
-		    ZREGNAME(0, Rt),
-		    SREGNAME(1, Rn),
-		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
-		    0);
-	}
+	regoffset_b_common("ldrb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1528,7 +1628,7 @@ OPFUNC_DECL(op_ldrh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrh_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_h_common("ldrh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1564,7 +1664,7 @@ OPFUNC_DECL(op_ldrsb_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_b_common("ldrsb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1600,7 +1700,7 @@ OPFUNC_DECL(op_ldrsh_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_h_common("ldrsh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1642,7 +1742,7 @@ OPFUNC_DECL(op_ldrsw_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrsw_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_w_common("ldrsw", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2345,7 +2445,7 @@ OPFUNC_DECL(op_str_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_x_common("str", pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2381,7 +2481,7 @@ OPFUNC_DECL(op_strb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_strb_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_b_common("strb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2417,7 +2517,7 @@ OPFUNC_DECL(op_strh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_strh_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	regoffset_h_common("strh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void

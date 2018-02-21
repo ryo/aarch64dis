@@ -652,11 +652,112 @@ OPFUNC_DECL(op_asr_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 	    ZREGNAME(sf, Rm));
 }
 
+struct op_sys_table {
+	uint32_t code;
+	int flags;
+#define OPE_NONE	0x00000000
+#define OPE_XT		0x00000001
+	const char *opname;
+};
+
+static struct op_sys_table op_sys_table[] = {
+	{ SYSREG_ENC(1, 0, 7,  1, 0), OPE_NONE,	"ic\tialluis"		},
+	{ SYSREG_ENC(1, 0, 7,  1, 0), OPE_NONE,	"ic\tialluis"		},
+	{ SYSREG_ENC(1, 0, 7,  5, 0), OPE_NONE,	"ic\tiallu"		},
+	{ SYSREG_ENC(1, 3, 7,  5, 1), OPE_XT,	"ic\tivau"		},
+	{ SYSREG_ENC(1, 0, 7,  6, 1), OPE_XT,	"dc\tivac"		},
+	{ SYSREG_ENC(1, 0, 7,  6, 2), OPE_XT,	"dc\tisw"		},
+	{ SYSREG_ENC(1, 0, 7, 10, 2), OPE_XT,	"dc\tcsw"		},
+	{ SYSREG_ENC(1, 0, 7, 14, 2), OPE_XT,	"dc\tcisw"		},
+	{ SYSREG_ENC(1, 3, 7, 10, 1), OPE_XT,	"dc\tcvac"		},
+	{ SYSREG_ENC(1, 3, 7, 11, 1), OPE_XT,	"dc\tcvau"		},
+	{ SYSREG_ENC(1, 3, 7, 14, 1), OPE_XT,	"dc\tcivac"		},
+	{ SYSREG_ENC(1, 3, 7,  4, 1), OPE_XT,	"dc\tzva"		},
+	{ SYSREG_ENC(1, 0, 7,  8, 0), OPE_XT,	"at\ts1e1r"		},
+	{ SYSREG_ENC(1, 0, 7,  8, 1), OPE_XT,	"at\ts1e1w"		},
+	{ SYSREG_ENC(1, 0, 7,  8, 2), OPE_XT,	"at\ts1e0r"		},
+	{ SYSREG_ENC(1, 0, 7,  8, 3), OPE_XT,	"at\ts1e0w"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 0), OPE_XT,	"at\ts1e2r"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 1), OPE_XT,	"at\ts1e2w"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 4), OPE_XT,	"at\ts12e1r"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 5), OPE_XT,	"at\ts12e1w"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 6), OPE_XT,	"at\ts12e0r"		},
+	{ SYSREG_ENC(1, 4, 7,  8, 7), OPE_XT,	"at\ts12e0w"		},
+	{ SYSREG_ENC(1, 6, 7,  8, 0), OPE_XT,	"at\ts1e3r"		},
+	{ SYSREG_ENC(1, 6, 7,  8, 1), OPE_XT,	"at\ts1e3w"		},
+	{ SYSREG_ENC(1, 0, 8,  3, 0), OPE_NONE,	"tlbi\tvmalle1is"	},
+	{ SYSREG_ENC(1, 0, 8,  3, 1), OPE_XT,	"tlbi\tvae1is"		},
+	{ SYSREG_ENC(1, 0, 8,  3, 2), OPE_XT,	"tlbi\taside1is"	},
+	{ SYSREG_ENC(1, 0, 8,  3, 3), OPE_XT,	"tlbi\tvaae1is"		},
+	{ SYSREG_ENC(1, 0, 8,  3, 5), OPE_XT,	"tlbi\tvale1is"		},
+	{ SYSREG_ENC(1, 0, 8,  3, 7), OPE_XT,	"tlbi\tvaale1is"	},
+	{ SYSREG_ENC(1, 0, 8,  7, 0), OPE_NONE,	"tlbi\tvmalle1"		},
+	{ SYSREG_ENC(1, 0, 8,  7, 1), OPE_XT,	"tlbi\tvae1"		},
+	{ SYSREG_ENC(1, 0, 8,  7, 2), OPE_XT,	"tlbi\taside1"		},
+	{ SYSREG_ENC(1, 0, 8,  7, 3), OPE_XT,	"tlbi\tvaae1"		},
+	{ SYSREG_ENC(1, 0, 8,  7, 5), OPE_XT,	"tlbi\tvale1"		},
+	{ SYSREG_ENC(1, 0, 8,  7, 7), OPE_XT,	"tlbi\tvaale1"		},
+	{ SYSREG_ENC(1, 4, 8,  0, 1), OPE_XT,	"tlbi\tipas2e1is"	},
+	{ SYSREG_ENC(1, 4, 8,  0, 5), OPE_XT,	"tlbi\tipas2le1is"	},
+	{ SYSREG_ENC(1, 4, 8,  3, 0), OPE_NONE,	"tlbi\talle2is"		},
+	{ SYSREG_ENC(1, 4, 8,  3, 1), OPE_XT,	"tlbi\tvae2is"		},
+	{ SYSREG_ENC(1, 4, 8,  3, 4), OPE_NONE,	"tlbi\talle1is"		},
+	{ SYSREG_ENC(1, 4, 8,  3, 5), OPE_XT,	"tlbi\tvale2is"		},
+	{ SYSREG_ENC(1, 4, 8,  3, 6), OPE_NONE,	"tlbi\tvmalls12e1is"	},
+	{ SYSREG_ENC(1, 4, 8,  4, 1), OPE_XT,	"tlbi\tipas2e1"		},
+	{ SYSREG_ENC(1, 4, 8,  4, 5), OPE_XT,	"tlbi\tipas2le1"	},
+	{ SYSREG_ENC(1, 4, 8,  7, 0), OPE_NONE,	"tlbi\talle2"		},
+	{ SYSREG_ENC(1, 4, 8,  7, 1), OPE_XT,	"tlbi\tvae2"		},
+	{ SYSREG_ENC(1, 4, 8,  7, 4), OPE_NONE,	"tlbi\talle1"		},
+	{ SYSREG_ENC(1, 4, 8,  7, 5), OPE_XT,	"tlbi\tvale2"		},
+	{ SYSREG_ENC(1, 4, 8,  7, 6), OPE_NONE,	"tlbi\tvmalls12e1"	},
+	{ SYSREG_ENC(1, 6, 8,  3, 0), OPE_NONE,	"tlbi\talle3is"		},
+	{ SYSREG_ENC(1, 6, 8,  3, 1), OPE_XT,	"tlbi\tvae3is"		},
+	{ SYSREG_ENC(1, 6, 8,  3, 5), OPE_XT,	"tlbi\tvale3is"		},
+	{ SYSREG_ENC(1, 6, 8,  7, 0), OPE_NONE,	"tlbi\talle3"		},
+	{ SYSREG_ENC(1, 6, 8,  7, 1), OPE_XT,	"tlbi\tvae3"		},
+	{ SYSREG_ENC(1, 6, 8,  7, 5), OPE_XT,	"tlbi\tvale3"		}
+};
+
 static void
 OPFUNC_DECL(op_at, op1, CRn, CRm, op2, Rt, UNUSED5)
 {
+	uint32_t code;
+	size_t i;
+
 	/* ALIAS: dc,ic,sys,tlbi */
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	code = SYSREG_ENC(1, op1, CRn, CRm, op2);
+	for (i = 0; i < __arraycount(op_sys_table); i++) {
+		if (op_sys_table[i].code != code)
+			continue;
+
+		if (((op_sys_table[i].flags & OPE_XT) != 0) &&
+		    (Rt != 31)) {
+			PRINTF("%12lx:\t%08x	%s, %s\n", pc, insn,
+			    op_sys_table[i].opname,
+			    ZREGNAME(1, Rt));
+		} else if (Rt != 31) {
+#if 0
+			/* Rt suppressed, but Rt field is not a xzr */
+			UNDEFINED(pc, insn, "illegal Rt");
+#else
+			/* fallback to sys instruction */
+			continue;
+#endif
+		} else {
+			PRINTF("%12lx:\t%08x	%s\n", pc, insn,
+			    op_sys_table[i].opname);
+		}
+		return;
+	}
+
+	/* default, sys instruction */
+	PRINTF("%12lx:\t%08x	sys	#%lu, %s, %s, #%lu, %s\n", pc, insn,
+	    op1,
+	    CREGNAME(CRn),
+	    CREGNAME(CRm),
+	    op2,
+	    ZREGNAME(1,Rt));
 }
 
 static void

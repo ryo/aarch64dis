@@ -10,6 +10,13 @@ knownbugs:
 
 
 testpattern:
+	ic	IALLUIS
+	ic	IALLUIS
+	.word	0x0d508711f & ~1
+
+	sys	#0, C0, C0, #0, x0
+
+
 	msr	SPsel, #1
 	msr	DAIFset, #10
 	msr	DAIFclr, #15

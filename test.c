@@ -153,6 +153,15 @@ parse_disasm(char *p)
 			*p = '\0';
 	}
 
+	/*
+	 * cut "\t// #imm" from original
+	 */
+	p = strstr(origbuf_cmp, "//");
+	if (p != NULL) {
+		while ((p[-1] == '\t') || (p[-1] == ' '))
+			p--;
+		*p = '\0';
+	}
 
 	if (strcmp(origbuf_cmp, asmbuf_cmp) == 0) {
 #if 1

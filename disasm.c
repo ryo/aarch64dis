@@ -606,12 +606,12 @@ OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
 		PRINTF("%12lx:\t%08x	asr	%s, %s, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    imms);
+		    bitwidth - immr);
 	} else if (imms == (bitwidth - 1)) {
 		PRINTF("%12lx:\t%08x	asr	%s, %s, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    imms);
+		    immr);
 	} else if (imms < immr) {
 		PRINTF("%12lx:\t%08x	sbfiz	%s, %s, #%lu, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
@@ -623,7 +623,7 @@ OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr,
-		    (imms -immr + 1) & (bitwidth - 1));
+		    (imms - immr + 1) & (bitwidth - 1));
 	} else if ((immr == 0) && (imms == 7)) {
 		PRINTF("%12lx:\t%08x	sxtb	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
@@ -1706,7 +1706,7 @@ OPFUNC_DECL(op_lsl_imm, sf, n, immr, imms, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr,
-		    (imms -immr + 1) & (bitwidth - 1));
+		    (imms - immr + 1) & (bitwidth - 1));
 	} else if ((immr == 0) && (imms == 7)) {
 		PRINTF("%12lx:\t%08x	uxtb	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),

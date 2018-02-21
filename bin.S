@@ -10,6 +10,22 @@ knownbugs:
 
 
 testpattern:
+	asr	w24, w10, #1
+	asr	w24, w10, #2
+	asr	w24, w10, #3
+	asr	w24, w10, #4
+	asr	w24, w10, #5
+	asr	w24, w10, #31
+	asr	x24, x10, #32
+	asr	x24, x10, #33
+	asr	x24, x10, #34
+	asr	x24, x10, #35
+	asr	x24, x10, #36
+	asr	x24, x10, #60
+	asr	x24, x10, #61
+	asr	x24, x10, #62
+	asr	x24, x10, #63
+
 	ic	IALLUIS
 	ic	IALLUIS
 	.word	0x0d508711f & ~1

@@ -8,8 +8,11 @@ knownbugs:
 	nop
 
 
-
 testpattern:
+	mov	x9, #0x4000400040004
+	mov	x9, #0x700000007
+	mov	w1, #0x20002
+
 	asr	w24, w10, #1
 	asr	w24, w10, #2
 	asr	w24, w10, #3

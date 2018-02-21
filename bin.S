@@ -9,6 +9,22 @@ knownbugs:
 
 
 testpattern:
+	prfm	PLDL1KEEP, [x0, x1]
+//	prfm	PLDL1KEEP, [x0, w1]
+	prfm	PLDL1KEEP, [x0, x1, lsl #0]
+//	prfm	PLDL1KEEP, [x0, w1, lsl #0]
+	prfm	PLDL1KEEP, [x0, x1, lsl #3]
+//	prfm	PLDL1KEEP, [x0, w1, lsl #3]
+
+	prfm	PLDL1KEEP, [x0, w1, uxtw #0]
+	prfm	PLDL1KEEP, [x0, w1, uxtw #3]
+	prfm	PLDL1KEEP, [x0, w1, sxtw #0]
+	prfm	PLDL1KEEP, [x0, w1, sxtw #3]
+	prfm	PLDL1KEEP, [x0, x1, sxtx]
+	prfm	PLDL1KEEP, [x0, x1, sxtx]
+	prfm	PLDL1KEEP, [x0, x1, sxtx #3]
+	prfm	PLDL1KEEP, [x0, x1, sxtx #3]
+
 	mov	x9, #0x4000400040004
 	mov	x9, #0x700000007
 	mov	w1, #0x20002

@@ -1415,14 +1415,14 @@ OPFUNC_DECL(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 
 	if (shift == 0) {
 		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s%s]\n", pc, insn,
-		    PREFETCHNAME(Rt),
+		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
 		amount = 2 + size;
 		PRINTF("%12lx:\t%08x	ldr	%s, [%s,%s,%s #%lu]\n", pc, insn,
-		    PREFETCHNAME(Rt),
+		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),

@@ -125,6 +125,36 @@ static const char *prefetchop[32] = {
 };
 #define PREFETCHNAME(op)	prefetchop[(op) & 31]
 
+
+#include "sysreg.h"
+
+static const char *
+sysregname(unsigned int rw,
+           uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
+{
+	const char *candidate;
+	uint32_t code;
+	size_t i;
+
+	candidate = "???";
+	code = SYSREG_ENC(op0, op1, CRn, CRm, op2);
+	for (i = 0; i < __arraycount(sysreg_table); i++) {
+		if ((sysreg_table[i].code & SYSREG_MASK) == code) {
+			candidate = sysreg_table[i].regname;
+			if ((sysreg_table[i].code & rw) != 0) {
+				return candidate;
+			}
+			/* candidate is mismatch rw, but correct instruction */
+		}
+	}
+	return candidate;
+}
+#define RSYSREGNAME(op0, op1, CRn, CRm, op2)	\
+	sysregname(SYSREG_R, op0, op1, CRn, CRm, op2)
+#define WSYSREGNAME(op0, op1, CRn, CRm, op2)	\
+	sysregname(SYSREG_W, op0, op1, CRn, CRm, op2)
+
+
 static int64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 {
@@ -1718,13 +1748,17 @@ OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_mrs, o0, op1, CRn, CRm, op2, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	mrs	%s, %s\n", pc, insn,
+	    ZREGNAME(1, Rt),
+	    RSYSREGNAME(o0, op1, CRn, CRm, op2));
 }
 
 static void
 OPFUNC_DECL(op_msr, o0, op1, CRn, CRm, op2, Rt)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	msr	%s, %s\n", pc, insn,
+	    WSYSREGNAME(o0, op1, CRn, CRm, op2),
+	    ZREGNAME(1, Rt));
 }
 
 static void

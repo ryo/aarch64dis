@@ -1181,51 +1181,86 @@ OPFUNC_DECL(op_cneg, sf, Rm, cond, Rn, Rd, UNUSED5)
 }
 
 static void
+crc32w_common(const char *op,
+              uint64_t pc, uint32_t insn,
+              uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+{
+	if (sf != 0) {
+		UNDEFINED(pc, insn, "illegal size");
+		return;
+	}
+
+	PRINTF("%12lx:\t%08x	%s	%s, %s, %s\n", pc, insn,
+	    op,
+	    ZREGNAME(0, Rd),
+	    ZREGNAME(0, Rn),
+	    ZREGNAME(0, Rm));
+}
+
+static void
+crc32x_common(const char *op,
+              uint64_t pc, uint32_t insn,
+              uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+{
+	if (sf == 0) {
+		UNDEFINED(pc, insn, "illegal size");
+		return;
+	}
+
+	PRINTF("%12lx:\t%08x	%s	%s, %s, %s\n", pc, insn,
+	    op,
+	    ZREGNAME(0, Rd),
+	    ZREGNAME(0, Rn),
+	    ZREGNAME(1, Rm));
+}
+
+
+static void
 OPFUNC_DECL(op_crc32b, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32b", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32cb, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32cb", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32ch, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32ch", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32cw, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32cw", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32cx, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32cx", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32h, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32h", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32w, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32w_common("crc32w", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_crc32x, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	crc32x_common("crc32x", pc, insn, sf, Rm, Rn, Rd);
 }
 
 static void

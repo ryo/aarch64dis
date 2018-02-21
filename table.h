@@ -15,8 +15,6 @@
 	{ {16, 3}, { 8, 4}, { 5, 3}, { 0, 0}, { 0, 0}, { 0, 0} }
 #define FMT_OP1_CRN_CRM_OP2_RT		\
 	{ {16, 3}, {12, 4}, { 8, 4}, { 5, 3}, { 0, 5}, { 0, 0} }
-#define FMT_O0_OP1_CRN_CRM_OP2_RT	\
-	{ {19, 1}, {16, 3}, {12, 4}, { 8, 4}, { 5, 3}, { 0, 5} }
 #define FMT_RM_RN_RD			\
 	{ {16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0} }
 #define FMT_RS_RN_RT			\
@@ -29,6 +27,8 @@
 	{ {16, 5}, {13, 3}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0} }
 #define FMT_IMM16			\
 	{ { 5,16}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0} }
+#define FMT_OP0_OP1_CRN_CRM_OP2_RT	\
+	{ {19, 2}, {16, 3}, {12, 4}, { 8, 4}, { 5, 3}, { 0, 5} }
 #define FMT_IMM7_RT2_RN_RT		\
 	{ {15, 7}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_IMM12_RN_RT			\
@@ -122,8 +122,6 @@ struct aarch64_insn_info insn_tables[] = {
  { 0xfff8f01f, 0xd500401f, FMT_OP1_CRM_OP2,                op_msr_imm },
  { 0xfff80000, 0xd5080000, FMT_OP1_CRN_CRM_OP2_RT,         op_at },
  { 0xfff80000, 0xd5280000, FMT_OP1_CRN_CRM_OP2_RT,         op_sysl },
- { 0xfff00000, 0xd5300000, FMT_O0_OP1_CRN_CRM_OP2_RT,      op_mrs },
- { 0xfff00000, 0xd5100000, FMT_O0_OP1_CRN_CRM_OP2_RT,      op_msr },
  { 0xffe0fc00, 0x9b407c00, FMT_RM_RN_RD,                   op_smulh },
  { 0xffe0fc00, 0x0800fc00, FMT_RS_RN_RT,                   op_stlxrb },
  { 0xffe0fc00, 0x4800fc00, FMT_RS_RN_RT,                   op_stlxrh },
@@ -169,6 +167,8 @@ struct aarch64_insn_info insn_tables[] = {
  { 0xffe0001f, 0xd4000002, FMT_IMM16,                      op_hvc },
  { 0xffe0001f, 0xd4000003, FMT_IMM16,                      op_smc },
  { 0xffe0001f, 0xd4000001, FMT_IMM16,                      op_svc },
+ { 0xffe00000, 0xd5200000, FMT_OP0_OP1_CRN_CRM_OP2_RT,     op_mrs },
+ { 0xffe00000, 0xd5000000, FMT_OP0_OP1_CRN_CRM_OP2_RT,     op_msr },
  { 0xffc00000, 0x68c00000, FMT_IMM7_RT2_RN_RT,             op_ldpsw_postidx },
  { 0xffc00000, 0x69c00000, FMT_IMM7_RT2_RN_RT,             op_ldpsw_preidx },
  { 0xffc00000, 0x69400000, FMT_IMM7_RT2_RN_RT,             op_ldpsw_signed },

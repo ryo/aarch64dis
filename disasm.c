@@ -1463,7 +1463,36 @@ OPFUNC_DECL(op_ldrb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrb_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	uint64_t r;
+
+	switch (option) {
+	case 2:
+	case 6:
+		r = 0;
+		break;
+	case 3:
+	case 7:
+		r = 1;
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal imm6");
+		return;
+	}
+
+	if (shift == 0) {
+		PRINTF("%12lx:\t%08x	ldrb	%s, [%s,%s%s]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+	} else {
+		PRINTF("%12lx:\t%08x	ldrb	%s, [%s,%s,%s #%lu]\n", pc, insn,
+		    ZREGNAME(0, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    0);
+	}
 }
 
 static void

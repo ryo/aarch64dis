@@ -266,7 +266,7 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 
 	result = rotate(bitwidth, (1ULL << (imms + 1)) - 1, immr);
 	while (esize < bitwidth) {
-		result |= (result >> esize);
+		result |= rotate(64, result, esize);
 		esize <<= 1;
 	}
 	return (result & ((1UL << bitwidth) - 1));
@@ -1802,7 +1802,7 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 		    SREGNAME(sf, Rd),
 		    DecodeBitMasks(sf, n, immr, imms));
 	} else {
-		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx	#XXX\n", pc, insn,
+		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, immr, imms));

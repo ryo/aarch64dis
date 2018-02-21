@@ -1746,25 +1746,45 @@ OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mrs, o0, op1, CRn, CRm, op2, Rt)
+OPFUNC_DECL(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 {
 	PRINTF("%12lx:\t%08x	mrs	%s, %s\n", pc, insn,
 	    ZREGNAME(1, Rt),
-	    RSYSREGNAME(o0, op1, CRn, CRm, op2));
+	    RSYSREGNAME(op0, op1, CRn, CRm, op2));
 }
 
 static void
-OPFUNC_DECL(op_msr, o0, op1, CRn, CRm, op2, Rt)
+OPFUNC_DECL(op_msr, op0, op1, CRn, CRm, op2, Rt)
 {
 	PRINTF("%12lx:\t%08x	msr	%s, %s\n", pc, insn,
-	    WSYSREGNAME(o0, op1, CRn, CRm, op2),
+	    WSYSREGNAME(op0, op1, CRn, CRm, op2),
 	    ZREGNAME(1, Rt));
 }
 
 static void
 OPFUNC_DECL(op_msr_imm, op1, CRm, op2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	const char *pstatefield;
+
+#define MSRIMM_OP(op1, op2)	(((op1) << 3) | (op2))
+
+	switch (MSRIMM_OP(op1, op2)) {
+	case MSRIMM_OP(0, 5):
+		pstatefield = "spsel";
+		break;
+	case MSRIMM_OP(3, 6):
+		pstatefield = "daifset";
+		break;
+	case MSRIMM_OP(3, 7):
+		pstatefield = "daifclr";
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal op1/op2");
+		return;
+	}
+
+	PRINTF("%12lx:\t%08x	msr	%s, #0x%lx\n", pc, insn,
+	    pstatefield, CRm);
 }
 
 static void

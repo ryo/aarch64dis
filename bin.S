@@ -10,6 +10,10 @@ knownbugs:
 
 
 testpattern:
+	msr	SPsel, #1
+	msr	DAIFset, #10
+	msr	DAIFclr, #15
+
 	msr	dbgdtrtx_el0, x0
 	mrs	x0, dbgdtrrx_el0
 

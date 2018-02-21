@@ -286,6 +286,7 @@ struct sysreg_table sysreg_table[] = {
 	{ SYSREG_ENC(3, 4, 12,  0, 1) | SYSREG_R,  "rvbar_el2"		},
 	{ SYSREG_ENC(3, 4, 12,  0, 2) | SYSREG_RW, "rmr_el2"		},
 	{ SYSREG_ENC(3, 4, 13,  0, 2) | SYSREG_RW, "tpidr_el2"		},
+	{ SYSREG_ENC(3, 4, 14,  0, 3) | SYSREG_RW, "cntvoff_el2"	},
 	{ SYSREG_ENC(3, 4, 14,  1, 0) | SYSREG_RW, "cnthctl_el2"	},
 	{ SYSREG_ENC(3, 4, 14,  2, 0) | SYSREG_RW, "cnthp_tval_el2"	},
 	{ SYSREG_ENC(3, 4, 14,  2, 1) | SYSREG_RW, "cnthp_ctl_el2"	},

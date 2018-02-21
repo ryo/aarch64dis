@@ -129,14 +129,14 @@ static const char *prefetchop[32] = {
 #include "sysreg.h"
 
 static const char *
-sysregname(unsigned int rw,
+sysregname(char *buf, size_t buflen, uint32_t rw, 
            uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
 {
 	const char *candidate;
 	uint32_t code;
 	size_t i;
 
-	candidate = "???";
+	candidate = NULL;
 	code = SYSREG_ENC(op0, op1, CRn, CRm, op2);
 	for (i = 0; i < __arraycount(sysreg_table); i++) {
 		if ((sysreg_table[i].code & SYSREG_MASK) == code) {
@@ -147,12 +147,19 @@ sysregname(unsigned int rw,
 			/* candidate is mismatch rw, but correct instruction */
 		}
 	}
+
+	if (candidate == NULL) {
+#define SYSREGNAMEBUFLEN	sizeof("s99_99_c99_c99_99")
+		snprintf(buf, buflen, "s%lu_%lu_c%lu_c%lu_%lu",
+		    op0, op1, CRn, CRm, op2);
+		return buf;
+	}
 	return candidate;
 }
-#define RSYSREGNAME(op0, op1, CRn, CRm, op2)	\
-	sysregname(SYSREG_R, op0, op1, CRn, CRm, op2)
-#define WSYSREGNAME(op0, op1, CRn, CRm, op2)	\
-	sysregname(SYSREG_W, op0, op1, CRn, CRm, op2)
+#define RSYSREGNAME(buf, buflen, op0, op1, CRn, CRm, op2)		\
+	sysregname(buf, buflen, SYSREG_R, op0, op1, CRn, CRm, op2)
+#define WSYSREGNAME(buf, buflen, op0, op1, CRn, CRm, op2)		\
+	sysregname(buf, buflen, SYSREG_W, op0, op1, CRn, CRm, op2)
 
 
 static int64_t
@@ -1748,16 +1755,20 @@ OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 {
+	char buf[SYSREGNAMEBUFLEN];
+
 	PRINTF("%12lx:\t%08x	mrs	%s, %s\n", pc, insn,
 	    ZREGNAME(1, Rt),
-	    RSYSREGNAME(op0, op1, CRn, CRm, op2));
+	    RSYSREGNAME(buf, sizeof(buf), op0, op1, CRn, CRm, op2));
 }
 
 static void
 OPFUNC_DECL(op_msr, op0, op1, CRn, CRm, op2, Rt)
 {
+	char buf[SYSREGNAMEBUFLEN];
+
 	PRINTF("%12lx:\t%08x	msr	%s, %s\n", pc, insn,
-	    WSYSREGNAME(op0, op1, CRn, CRm, op2),
+	    WSYSREGNAME(buf, sizeof(buf), op0, op1, CRn, CRm, op2),
 	    ZREGNAME(1, Rt));
 }
 

@@ -92,7 +92,7 @@ static const char *s_xregs[32] = {
 
 static const char *cregs[16] = {
 	 "C0",  "C1",  "C2",  "C3",  "C4",  "C5",  "C6",  "C7",
-	 "C8",  "C9", "C10", "C11", "C12", "C13", "C14", "C15",
+	 "C8",  "C9", "C10", "C11", "C12", "C13", "C14", "C15"
 };
 #define CREGNAME(n)	cregs[(n) & 15]
 
@@ -129,37 +129,60 @@ static const char *prefetchop[32] = {
 #include "sysreg.h"
 
 static const char *
-sysregname(char *buf, size_t buflen, uint32_t rw, 
-           uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
+sysregname_bsearch(uint32_t code)
 {
-	const char *candidate;
-	uint32_t code;
-	size_t i;
+	struct sysreg_table *base, *p;
+	unsigned int lim;
+	int32_t cmp;
 
-	candidate = NULL;
-	code = SYSREG_ENC(op0, op1, CRn, CRm, op2);
-	for (i = 0; i < __arraycount(sysreg_table); i++) {
-		if ((sysreg_table[i].code & SYSREG_MASK) == code) {
-			candidate = sysreg_table[i].regname;
-			if ((sysreg_table[i].code & rw) != 0) {
-				return candidate;
-			}
-			/* candidate is mismatch rw, but correct instruction */
+	base = sysreg_table;
+	for (lim = __arraycount(sysreg_table); lim != 0; lim >>= 1) {
+		p = base + (lim >> 1);
+		cmp = code - p->code;
+		if (cmp == 0)
+			return p->regname;
+		if (cmp > 0) {
+			base = p + 1;
+			lim--;
 		}
 	}
+	return NULL;
+}
 
-	if (candidate == NULL) {
+#define SYSREG_OP_READ	0x01
+#define SYSREG_OP_WRITE	0x02
+
+static const char *
+sysregname(char *buf, size_t buflen, uint32_t rw,
+           uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
+{
+	const char *name;
+	uint32_t code;
+
+	code = SYSREG_ENC(op0, op1, CRn, CRm, op2);
+	name = sysregname_bsearch(code);
+
+	if ((name != NULL) && (code == SYSREG_ENC(2,3,0,5,0))) {
+		/*
+		 * special case for dbgdtrrx_el0(RO) and dbgdtrtx_el0(WO)
+		 */
+		if (rw & SYSREG_OP_WRITE)
+			return "dbgdtrtx_el0";
+		return "dbgdtrrx_el0";
+	}
+
+	if (name == NULL) {
 #define SYSREGNAMEBUFLEN	sizeof("s99_99_c99_c99_99")
 		snprintf(buf, buflen, "s%lu_%lu_c%lu_c%lu_%lu",
 		    op0, op1, CRn, CRm, op2);
 		return buf;
 	}
-	return candidate;
+	return name;
 }
 #define RSYSREGNAME(buf, buflen, op0, op1, CRn, CRm, op2)		\
-	sysregname(buf, buflen, SYSREG_R, op0, op1, CRn, CRm, op2)
+	sysregname(buf, buflen, SYSREG_OP_READ, op0, op1, CRn, CRm, op2)
 #define WSYSREGNAME(buf, buflen, op0, op1, CRn, CRm, op2)		\
-	sysregname(buf, buflen, SYSREG_W, op0, op1, CRn, CRm, op2)
+	sysregname(buf, buflen, SYSREG_OP_WRITE, op0, op1, CRn, CRm, op2)
 
 
 static int64_t

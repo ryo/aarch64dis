@@ -4,9 +4,6 @@ use strict;
 use warnings;
 
 print <<__HEADER__;
-#define SYSREG_R	0x80000000
-#define SYSREG_W	0x40000000
-#define SYSREG_RW	(SYSREG_R | SYSREG_W)
 #define SYSREG_ENC(op0, op1, CRn, CRm, op2)		\\
 	(((op0)<<19)|((op1)<<16)|((CRn)<<12)|((CRm)<<8)|((op2)<<5))
 #define SYSREG_MASK	SYSREG_ENC(3,7,15,15,7)
@@ -17,7 +14,7 @@ struct sysreg_table {
 };
 
 struct sysreg_table sysreg_table[] = {
-	/*         op0 op1 CRn CRm op2        rw?   name		*/
+	/*	         op0 op1 CRn CRm op2 name			*/
 __HEADER__
 
 my @output;
@@ -53,17 +50,8 @@ while (<DATA>) {
 		die "no param: $line\n";
 	}
 
-	my $rw;
-	if (defined($comment) && ($comment eq 'RO')) {
-		$rw = "SYSREG_R, ";
-	} elsif (defined($comment) && ($comment eq 'WO')) {
-		$rw = "SYSREG_W, ";
-	} else {
-		$rw = "SYSREG_RW,";
-	}
-
-	my $output = sprintf "	{ SYSREG_ENC(%d, %d, %2d, %2d, %d) | $rw \"%s\"", @params, lc($sym);
-	my $space = 72 - length($output);
+	my $output = sprintf "	{	SYSREG_ENC(%d, %d, %2d, %2d, %d), \"%s\"", @params, lc($sym);
+	my $space = 66 - length($output);
 	$output .= "\t" x ($space >> 3);
 	$output .= "}";
 
@@ -161,8 +149,7 @@ DBGCLAIMCLR_EL1		2	0	7	9	6
 DBGAUTHSTATUS_EL1	2	0	7	14	6	# RO
 MDCCSR_EL0		2	3	0	1	0	# RO
 DBGDTR_EL0		2	3	0	4	0
-DBGDTRRX_EL0		2	3	0	5	0	# RO
-DBGDTRTX_EL0		2	3	0	5	0	# WO
+DBGDTRRX_EL0		2	3	0	5	0	# RW XXX: DBGDTRRX_EL0(RO), DBGDTRTX_EL0(WO)
 DBGVCR32_EL2		2	4	0	7	0
 
 TEECR32_EL1		2	2	0	0	0

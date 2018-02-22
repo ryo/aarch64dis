@@ -5,10 +5,43 @@
 
 
 knownbugs:
+	mov	w1, #0x20002
+	and	w9, w22, #0x10001
+	cmp	w10, #0xfff
+	cmp	w9, #0xf01
+	ldr	w8, [x19,#12608]
+	ldrsw	x21, [x20,#24]!
+	mov	w8, #0x10001
+	mov	x8, #0xffff1000ffffffff
+	rev16	w0, w0
+	smaddl	x25, w8, w27, x22
+	smaddl	x28, w8, w10, x26
+	smull	x8, w0, w8
+	smull	x8, w8, w9
+	str	w8, [x19,#12608]
+	str	xzr, [x20,#32728]
+	sub	w11, w1, #0x9c4
+
+objdump_bug:	/* ??? */
+	orr	x10, xzr, #0x100000000
+	orr	x10, xzr, #0xfff00000000
+	orr	x10, xzr, #0xfff000000000
+	orr	x10, xzr, #0xfff0000000000	//ok
+	orr	x10, xzr, #0xfff00000000000	//ok
+	orr	x10, xzr, #0xfff000000000000
+	orr	x10, xzr, #0xfff0000000000000
 	nop
 
 
 testpattern:
+	ldrh	w10, [x25,#50]!
+	ldrb	w9, [x26,#116]!
+	ldur	x8, [x26,#12]
+
+	sxtw	x20, w20
+	umull	x8, w0, w24
+	sdiv	w19, w10, w8
+
 	ldar	w1, [x5]
 	ldar	w2, [x6,#0]
 	ldar	x3, [x7]

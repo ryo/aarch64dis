@@ -64,7 +64,7 @@ testn:
 
 testnn:
 	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | egrep '^(ORIG|ERR)' > r
-	grep -v 'ORIG.*\.word' r | less -p 'ORIG............................'
+	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
 
 testb:
 	aarch64--netbsd-clang -mcrc -c bin.S

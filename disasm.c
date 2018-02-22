@@ -1135,17 +1135,22 @@ OPFUNC_DECL(op_cmp_extreg, sf, Rm, option, imm3, Rn, Rd)
 static void
 OPFUNC_DECL(op_cmp_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 {
+	if (shift & 2) {
+		UNDEFINED(pc, insn, "illegal shift");
+		return;
+	}
+
 	/* ALIAS: subs_imm */
 	if (Rd == 31) {
 		PRINTF("%12lx:\t%08x	cmp	%s, #0x%lx%s\n", pc, insn,
 		    SREGNAME(sf, Rn),
-		    SignExtend(12, imm12, 1),
+		    ZeroExtend(12, imm12, 1),
 		    SHIFTOP2(shift, "", ", lsl #12"));
 	} else {
 		PRINTF("%12lx:\t%08x	subs	%s, %s, #0x%lx%s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
-		    SignExtend(12, imm12, 1),
+		    ZeroExtend(12, imm12, 1),
 		    SHIFTOP2(shift, "", ", lsl #12"));
 	}
 }
@@ -1609,7 +1614,7 @@ OPFUNC_DECL(op_ldr_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 		PRINTF("%12lx:\t%08x	ldr	%s, [%s,#%ld]\n", pc, insn,
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
-		    SignExtend(12, imm12, (size == 0) ? 4 : 8));
+		    ZeroExtend(12, imm12, (size == 0) ? 4 : 8));
 	}
 }
 
@@ -1790,7 +1795,7 @@ OPFUNC_DECL(op_ldrsw_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 	PRINTF("%12lx:\t%08x	ldrsw	%s, [%s],#%ld\n", pc, insn,
 	    ZREGNAME(1, Rt),
 	    SREGNAME(1, Rn),
-	    SignExtend(9, imm9, 4));
+	    SignExtend(9, imm9, 1));
 }
 
 static void
@@ -1799,7 +1804,7 @@ OPFUNC_DECL(op_ldrsw_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 	PRINTF("%12lx:\t%08x	ldrsw	%s, [%s,#%ld]!\n", pc, insn,
 	    ZREGNAME(1, Rt),
 	    SREGNAME(1, Rn),
-	    SignExtend(9, imm9, 4));
+	    SignExtend(9, imm9, 1));
 }
 
 static void
@@ -2158,7 +2163,7 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 		    SREGNAME(sf, Rd),
 		    DecodeBitMasks(sf, n, immr, imms));
 	} else {
-		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx\n", pc, insn,
+		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx	# mov_mbimm\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, immr, imms));
@@ -2170,16 +2175,22 @@ OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
 	const uint64_t mask = (sf == 0) ? 0xffffffff : 0xffffffffffffffffUL;
 
+	if ((sf == 0) && (hw >= 2)) {
+		UNDEFINED(pc, insn, "illegal size");
+		return;
+	}
+
 	/* ALIAS: movn */
 	if ((hw == 0) || (imm16 == 0)) {
 		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ZeroExtend(16, ~imm16, 1) & mask);
+		    ~(ZeroExtend(16, imm16, 1) & mask));
 	} else {
-		const int shift = hw * 16;
-		PRINTF("%12lx:\t%08x	movn	%s, #0x%lx, lsl #%d\n", pc, insn,
+		/* movn */
+		const uint64_t shift = hw * 16;
+		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ZeroExtend(16, ~imm16, 1) & mask, shift);
+		    ~(ZeroExtend(16, imm16, 1) << shift));
 	}
 }
 
@@ -2430,7 +2441,7 @@ OPFUNC_DECL(op_rev, sf, x, Rn, Rd, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_rev16, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	rev	%s, %s\n", pc, insn,
+	PRINTF("%12lx:\t%08x	rev16	%s, %s\n", pc, insn,
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn));
 }
@@ -2468,15 +2479,15 @@ OPFUNC_DECL(op_smaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 {
 	/* ALIAS: smull */
 	if (Ra == 31) {
-		PRINTF("%12lx:\t%08x	smaddl	%s, %s, %s\n", pc, insn,
+		PRINTF("%12lx:\t%08x	smull	%s, %s, %s\n", pc, insn,
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm));
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm));
 	} else {
 		PRINTF("%12lx:\t%08x	smaddl	%s, %s, %s, %s\n", pc, insn,
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm),
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm),
 		    ZREGNAME(1, Ra));
 	}
 }
@@ -2635,7 +2646,7 @@ OPFUNC_DECL(op_str_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 		PRINTF("%12lx:\t%08x	str	%s, [%s,#%ld]\n", pc, insn,
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
-		    SignExtend(12, imm12, (size == 0) ? 4 : 8));
+		    ZeroExtend(12, imm12, (size == 0) ? 4 : 8));
 	}
 }
 
@@ -2794,7 +2805,7 @@ OPFUNC_DECL(op_sub_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 	PRINTF("%12lx:\t%08x	sub	%s, %s, #0x%lx%s\n", pc, insn,
 	    SREGNAME(sf, Rd),
 	    SREGNAME(sf, Rn),
-	    SignExtend(12, imm12, 1),
+	    ZeroExtend(12, imm12, 1),
 	    SHIFTOP2(shift, "", ", lsl #12"));
 }
 

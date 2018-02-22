@@ -780,7 +780,7 @@ OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
 		    ZREGNAME(sf, Rn),
 		    (bitwidth - immr) & (bitwidth - 1),
 		    (imms + 1) & (bitwidth - 1));
-	} else if (BFXPreferred(sf, 1, imms, immr)) {
+	} else if (BFXPreferred(sf, 0, imms, immr)) {
 		PRINTF("%12lx:\t%08x	sbfx	%s, %s, #%lu, #%lu\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
@@ -789,15 +789,15 @@ OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
 	} else if ((immr == 0) && (imms == 7)) {
 		PRINTF("%12lx:\t%08x	sxtb	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn));
+		    ZREGNAME(0, Rn));
 	} else if ((immr == 0) && (imms == 15)) {
 		PRINTF("%12lx:\t%08x	sxth	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn));
+		    ZREGNAME(0, Rn));
 	} else if ((immr == 0) && (imms == 31)) {
 		PRINTF("%12lx:\t%08x	sxtw	%s, %s\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn));
+		    ZREGNAME(0, Rn));
 	} else {
 		UNDEFINED(pc, insn, "unknown");
 	}
@@ -2074,12 +2074,12 @@ OPFUNC_DECL(op_lsl_imm, sf, n, immr, imms, Rn, Rd)
 		    (imms - immr + 1) & (bitwidth - 1));
 	} else if ((immr == 0) && (imms == 7)) {
 		PRINTF("%12lx:\t%08x	uxtb	%s, %s\n", pc, insn,
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn));
+		    ZREGNAME(0, Rd),
+		    ZREGNAME(0, Rn));
 	} else if ((immr == 0) && (imms == 15)) {
 		PRINTF("%12lx:\t%08x	uxth	%s, %s\n", pc, insn,
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn));
+		    ZREGNAME(0, Rd),
+		    ZREGNAME(0, Rn));
 	} else {
 		UNDEFINED(pc, insn, "unknown");
 	}

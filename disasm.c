@@ -210,7 +210,10 @@ static uint64_t
 rotate(int bitwidth, uint64_t v, int n)
 {
 	n &= (bitwidth - 1);
-	return (((v << (bitwidth - n)) | (v >> n)) & ((1UL << bitwidth) - 1));
+	if (bitwidth < 64)
+		return (((v << (bitwidth - n)) | (v >> n)) & ((1UL << bitwidth) - 1));
+	else
+		return (((v << (bitwidth - n)) | (v >> n)));
 }
 
 static bool
@@ -232,7 +235,7 @@ MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 }
 
 static bool
-ValidBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
+ValidBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 {
 	int esize, len;
 
@@ -252,7 +255,7 @@ ValidBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 }
 
 static uint64_t
-DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
+DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 {
 	const int bitwidth = (sf == 0) ? 32 : 64;
 	uint64_t result;
@@ -264,9 +267,9 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 	imms &= (esize - 1);
 	immr &= (esize - 1);
 
-	result = rotate(bitwidth, (1ULL << (imms + 1)) - 1, immr);
+	result = rotate(esize, (1ULL << (imms + 1)) - 1, immr);
 	while (esize < bitwidth) {
-		result |= rotate(64, result, esize);
+		result |= (result << esize);
 		esize <<= 1;
 	}
 	return (result & ((1UL << bitwidth) - 1));
@@ -713,7 +716,7 @@ OPFUNC_DECL(op_adrp, immlo, immhi, Rd, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 {
-	if (!ValidBitMasks(sf, n, immr, imms)) {
+	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
 		return;
 	}
@@ -721,7 +724,7 @@ OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 	PRINTF("%12lx:\t%08x	and	%s, %s, #0x%lx\n", pc, insn,
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
-	    DecodeBitMasks(sf, n, immr, imms));
+	    DecodeBitMasks(sf, n, imms, immr));
 }
 
 static void
@@ -733,7 +736,7 @@ OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 static void
 OPFUNC_DECL(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 {
-	if (!ValidBitMasks(sf, n, immr, imms)) {
+	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
 		return;
 	}
@@ -742,12 +745,12 @@ OPFUNC_DECL(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 	if (Rd == 31) {
 		PRINTF("%12lx:\t%08x	tst	%s, #0x%lx\n", pc, insn,
 		    ZREGNAME(sf, Rn),
-		    DecodeBitMasks(sf, n, immr, imms));
+		    DecodeBitMasks(sf, n, imms, immr));
 	} else {
 		PRINTF("%12lx:\t%08x	ands	%s, %s, #0x%lx\n", pc, insn,
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    DecodeBitMasks(sf, n, immr, imms));
+		    DecodeBitMasks(sf, n, imms, immr));
 	}
 }
 
@@ -1338,7 +1341,7 @@ OPFUNC_DECL(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 static void
 OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 {
-	if (!ValidBitMasks(sf, n, immr, imms)) {
+	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
 		return;
 	}
@@ -1346,7 +1349,7 @@ OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 	PRINTF("%12lx:\t%08x	eor	%s, %s, #0x%lx\n", pc, insn,
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
-	    DecodeBitMasks(sf, n, immr, imms));
+	    DecodeBitMasks(sf, n, imms, immr));
 }
 
 static void
@@ -2151,22 +2154,28 @@ OPFUNC_DECL(op_mneg, sf, Rm, Ra, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 {
-	if (!ValidBitMasks(sf, n, immr, imms)) {
+	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
 		return;
 	}
 
 	/* ALIAS: orr_imm */
 	/* to distinguish from mov_iwimm */
+#if 1
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
+#else
+	/* same as objdump? */
+	(void)MoveWidePreferred;
+	if (Rn == 31) {
+#endif
 		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx	# orr\n", pc, insn,
 		    SREGNAME(sf, Rd),
-		    DecodeBitMasks(sf, n, immr, imms));
+		    DecodeBitMasks(sf, n, imms, immr));
 	} else {
-		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx	# mov_mbimm\n", pc, insn,
+		PRINTF("%12lx:\t%08x	orr	%s, %s, #0x%lx	# mov_bmimm\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
-		    DecodeBitMasks(sf, n, immr, imms));
+		    DecodeBitMasks(sf, n, imms, immr));
 	}
 }
 
@@ -2184,7 +2193,7 @@ OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 	if ((hw == 0) || (imm16 == 0)) {
 		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx\n", pc, insn,
 		    ZREGNAME(sf, Rd),
-		    ~(ZeroExtend(16, imm16, 1) & mask));
+		    (~(ZeroExtend(16, imm16, 1) & mask)) & mask);
 	} else {
 		/* movn */
 		const uint64_t shift = hw * 16;

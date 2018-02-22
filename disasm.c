@@ -535,13 +535,13 @@ regoffset_w_common(const char *op,
 	if ((shift == 0) && (option == 3)) {
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s]\n", pc, insn,
 		    op,
-		    ZREGNAME(0, Rt),
+		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm));
 	} else {
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
 		    op,
-		    ZREGNAME(0, Rt),
+		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),

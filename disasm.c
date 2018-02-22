@@ -2464,9 +2464,9 @@ static void
 OPFUNC_DECL(op_sdiv, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
 	PRINTF("%12lx:\t%08x	sdiv	%s, %s, %s\n", pc, insn,
-	    ZREGNAME(1, Rd),
-	    ZREGNAME(1, Rn),
-	    ZREGNAME(1, Rm));
+	    ZREGNAME(sf, Rd),
+	    ZREGNAME(sf, Rn),
+	    ZREGNAME(sf, Rm));
 }
 
 static void
@@ -2860,13 +2860,13 @@ OPFUNC_DECL(op_umaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 	if (Ra == 31) {
 		PRINTF("%12lx:\t%08x	umull	%s, %s, %s\n", pc, insn,
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm));
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm));
 	} else {
 		PRINTF("%12lx:\t%08x	umaddl	%s, %s, %s, %s\n", pc, insn,
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm),
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm),
 		    ZREGNAME(1, Ra));
 	}
 }

@@ -5,6 +5,38 @@
 
 
 knownbugs:
+	ldrh	w2, [x25,w8,uxtw]
+	ldrsh	w9, [x21],#2
+	ldrsh	w8, [x20,#170]!
+	ldrsh	w9, [x8,#40]!
+	ldrsh	w8, [x27,#2]!
+	ror	w15, w16, w15
+	ror	w11, w11, w12
+	strh	w11, [x22,w10,sxtw]
+	strh	w0, [x8,w1,uxtw]
+	stxr	w3, x0, [x4]
+	stxrb	w11, w9, [x8]
+	stxrh	w3, w2, [x4]
+
+
+	nop
+
+objdump_bug:	/* ??? */
+	orr	x10, xzr, #0x100000000
+	orr	x10, xzr, #0xfff00000000
+	orr	x10, xzr, #0xfff000000000
+	orr	x10, xzr, #0xfff0000000000	//ok
+	orr	x10, xzr, #0xfff00000000000	//ok
+	orr	x10, xzr, #0xfff000000000000
+	orr	x10, xzr, #0xfff0000000000000
+	nop
+
+
+testpattern:
+	ldrsw	x28, [x8,x27,lsl #2]
+	ldrsw	x9, [x20,x8]
+	nop
+
 	mov	w1, #0x20002
 	and	w9, w22, #0x10001
 	cmp	w10, #0xfff
@@ -22,18 +54,6 @@ knownbugs:
 	str	xzr, [x20,#32728]
 	sub	w11, w1, #0x9c4
 
-objdump_bug:	/* ??? */
-	orr	x10, xzr, #0x100000000
-	orr	x10, xzr, #0xfff00000000
-	orr	x10, xzr, #0xfff000000000
-	orr	x10, xzr, #0xfff0000000000	//ok
-	orr	x10, xzr, #0xfff00000000000	//ok
-	orr	x10, xzr, #0xfff000000000000
-	orr	x10, xzr, #0xfff0000000000000
-	nop
-
-
-testpattern:
 	ldrh	w10, [x25,#50]!
 	ldrb	w9, [x26,#116]!
 	ldur	x8, [x26,#12]

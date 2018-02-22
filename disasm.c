@@ -2152,15 +2152,9 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 	}
 
 	/* ALIAS: orr_imm */
-#if 0
 	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
-#else
-	/* same as objdump... */
-	(void)MoveWidePreferred;
-	if (Rn == 31) {
-#endif
-		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx\n", pc, insn,
+		PRINTF("%12lx:\t%08x	mov	%s, #0x%lx	# orr\n", pc, insn,
 		    SREGNAME(sf, Rd),
 		    DecodeBitMasks(sf, n, immr, imms));
 	} else {

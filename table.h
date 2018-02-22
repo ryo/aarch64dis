@@ -114,6 +114,7 @@ struct aarch64_insn_info insn_tables[] = {
  { 0xfffffc00, 0x485f7c00, FMT_RN_RT,                      op_ldxrh },
  { 0xfffffc00, 0xdac00800, FMT_RN_RD,                      op_rev32 },
  { 0xfffffc00, 0x089ffc00, FMT_RN_RT,                      op_stlrb },
+ { 0xfffffc00, 0x489ffc00, FMT_RN_RT,                      op_stlrh },
  { 0xfffff0ff, 0xd503305f, FMT_CRM,                        op_clrex },
  { 0xfffff0ff, 0xd50330bf, FMT_CRM,                        op_dmb },
  { 0xfffff0ff, 0xd503309f, FMT_CRM,                        op_dsb },

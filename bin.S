@@ -9,13 +9,24 @@ knownbugs:
 
 
 testpattern:
-	prfm	PLDL1KEEP, [x0, x1]
-//	prfm	PLDL1KEEP, [x0, w1]
-	prfm	PLDL1KEEP, [x0, x1, lsl #0]
-//	prfm	PLDL1KEEP, [x0, w1, lsl #0]
-	prfm	PLDL1KEEP, [x0, x1, lsl #3]
-//	prfm	PLDL1KEEP, [x0, w1, lsl #3]
+	ldar	w1, [x5]
+	ldar	w2, [x6,#0]
+	ldar	x3, [x7]
+	ldar	x4, [x8,#0]
 
+	crc32b	w0, w1, w2
+	crc32x	w0, w1, x2
+
+	ldr	x1, [sp, x0, lsl #0]
+	ldr	w2, [sp, x0, lsl #0]
+	ldrb	w0, [sp, x0, lsl #0]
+	ldrb	w0, [sp, w0, uxtw]
+	ldrb	w0, [sp, w0, uxtw #0]
+
+
+	prfm	PLDL1KEEP, [x0, x1]
+	prfm	PLDL1KEEP, [x0, x1, lsl #0]
+	prfm	PLDL1KEEP, [x0, x1, lsl #3]
 	prfm	PLDL1KEEP, [x0, w1, uxtw #0]
 	prfm	PLDL1KEEP, [x0, w1, uxtw #3]
 	prfm	PLDL1KEEP, [x0, w1, sxtw #0]
@@ -24,6 +35,19 @@ testpattern:
 	prfm	PLDL1KEEP, [x0, x1, sxtx]
 	prfm	PLDL1KEEP, [x0, x1, sxtx #3]
 	prfm	PLDL1KEEP, [x0, x1, sxtx #3]
+
+	prfm	PLDL1KEEP, [x0, xzr]
+	prfm	PLDL1KEEP, [x0, xzr, lsl #0]
+	prfm	PLDL1KEEP, [x0, xzr, lsl #3]
+	prfm	PLDL1KEEP, [x0, wzr, uxtw #0]
+	prfm	PLDL1KEEP, [x0, wzr, uxtw #3]
+	prfm	PLDL1KEEP, [x0, wzr, sxtw #0]
+	prfm	PLDL1KEEP, [x0, wzr, sxtw #3]
+	prfm	PLDL1KEEP, [x0, xzr, sxtx]
+	prfm	PLDL1KEEP, [x0, xzr, sxtx]
+	prfm	PLDL1KEEP, [x0, xzr, sxtx #3]
+	prfm	PLDL1KEEP, [x0, xzr, sxtx #3]
+
 
 	mov	x9, #0x4000400040004
 	mov	x9, #0x700000007
@@ -419,6 +443,7 @@ testpattern:
 	add	sp, sp, w0, uxtw
 	add	sp, sp, w0, uxtw
 
+	hlt	#0
 	add	x0, x1, w0, lsl #4
 
 	nop

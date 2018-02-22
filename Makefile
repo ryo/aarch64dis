@@ -63,6 +63,7 @@ testn:
 	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | less -r
 
 testb:
+	aarch64--netbsd-clang -mcrc -c bin.S
 	aarch64--netbsd-objdump -Dr bin.o | ./disasm_test | less -r
 
 testc:

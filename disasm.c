@@ -103,8 +103,8 @@ static const char *cregs[16] = {
 
 static const char *conditioncode[16] = {
 	"eq", "ne", "cs", "cc",
-	"mi", "pl", "vs", "vc", 
-	"hi", "ls", "ge", "lt", 
+	"mi", "pl", "vs", "vc",
+	"hi", "ls", "ge", "lt",
 	"gt", "le", "al", "nv"
 };
 #define CONDNAME(c)	conditioncode[(c) & 15]
@@ -209,28 +209,28 @@ ZeroExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 static uint64_t
 rotate(int bitwidth, uint64_t v, int n)
 {
+	uint64_t result;
+
 	n &= (bitwidth - 1);
+	result = (((v << (bitwidth - n)) | (v >> n)));
 	if (bitwidth < 64)
-		return (((v << (bitwidth - n)) | (v >> n)) & ((1UL << bitwidth) - 1));
-	else
-		return (((v << (bitwidth - n)) | (v >> n)));
+		result &= ((1UL << bitwidth) - 1);
+	return result;
 }
 
 static bool
 MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
 {
-	const int width = (sf == 0) ? 32 : 64;
+	const int bitwidth = (sf == 0) ? 32 : 64;
 
 	if ((sf != 0) && (n == 0))
 		return false;
 	if ((sf == 0) && ((n != 0) || (immr > 0x1f)))
 		return false;
-	if (imms < 16) {
+	if (imms < 16)
 		return ((-immr & 15) <= (15 - imms));
-	}
-	if (imms >= (uint64_t)(width - 15)) {
-		return ((immr & 15) <= (imms - (width - 15)));
-	}
+	if (imms >= (uint64_t)(bitwidth - 15))
+		return ((immr & 15) <= (imms - (bitwidth - 15)));
 	return false;
 }
 
@@ -262,11 +262,9 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 	int esize, len;
 
 	len = fls64((n << 6) + (~imms & 0x3f)) - 1;
-
 	esize = (1 << len);
 	imms &= (esize - 1);
 	immr &= (esize - 1);
-
 	result = rotate(esize, (1ULL << (imms + 1)) - 1, immr);
 	while (esize < bitwidth) {
 		result |= (result << esize);
@@ -282,10 +280,8 @@ BFXPreferred(uint64_t sf, uint64_t opc, uint64_t imms, uint64_t immr)
 
 	if (imms < immr)
 		return false;
-
 	if (imms == (bitwidth - 1))
 		return false;
-
 	if (immr == 0) {
 		if ((sf == 0) && ((imms == 7) || (imms == 15)))
 			return false;
@@ -346,31 +342,28 @@ extendreg_common(const char *op, const char *z_op,
 				    SREGNAME(sf, Rn),
 				    ZREGNAME(r, Rm),
 				    SHIFTOP8(option,
-				        "uxtb", "uxth", "uxtw", "uxtx", "sxtb", "sxth", "sxtw", "sxtx"));
+				        "uxtb", "uxth", "uxtw", "uxtx",
+				        "sxtb", "sxth", "sxtw", "sxtx"));
 			}
 		} else {
 			PRINTF("%s, %s, %s #%lu\n",
 			    SREGNAME(sf, Rn),
 			    ZREGNAME(r, Rm),
 			    SHIFTOP8(option,
-			        "uxtb", "uxth", "lsl", "lsl", "sxtb", "sxth", "sxtw", "sxtx"),
+			        "uxtb", "uxth", "lsl", "lsl",
+			        "sxtb", "sxth", "sxtw", "sxtx"),
 			    imm3);
 		}
 	} else {
-		if (imm3 == 0) {
-			PRINTF("%s, %s, %s\n",
-			    SREGNAME(sf, Rn),
-			    ZREGNAME(r, Rm),
-			    SHIFTOP8(option,
-			        "uxtb", "uxth", "uxtw", "uxtx", "sxtb", "sxth", "sxtw", "sxtx"));
-		} else {
-			PRINTF("%s, %s, %s #%lu\n",
-			    SREGNAME(sf, Rn),
-			    ZREGNAME(r, Rm),
-			    SHIFTOP8(option,
-			        "uxtb", "uxth", "uxtw", "uxtx", "sxtb", "sxth", "sxtw", "sxtx"),
-			    imm3);
-		}
+		PRINTF("%s, %s, %s",
+		    SREGNAME(sf, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option,
+		        "uxtb", "uxth", "uxtw", "uxtx",
+		        "sxtb", "sxth", "sxtw", "sxtx"));
+		if (imm3 != 0)
+			PRINTF(" #%lu", imm3);
+		PRINTF("\n");
 	}
 }
 
@@ -459,14 +452,16 @@ regoffset_b_common(const char *op,
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+		    SHIFTOP8(option,
+		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
 		    op,
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
 		    0);
 	}
 }
@@ -505,14 +500,16 @@ regoffset_h_common(const char *op,
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
 	} else {
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
 		    op,
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
 		    shift);
 	}
 }
@@ -551,14 +548,16 @@ regoffset_w_common(const char *op,
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
 	} else {
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
 		    op,
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
 		    shift * 2);
 	}
 }
@@ -591,7 +590,8 @@ regoffset_x_common(const char *op,
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+		    SHIFTOP8(option,
+		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
 		amount = 2 + size;
 		PRINTF("%12lx:\t%08x	%s	%s, [%s,%s,%s #%lu]\n", pc, insn,
@@ -599,7 +599,8 @@ regoffset_x_common(const char *op,
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
 		    amount);
 	}
 }
@@ -663,14 +664,16 @@ OPFUNC_DECL(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		UNDEFINED(pc, insn, "illegal shift");
 		return;
 	}
-	shiftreg_common("add", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("add", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmn_extreg */
-	extendreg_common("adds", "cmn", pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	extendreg_common("adds", "cmn", pc, insn,
+	    sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
@@ -704,7 +707,8 @@ OPFUNC_DECL(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		return;
 	}
 	/* ALIAS: cmn_shiftreg */
-	shiftreg_common("adds", NULL, "cmn", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("adds", NULL, "cmn", pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -744,7 +748,8 @@ OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("and", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("and", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -772,7 +777,8 @@ static void
 OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
-	shiftreg_common("ands", NULL, "tst", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("ands", NULL, "tst", pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -979,13 +985,15 @@ OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bic", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("bic", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bics", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("bics", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1181,7 +1189,8 @@ OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	}
 
 	/* ALIAS: negs,subs_shiftreg */
-	shiftreg_common("subs", "negs", "cmp", pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("subs", "negs", "cmp", pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1349,7 +1358,8 @@ OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eon", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("eon", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1369,7 +1379,8 @@ OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eor", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("eor", NULL, NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -2226,7 +2237,8 @@ OPFUNC_DECL(op_mov_reg, sf, shift, Rm, imm6, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rm));
 	} else {
-		shiftreg_common("orr", NULL, NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+		shiftreg_common("orr", NULL, NULL, pc, insn,
+		    sf, shift, Rm, imm6, Rn, Rd);
 	}
 }
 
@@ -2319,14 +2331,16 @@ static void
 OPFUNC_DECL(op_mvn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: orn */
-	shiftreg_common("orn", "mvn", NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("orn", "mvn", NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_neg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: sub_shiftreg */
-	shiftreg_common("sub", "neg", NULL, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("sub", "neg", NULL, pc, insn,
+	    sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -2408,13 +2422,15 @@ OPFUNC_DECL(op_prfm_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+		    SHIFTOP8(option,
+		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
 		PRINTF("%12lx:\t%08x	prfm	%s, [%s,%s,%s #%lu]\n", pc, insn,
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
-		    SHIFTOP8(option, "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
 		    3);
 	}
 }

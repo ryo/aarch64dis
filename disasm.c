@@ -887,8 +887,7 @@ OPFUNC_DECL(op_at, op1, CRn, CRm, op2, Rt, UNUSED5)
 static void
 OPFUNC_DECL(op_b, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("b\t%lx\n",
-	    SignExtend(26, imm26, 4) + pc);
+	PRINTF("b\t%lx\n", SignExtend(26, imm26, 4) + pc);
 }
 
 static void
@@ -938,29 +937,25 @@ OPFUNC_DECL(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 static void
 OPFUNC_DECL(op_bl, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("bl\t%lx\n",
-	    SignExtend(26, imm26, 4) + pc);
+	PRINTF("bl\t%lx\n", SignExtend(26, imm26, 4) + pc);
 }
 
 static void
 OPFUNC_DECL(op_blr, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("blr\t%s\n",
-	    ZREGNAME(1, Rn));
+	PRINTF("blr\t%s\n", ZREGNAME(1, Rn));
 }
 
 static void
 OPFUNC_DECL(op_br, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("br\t%s\n",
-	    ZREGNAME(1, Rn));
+	PRINTF("br\t%s\n", ZREGNAME(1, Rn));
 }
 
 static void
 OPFUNC_DECL(op_brk, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("brk\t#0x%lx\n",
-	    imm16);
+	PRINTF("brk\t#0x%lx\n", imm16);
 }
 
 static void
@@ -1247,34 +1242,28 @@ OPFUNC_DECL(op_csel, sf, Rm, cond, Rn, Rd, UNUSED5)
 static void
 OPFUNC_DECL(op_dcps1, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	if (imm16 == 0) {
+	if (imm16 == 0)
 		PRINTF("dpcs1\n");
-	} else {
-		PRINTF("dpcs1\t#0x%lx\n",
-		    imm16);
-	}
+	else
+		PRINTF("dpcs1\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_dcps2, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	if (imm16 == 0) {
+	if (imm16 == 0)
 		PRINTF("dpcs2\n");
-	} else {
-		PRINTF("dpcs2\t#0x%lx\n",
-		    imm16);
-	}
+	else
+		PRINTF("dpcs2\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	if (imm16 == 0) {
+	if (imm16 == 0)
 		PRINTF("dpcs3\n");
-	} else {
-		PRINTF("dpcs3\t#0x%lx\n",
-		    imm16);
-	}
+	else
+		PRINTF("dpcs3\t#0x%lx\n", imm16);
 }
 
 static void
@@ -1384,25 +1373,22 @@ OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_hlt, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("hlt\t#0x%lx\n",
-	    imm16);
+	PRINTF("hlt\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_hvc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("hvc\t#0x%lx\n",
-	    imm16);
+	PRINTF("hvc\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_isb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	if (CRm == 15) {
+	if (CRm == 15)
 		PRINTF("isb\n");
-	} else {
+	else
 		PRINTF("isb\t#d\n", CRm);
-	}
 }
 
 static void
@@ -2125,8 +2111,8 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 	}
 
 	/* ALIAS: orr_imm */
-	/* to distinguish from mov_iwimm */
 #if 1
+	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
 #else
 	/* same as objdump? */
@@ -2341,19 +2327,10 @@ OPFUNC_DECL(op_prfm_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_prfm_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 {
-	uint64_t r;
+	int r;
 
-	switch (option) {
-	case 2:
-	case 6:
-		r = 0;
-		break;
-	case 3:
-	case 7:
-		r = 1;
-		break;
-	default:
-		UNDEFINED(pc, insn, "illegal imm6");
+	if ((r = regoffset_option_to_r(option)) < 0) {
+		UNDEFINED(pc, insn, "illegal option");
 		return;
 	}
 
@@ -2401,12 +2378,10 @@ OPFUNC_DECL(op_rbit, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ret, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	if (Rn == 30) {
+	if (Rn == 30)
 		PRINTF("ret\n");
-	} else {
-		PRINTF("ret\t%s\n",
-		    ZREGNAME(1, Rn));
-	}
+	else
+		PRINTF("ret\t%s\n", ZREGNAME(1, Rn));
 }
 
 static void
@@ -2991,6 +2966,8 @@ disasm_insn(uint64_t loc, uint32_t insn)
 
 		/* extract operands */
 		for (j = 0; j < INSN_MAXARG; j++) {
+			if (insn_tables[i].bitinfo[j].width == 0)
+				break;
 			args[j] = (insn >> insn_tables[i].bitinfo[j].pos) &
 			    WIDTHMASK(insn_tables[i].bitinfo[j].width);
 		}
@@ -3049,70 +3026,3 @@ disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize)
 
 	return sizeof(uint32_t);
 }
-
-#ifdef STANDALONE_TEST
-int
-main(int argc, char *argv[])
-{
-	disasm_insn(0x200101d34, 0xf81d0ff6);	//        str     x22, [sp,#-48]!
-	disasm_insn(0x200101d38, 0xa90153f5);	//        stp     x21, x20, [sp,#16]
-	disasm_insn(0x200101d3c, 0xa9027bf3);	//        stp     x19, x30, [sp,#32]
-	disasm_insn(0x200101d40, 0xaa0203f3);	//        mov     x19, x2
-	disasm_insn(0x200101d44, 0xb40009b3);	//        cbz     x19, 200101e78 <___start+0x144>
-	disasm_insn(0x200101d48, 0x900000a8);	//        adrp    x8, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101d4c, 0xf941f908);	//        ldr     x8, [x8,#1008]
-	disasm_insn(0x200101d50, 0x900000b4);	//        adrp    x20, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101d54, 0xf9000113);	//        str     x19, [x8]
-	disasm_insn(0x200101d58, 0xf9400a68);	//        ldr     x8, [x19,#16]
-	disasm_insn(0x200101d5c, 0xf941fe94);	//        ldr     x20, [x20,#1016]
-	disasm_insn(0x200101d60, 0xf9000288);	//        str     x8, [x20]
-	disasm_insn(0x200101d64, 0xf9400268);	//        ldr     x8, [x19]
-	disasm_insn(0x200101d68, 0xf9400109);	//        ldr     x9, [x8]
-	disasm_insn(0x200101d6c, 0xb4000209);	//        cbz     x9, 200101dac <___start+0x78>
-	disasm_insn(0x200101d70, 0x900000a8);	//        adrp    x8, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101d74, 0xf941ed08);	//        ldr     x8, [x8,#984]
-	disasm_insn(0x200101d78, 0xf9000109);	//        str     x9, [x8]
-	disasm_insn(0x200101d7c, 0xf9400269);	//        ldr     x9, [x19]
-	disasm_insn(0x200101d80, 0xf9400129);	//        ldr     x9, [x9]
-	disasm_insn(0x200101d84, 0x14000002);	//        b       200101d8c <___start+0x58>
-	disasm_insn(0x200101d88, 0x91000529);	//        add     x9, x9, #0x1
-	disasm_insn(0x200101d8c, 0x3940012a);	//        ldrb    w10, [x9]
-	disasm_insn(0x200101d90, 0x7100bd5f);	//        cmp     w10, #0x2f
-	disasm_insn(0x200101d94, 0x54000060);	//        b.eq    200101da0 <___start+0x6c>
-	disasm_insn(0x200101d98, 0x35ffff8a);	//        cbnz    w10, 200101d88 <___start+0x54>
-	disasm_insn(0x200101d9c, 0x14000009);	//        b       200101dc0 <___start+0x8c>
-	disasm_insn(0x200101da0, 0x91000529);	//        add     x9, x9, #0x1
-	disasm_insn(0x200101da4, 0xf9000109);	//        str     x9, [x8]
-	disasm_insn(0x200101da8, 0x17fffff9);	//        b       200101d8c <___start+0x58>
-	disasm_insn(0x200101dac, 0x900000a8);	//        adrp    x8, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101db0, 0xf941ed08);	//        ldr     x8, [x8,#984]
-	disasm_insn(0x200101db4, 0x900000a9);	//        adrp    x9, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101db8, 0x9121e129);	//        add     x9, x9, #0x878
-	disasm_insn(0x200101dbc, 0xf9000109);	//        str     x9, [x8]
-	disasm_insn(0x200101dc0, 0x900000a8);	//        adrp    x8, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101dc4, 0xf941f108);	//        ldr     x8, [x8,#992]
-	disasm_insn(0x200101dc8, 0xb4000168);	//        cbz     x8, 200101df4 <___start+0xc0>
-	disasm_insn(0x200101dcc, 0xb4000621);	//        cbz     x1, 200101e90 <___start+0x15c>
-	disasm_insn(0x200101dd0, 0xb9400028);	//        ldr     w8, [x1]
-	disasm_insn(0x200101dd4, 0x52970f49);	//        mov     w9, #0xb87a                     // #47226
-	disasm_insn(0x200101dd8, 0x72baaa09);	//        movk    w9, #0xd550, lsl #16
-	disasm_insn(0x200101ddc, 0x6b09011f);	//        cmp     w8, w9
-	disasm_insn(0x200101de0, 0x54000641);	//        b.ne    200101ea8 <___start+0x174>
-	disasm_insn(0x200101de4, 0xb9400428);	//        ldr     w8, [x1,#4]
-	disasm_insn(0x200101de8, 0x7100051f);	//        cmp     w8, #0x1
-	disasm_insn(0x200101dec, 0x540006a1);	//        b.ne    200101ec0 <___start+0x18c>
-	disasm_insn(0x200101df0, 0x97ffff8c);	//        bl      200101c20 <atexit@plt>
-	disasm_insn(0x200101df4, 0x97ffffa7);	//        bl      200101c90 <_libc_init@plt>
-	disasm_insn(0x200101df8, 0x900000b5);	//        adrp    x21, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101dfc, 0xf941f6b5);	//        ldr     x21, [x21,#1000]
-	disasm_insn(0x200101e00, 0x900000a8);	//        adrp    x8, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101e04, 0x91086108);	//        add     x8, x8, #0x218
-	disasm_insn(0x200101e08, 0xeb15011f);	//        cmp     x8, x21
-	disasm_insn(0x200101e0c, 0x540000e2);	//        b.cs    200101e28 <___start+0xf4>
-	disasm_insn(0x200101e10, 0x900000b6);	//        adrp    x22, 200115000 <__EH_FRAME_END__+0xfdf0>
-	disasm_insn(0x200101e14, 0x910862d6);	//        add     x22, x22, #0x218
-	disasm_insn(0x200101e18, 0xf84086c8);	//        ldr     x8, [x22],#8
-	disasm_insn(0x200101e1c, 0xd63f0100);	//        blr     x8
-	disasm_insn(0x200101e20, 0xeb1502df);	//        cmp     x22, x21
-}
-#endif

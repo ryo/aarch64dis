@@ -2697,7 +2697,10 @@ OPFUNC_DECL(op_strb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_strb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	strb	%s, [%s,#%ld]!\n", pc, insn,
+	    ZREGNAME(0, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void
@@ -2733,7 +2736,10 @@ OPFUNC_DECL(op_strh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_strh_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);
+	PRINTF("%12lx:\t%08x	strh	%s, [%s,#%ld]!\n", pc, insn,
+	    ZREGNAME(0, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void

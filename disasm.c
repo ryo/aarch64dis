@@ -1640,7 +1640,7 @@ OPFUNC_DECL(op_ldrb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_ldrb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("%12lx:\t%08x	ldpb	%s, %s, [%s,#%ld]!\n", pc, insn,
+	PRINTF("%12lx:\t%08x	ldrb	%s, [%s,#%ld]!\n", pc, insn,
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));

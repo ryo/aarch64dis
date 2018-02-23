@@ -1297,7 +1297,6 @@ OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 	/* ALIAS: nop,sev,sevl,wfe,wfi,yield */
 	switch (op) {
 	case 0:
-	default:
 		PRINTF("nop\n");
 		break;
 	case 1:
@@ -1314,6 +1313,9 @@ OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 		break;
 	case 5:
 		PRINTF("sevl\n");
+		break;
+	default:
+		PRINTF("hint\t#0x%lx\n", op);
 		break;
 	}
 }

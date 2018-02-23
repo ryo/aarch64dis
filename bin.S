@@ -683,6 +683,24 @@ testpattern:
 	add	sp, sp, x0, sxtx #4
 
 
+	beq	1f
+	bne	1f
+	bcs	1f
+	bcc	1f
+	bmi	1f
+	bpl	1f
+	bvs	1f
+	bvc	1f
+	bhi	1f
+	bls	1f
+	bge	1f
+	blt	1f
+	bgt	1f
+	ble	1f
+	bal	1f
+	bnv	1f
+	nop
+1:
 
 	nop
 	nop

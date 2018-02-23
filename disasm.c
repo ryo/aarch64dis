@@ -40,8 +40,8 @@ static int test_printf(char const *fmt, ...);
 
 #define OPFUNC_DECL(func,a,b,c,d,e,f)		\
 func(uint64_t pc, uint32_t insn,		\
-     uint64_t a, uint64_t b, uint64_t c,	\
-     uint64_t d, uint64_t e, uint64_t f)
+    uint64_t a, uint64_t b, uint64_t c,	\
+    uint64_t d, uint64_t e, uint64_t f)
 
 struct bitpos {
 	uint8_t pos;
@@ -159,7 +159,7 @@ sysregname_bsearch(uint32_t code)
 
 static const char *
 sysregname(char *buf, size_t buflen, uint32_t rw,
-           uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
+    uint64_t op0, uint64_t op1, uint64_t CRn, uint64_t CRm, uint64_t op2)
 {
 	const char *name;
 	uint32_t code;
@@ -311,8 +311,8 @@ DecodeShift(uint64_t shift)
 
 static void
 extendreg_common(const char *op, const char *z_op,
-                 uint64_t pc, uint32_t insn, uint64_t sf, uint64_t Rm,
-                 uint64_t option, uint64_t imm3, uint64_t Rn, uint64_t Rd)
+    uint64_t pc, uint32_t insn, uint64_t sf, uint64_t Rm,
+    uint64_t option, uint64_t imm3, uint64_t Rn, uint64_t Rd)
 {
 	const int r = (sf == 0) ? 0 : ((option & 3) == 3) ? 1 : 0;
 
@@ -353,8 +353,8 @@ extendreg_common(const char *op, const char *z_op,
 
 static void
 shiftreg_common(const char *dnm_op, const char *dzm_op, const char *znm_op,
-                uint64_t pc, uint32_t insn, uint64_t sf, uint64_t shift,
-                uint64_t Rm, uint64_t imm6, uint64_t Rn, uint64_t Rd)
+    uint64_t pc, uint32_t insn, uint64_t sf, uint64_t shift,
+    uint64_t Rm, uint64_t imm6, uint64_t Rn, uint64_t Rd)
 {
 	if ((sf == 0) && (imm6 >= 32)) {
 		UNDEFINED(pc, insn, "illegal imm6");
@@ -400,9 +400,8 @@ regoffset_option_to_r(uint64_t option)
 
 static void
 regoffset_b_common(const char *op,
-                   uint64_t pc, uint32_t insn,
-                   uint64_t Rm, uint64_t option, uint64_t shift,
-                   uint64_t Rn, uint64_t Rt)
+    uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt)
 {
 	int r;
 
@@ -433,9 +432,9 @@ regoffset_b_common(const char *op,
 
 static void
 regoffset_h_common(const char *op,
-                   uint64_t pc, uint32_t insn,
-                   uint64_t Rm, uint64_t option, uint64_t shift,
-                   uint64_t Rn, uint64_t Rt)
+    uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift,
+    uint64_t Rn, uint64_t Rt)
 {
 	int r;
 
@@ -472,9 +471,9 @@ regoffset_h_common(const char *op,
 
 static void
 regoffset_w_common(const char *op,
-                   uint64_t pc, uint32_t insn,
-                   uint64_t Rm, uint64_t option, uint64_t shift,
-                   uint64_t Rn, uint64_t Rt)
+    uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift,
+    uint64_t Rn, uint64_t Rt)
 {
 	int r;
 
@@ -511,9 +510,9 @@ regoffset_w_common(const char *op,
 
 static void
 regoffset_x_common(const char *op,
-                   uint64_t pc, uint32_t insn,
-                   uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
-                   uint64_t Rn, uint64_t Rt)
+    uint64_t pc, uint32_t insn,
+    uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
+    uint64_t Rn, uint64_t Rt)
 {
 	int r;
 
@@ -1148,8 +1147,8 @@ OPFUNC_DECL(op_cneg, sf, Rm, cond, Rn, Rd, UNUSED5)
 
 static void
 crc32w_common(const char *op,
-              uint64_t pc, uint32_t insn,
-              uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+    uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
 {
 	if (sf != 0) {
 		UNDEFINED(pc, insn, "illegal size");
@@ -1165,8 +1164,8 @@ crc32w_common(const char *op,
 
 static void
 crc32x_common(const char *op,
-              uint64_t pc, uint32_t insn,
-              uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+    uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
 {
 	if (sf == 0) {
 		UNDEFINED(pc, insn, "illegal size");

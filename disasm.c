@@ -720,11 +720,11 @@ OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_asr_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL(op_sbfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
-	/* ALIAS: sbfiz,sbfm,sbfx,sxtb,sxth,sxtw */
+	/* ALIAS: asr_imm,sbfiz,sbfx,sxtb,sxth,sxtw */
 	if ((imms != (bitwidth - 1)) && ((imms + 1) == immr)) {
 		PRINTF("asr\t%s, %s, #%lu\n",
 		    ZREGNAME(sf, Rd),
@@ -843,12 +843,12 @@ static struct op_sys_table op_sys_table[] = {
 };
 
 static void
-OPFUNC_DECL(op_at, op1, CRn, CRm, op2, Rt, UNUSED5)
+OPFUNC_DECL(op_sys, op1, CRn, CRm, op2, Rt, UNUSED5)
 {
 	uint32_t code;
 	size_t i;
 
-	/* ALIAS: dc,ic,sys,tlbi */
+	/* ALIAS: at,dc,ic,sys,tlbi */
 	code = SYSREG_ENC(1, op1, CRn, CRm, op2);
 	for (i = 0; i < __arraycount(op_sys_table); i++) {
 		if (op_sys_table[i].code != code)
@@ -1084,22 +1084,22 @@ OPFUNC_DECL(op_clz, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cmp_extreg, sf, Rm, option, imm3, Rn, Rd)
+OPFUNC_DECL(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
-	/* ALIAS: subs_extreg */
+	/* ALIAS: cmp_extreg */
 	extendreg_common("subs", "cmp",
 	    pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_cmp_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
+OPFUNC_DECL(op_subs_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 {
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
 		return;
 	}
 
-	/* ALIAS: subs_imm */
+	/* ALIAS: cmp_imm */
 	if (Rd == 31) {
 		PRINTF("cmp\t%s, #0x%lx%s\n",
 		    SREGNAME(sf, Rn),
@@ -1115,22 +1115,22 @@ OPFUNC_DECL(op_cmp_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
 		UNDEFINED(pc, insn, "illegal shift");
 		return;
 	}
 
-	/* ALIAS: negs,subs_shiftreg */
+	/* ALIAS: negs,cmp_shiftreg */
 	shiftreg_common("subs", "negs", "cmp",
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_cneg, sf, Rm, cond, Rn, Rd, UNUSED5)
+OPFUNC_DECL(op_csneg, sf, Rm, cond, Rn, Rd, UNUSED5)
 {
-	/* ALIAS: csneg */
+	/* ALIAS: cneg */
 	if ((Rn == Rm) && ((cond & 0xe) != 0x0e)) {
 		PRINTF("cneg\t%s, %s, %s\n",
 		    ZREGNAME(sf, Rd),
@@ -1267,14 +1267,14 @@ OPFUNC_DECL(op_eret, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_extr, sf, n, Rm, imms, Rn, Rd)
+OPFUNC_DECL(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 {
 	if (((sf ^ n) != 0) || (n == 0 && imms >= 0x20)) {
 		UNDEFINED(pc, insn, "illegal sf and N");
 		return;
 	}
 
-	/* ALIAS: ror_imm */
+	/* ALIAS: extr */
 	if (Rn == Rm) {
 		PRINTF("ror\t%s, %s, #%lu\n",
 		    ZREGNAME(sf, Rd),
@@ -1953,7 +1953,7 @@ OPFUNC_DECL(op_ldxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_lsl_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL(op_ubfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
@@ -2034,9 +2034,9 @@ OPFUNC_DECL(op_madd, sf, Rm, Ra, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mneg, sf, Rm, Ra, Rn, Rd, UNUSED5)
+OPFUNC_DECL(op_msub, sf, Rm, Ra, Rn, Rd, UNUSED5)
 {
-	/* ALIAS: msub */
+	/* ALIAS: mneg */
 	if (Ra == 31) {
 		PRINTF("mneg\t%s, %s, %s\n",
 		    ZREGNAME(sf, Rd),
@@ -2052,14 +2052,14 @@ OPFUNC_DECL(op_mneg, sf, Rm, Ra, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
 		return;
 	}
 
-	/* ALIAS: orr_imm */
+	/* ALIAS: mov_bmimm */
 #if 1
 	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
@@ -2080,7 +2080,7 @@ OPFUNC_DECL(op_mov_bmimm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_movn, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
 	const uint64_t mask = (sf == 0) ? 0xffffffff : 0xffffffffffffffffUL;
 
@@ -2089,7 +2089,7 @@ OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 		return;
 	}
 
-	/* ALIAS: movn */
+	/* ALIAS: mov_iwimm */
 	if ((hw == 0) || (imm16 == 0)) {
 		PRINTF("mov\t%s, #0x%lx\n",
 		    ZREGNAME(sf, Rd),
@@ -2104,9 +2104,9 @@ OPFUNC_DECL(op_mov_iwimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mov_reg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	/* ALIAS: orr_reg */
+	/* ALIAS: mov_reg */
 	if ((Rn == 31) && (imm6 == 0)) {
 		PRINTF("mov\t%s, %s\n",
 		    ZREGNAME(sf, Rd),
@@ -2118,9 +2118,9 @@ OPFUNC_DECL(op_mov_reg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_mov_wimm, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_movz, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 {
-	/* ALIAS: movz */
+	/* ALIAS: mov_wimm */
 	if ((hw == 0) || (imm16 == 0)) {
 		PRINTF("mov\t%s, #0x%lx\n",
 		    ZREGNAME(sf, Rd),
@@ -2203,25 +2203,25 @@ OPFUNC_DECL(op_msr_imm, op1, CRm, op2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mvn, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 {
-	/* ALIAS: orn */
+	/* ALIAS: mvn */
 	shiftreg_common("orn", "mvn", NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_neg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	/* ALIAS: sub_shiftreg */
+	/* ALIAS: neg */
 	shiftreg_common("sub", "neg", NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_ngc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_sbc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	/* ALIAS: sbc */
+	/* ALIAS: ngc */
 	if (Rn == 31) {
 		PRINTF("ngc\t%s, %s\n",
 		    ZREGNAME(sf, Rd),
@@ -2235,9 +2235,9 @@ OPFUNC_DECL(op_ngc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ngcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_sbcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 {
-	/* ALIAS: sbcs */
+	/* ALIAS: ngcs */
 	if (Rn == 31) {
 		PRINTF("ngcs\t%s, %s\n",
 		    ZREGNAME(sf, Rd),
@@ -2402,9 +2402,9 @@ OPFUNC_DECL(op_smc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_smnegl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_smsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 {
-	/* ALIAS: smsubl */
+	/* ALIAS: smnegl */
 	if (Ra == 31) {
 		PRINTF("smnegl\t%s, %s, %s\n",
 		    ZREGNAME(1, Rd),
@@ -2872,9 +2872,9 @@ OPFUNC_DECL(op_umaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_umnegl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_umsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 {
-	/* ALIAS: umsubl */
+	/* ALIAS: umnegl */
 	if (Ra == 31) {
 		PRINTF("umnegl\t%s, %s, %s\n",
 		    ZREGNAME(1, Rd),

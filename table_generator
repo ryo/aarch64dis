@@ -4,15 +4,29 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+chop(my @INPUT = <>);
+
+
 my @insns;
-while (<>) {
-	chop;
+
+for (@INPUT) {
+	next unless (m/MAINNAME/);
 	next if (m/^\s*#/);
 	s/\s*#.*//;
 	next if (m/^$/);
 
 	my ($sym, $defs) = split(/\s*:\s*/, $_, 2);
+	my $insn = parse_defs($sym, $defs);
+	push(@insns, $insn);
+}
 
+for (@INPUT) {
+	next if (m/MAINNAME/);
+	next if (m/^\s*#/);
+	s/\s*#.*//;
+	next if (m/^$/);
+
+	my ($sym, $defs) = split(/\s*:\s*/, $_, 2);
 	my $insn = parse_defs($sym, $defs);
 	push(@insns, $insn);
 }

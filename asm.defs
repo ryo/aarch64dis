@@ -78,7 +78,7 @@ cset		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# = csinc
 csetm		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>	# = csinv
 csinc		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
 csinv		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
-csneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
+csneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# MAINNAME
 
 dc		:	1	10		10101 00		0 01 op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
 
@@ -98,7 +98,7 @@ eor_shiftreg	:	sf<1>	10		01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
 extr		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imms<6>			Rn<5>	Rd<5>
 
-hint		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =nop
+hint		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =nop	MAINNAME
 
 hlt		:	1	10		10100 010			imm16<16>				00000
 hvc		:	1	10		10100 000			imm16<16>				00010
@@ -193,7 +193,7 @@ lsrv		:	sf<1> 0		0	11010 1 1			0 Rm<5> 0	01001		Rn<5>	Rd<5>
 
 
 madd		:	sf<1> 0		0	11011 0 0			0 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =mul
-mneg		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =msub
+mneg		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =msub	
 
 
 mov_tofromsp	:	sf<1> 0		0	10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# =add
@@ -205,15 +205,15 @@ mov_bmimm	:	sf<1> 0		1	10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
 mov_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =orr
 
 movk		:	sf<1> 1		1	10010 1 hw<2>			imm16<16>				Rd<5>
-movn		:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>
-movz		:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>
+movn		:	sf<1> 0		0	10010 1 hw<2>			imm16<16>				Rd<5>	# MAINNAME
+movz		:	sf<1> 1		0	10010 1 hw<2>			imm16<16>				Rd<5>	# MAINNAME
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 mrs		:	1	10		10101 00	1 op0<2> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
 msr_imm		:	1	10		10101 00	0 0 0     op1<3>	0100	CRm<4>	op2<3>		11111
 msr		:	1	10		10101 00	0 op0<2> op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
 
-msub		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =mneg
+msub		:	sf<1> 0		0	11011 0 0			0 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =mneg	MAINNAME
 mul		:	sf<1> 0		0	11011 0 0			0 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =madd
 
 #--------------------------------------------------------------------------          16|15          -------------------------
@@ -228,9 +228,9 @@ ngcs		:	sf<1> 1		1	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =sbcs
 nop		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 
 
-orn		:	sf<1> 0		1	01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mvn
-orr_imm		:	sf<1> 0		1	10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =mov(bmimm)
-orr_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mov(reg)
+orn		:	sf<1> 0		1	01010 shift<2>		1	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mvn		MAINNAME
+orr_imm		:	sf<1> 0		1	10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =mov(bmimm)	MAINNAME
+orr_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mov(reg)	MAINNAME
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 prfm_imm	:	11 111 001 10						imm12<12>			Rn<5>	Rt<5>
@@ -248,16 +248,16 @@ rev16		:	sf<1> 1 0	11010110	00000				0000	0 1		Rn<5>	Rd<5>
 rev32		:	1     1 0	11010110	00000				0000	1 0		Rn<5>	Rd<5>
 
 
-ror_imm		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =extr
+ror_imm		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =extr	MAINNAME
 ror_reg		:	sf<1>	00		11010 1 1		0	Rm<5>	0010	11		Rn<5>	Rd<5>	# =rorv
 rorv		:	sf<1>	00		11010 1 1		0	Rm<5>	0010	11		Rn<5>	Rd<5>	# =ror(reg)
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-sbc		:	sf<1> 1		0	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngc
-sbcs		:	sf<1> 1		1	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngcs
+sbc		:	sf<1> 1		0	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngc		MAINNAME
+sbcs		:	sf<1> 1		1	11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>	# =ngcs		MAINNAME
 
 sbfiz		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =sbfm
-sbfm		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
+sbfm		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw	MAINNAME
 sbfx		:	sf<1> 0		0	10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
 
 
@@ -273,7 +273,7 @@ smaddl		:	1	0	0	11011 0 0			1 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =smull
 smc		:	1	10		10100 000			imm16<16>				00011
 
 smnegl		:	1	0	0	11011 0 0			1 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =smsubl
-smsubl		:	1	0	0	11011 0 0			1 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =smnegl
+smsubl		:	1	0	0	11011 0 0			1 Rm<5> 1	Ra<5>		Rn<5>	Rd<5>	# =smnegl	MAINNAME
 
 smulh		:	1	0	0	11011 0 1			0 Rm<5> 0	11111		Rn<5>	Rd<5>	# =smnegl
 smull		:	1	0	0	11011 0 0			1 Rm<5> 0	Ra<5>		Rn<5>	Rd<5>	# =smaddl
@@ -327,11 +327,11 @@ stxrh		:	0 1		0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
 #--------------------------------------------------------------------------          16|15          -------------------------
 sub_extreg	:	sf<1>	10		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
 sub_imm		:	sf<1>	10		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
-sub_shiftreg	:	sf<1>	10		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+sub_shiftreg	:	sf<1>	10		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# MAINNAME
 
-subs_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
-subs_imm	:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
-subs_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
+subs_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>	# MAINNAME
+subs_imm	:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# MAINNAME
+subs_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# MAINNAME
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 svc		:	1	10		10100 000			imm16<16>				00001
@@ -342,7 +342,7 @@ sxth		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx
 sxtw		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-sys		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+sys		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys	MAINNAME
 sysl		:	1	10		10101 00	1 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
@@ -357,14 +357,14 @@ tst_shiftreg	:	sf<1>	11		01010 shift<2> 0	Rm<5>		imm6<6>			Rn<5>	Rd<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 ubfiz		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
-ubfm		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
+ubfm		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv	MAINNAME
 ubfx		:	sf<1>	10		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =ubfm=ubfiz=ubfx=lsl=lsrv
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 udiv		:	sf<1>	00		11010 11	0		Rm<5>	00001	0		Rn<5>	Rd<5>
 umaddl		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umull
 umnegl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl
-umsubl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl
+umsubl		:	1	00		11011 10	1		Rm<5>	1	Ra<5>		Rn<5>	Rd<5>	# =umsubl=umnegl	MAINNAME
 umulh		:	1	00		11011 11	0		Rm<5>	0	11111		Rn<5>	Rd<5>
 umull		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umaddl
 

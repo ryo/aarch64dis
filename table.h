@@ -110,7 +110,7 @@
 #define FMT_SIZE_OPC_IMM12_RN_RT	\
 	{{30, 2}, {22, 2}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 
-struct aarch64_insn_info insn_tables[] = {
+struct insn_info insn_tables[] = {
  /* mask,      pattern,    opcode format,               opfunc             */
  /* ---------  ----------  ---------------------------  ------------------ */
  { 0xffffffff, 0xd6bf03e0, FMT_NOARG,                   op_drps },
@@ -304,17 +304,13 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7f000000, 0x37000000, FMT_B5_B40_IMM14_RT,         op_tbnz },
  { 0x7f000000, 0x36000000, FMT_B5_B40_IMM14_RT,         op_tbz },
  { 0x3f800000, 0x2c000000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstnp },
- { 0x3f800000, 0x2c800000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_postidx },
+ { 0x3f800000, 0x2c800000, FMT_OPC_L_IMM7_RT2_RN_RT, op_simd_ldstp_postidx },
  { 0x3f800000, 0x2d800000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_preidx },
  { 0x3f800000, 0x2d000000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_signed },
- { 0x3f200c00, 0x3c000400, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldstr_immpostidx },
- { 0x3f200c00, 0x3c000c00, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldstr_immpreidx },
+ { 0x3f200c00, 0x3c000400, FMT_SIZE_OPC_IMM9_RN_RT, op_simd_ldstr_immpostidx },
+ { 0x3f200c00, 0x3c000c00, FMT_SIZE_OPC_IMM9_RN_RT, op_simd_ldstr_immpreidx },
  { 0x3f200c00, 0x3c200800, FMT_SIZE_OPC_RM_OPT_S_RN_RT, op_simd_ldstr_reg },
- { 0x3f000000, 0x3d000000, FMT_SIZE_OPC_IMM12_RN_RT,    op_simd_ldstr_immunsign },
+ { 0x3f000000, 0x3d000000, FMT_SIZE_OPC_IMM12_RN_RT, op_simd_ldstr_immunsign },
  { 0x00000000, 0x00000000, FMT_NOARG,                   op_undefined }
 };
-
-
-
-
 

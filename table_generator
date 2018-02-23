@@ -126,12 +126,19 @@ if (exists($opts{A})) {
 		unless (defined($alias)) {
 			push(@decl_output, insn_decl($insn));
 
-			push(@table_output, sprintf(" { 0x%08x, 0x%08x, FMT_%-24s op_%s },\n",
+			my $line = sprintf(" { 0x%08x, 0x%08x, FMT_%-24s op_%s },\n",
 			    $insn->{mask},
 			    $insn->{code},
 			    $insn->{symbol} . ",",
-			    $insn->{sym})
-			);
+			    $insn->{sym});
+			if (length($line) > 80) {
+				$line = sprintf(" { 0x%08x, 0x%08x, FMT_%s op_%s },\n",
+				    $insn->{mask},
+				    $insn->{code},
+				    $insn->{symbol} . ",",
+				    $insn->{sym});
+			}
+			push(@table_output, $line);
 		}
 	}
 
@@ -147,7 +154,7 @@ print @fmt_output;
 print "\n";
 
 print <<__HEADER__;
-struct aarch64_insn_info insn_tables[] = {
+struct insn_info insn_tables[] = {
  /* mask,      pattern,    opcode format,               opfunc             */
  /* ---------  ----------  ---------------------------  ------------------ */
 __HEADER__
@@ -157,7 +164,7 @@ __HEADER__
 	print " { 0x00000000, 0x00000000, FMT_NOARG,                   op_undefined }\n";
 	print "};\n";
 
-	print "\n\n\n\n\n";
+	print "\n";
 }
 
 

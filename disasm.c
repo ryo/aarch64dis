@@ -90,9 +90,9 @@ struct bitpos {
 	uint8_t width;
 };
 
-struct aarch64_insn_info {
+struct insn_info {
 	uint32_t mask;
-	uint32_t code;
+	uint32_t pattern;
 #define INSN_MAXARG	8
 	struct bitpos bitinfo[INSN_MAXARG];
 	OPFUNC_DECL(void (*opfunc),,,,,,,,);
@@ -3179,7 +3179,7 @@ disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 	unsigned int i, j;
 
 	for (i = 0; i < __arraycount(insn_tables); i++) {
-		if ((insn & insn_tables[i].mask) != insn_tables[i].code)
+		if ((insn & insn_tables[i].mask) != insn_tables[i].pattern)
 			continue;
 
 		/* extract operands */

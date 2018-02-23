@@ -70,15 +70,8 @@ cmp_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
 cneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
 
-crc32b		:	sf<1>	00		1101 0 110			Rm<5>	010	0	00	Rn<5>	Rd<5>
-crc32h		:	sf<1>	00		1101 0 110			Rm<5>	010	0	01	Rn<5>	Rd<5>
-crc32w		:	sf<1>	00		1101 0 110			Rm<5>	010	0	10	Rn<5>	Rd<5>
-crc32x		:	sf<1>	00		1101 0 110			Rm<5>	010	0	11	Rn<5>	Rd<5>
-
-crc32cb		:	sf<1>	00		1101 0 110			Rm<5>	010	1	00	Rn<5>	Rd<5>
-crc32ch		:	sf<1>	00		1101 0 110			Rm<5>	010	1	01	Rn<5>	Rd<5>
-crc32cw		:	sf<1>	00		1101 0 110			Rm<5>	010	1	10	Rn<5>	Rd<5>
-crc32cx		:	sf<1>	00		1101 0 110			Rm<5>	010	1	11	Rn<5>	Rd<5>
+crc32		:	sf<1>	00		1101 0 110			Rm<5>	010	0	sz<2>	Rn<5>	Rd<5>
+crc32c		:	sf<1>	00		1101 0 110			Rm<5>	010	1	sz<2>	Rn<5>	Rd<5>
 
 csel		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
 cset		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# = csinc

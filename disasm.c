@@ -1146,86 +1146,35 @@ OPFUNC_DECL(op_cneg, sf, Rm, cond, Rn, Rd, UNUSED5)
 }
 
 static void
-crc32w_common(const char *op,
+crc32_common(const char *op,
     uint64_t pc, uint32_t insn,
-    uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+    uint64_t sf, uint64_t Rm, uint64_t sz, uint64_t Rn, uint64_t Rd)
 {
-	if (sf != 0) {
+	const char bhwx[4] = "bhwx";	/* "crc32x" + SizeChar */
+
+	if (((sf != 0) && (sz != 3)) ||
+	    ((sf == 0) && (sz == 3))) {
 		UNDEFINED(pc, insn, "illegal size");
 		return;
 	}
 
-	PRINTF("%s\t%s, %s, %s\n",
-	    op,
+	PRINTF("%s%c\t%s, %s, %s\n",
+	    op, bhwx[sz & 3],
 	    ZREGNAME(0, Rd),
 	    ZREGNAME(0, Rn),
-	    ZREGNAME(0, Rm));
+	    ZREGNAME(sf, Rm));
 }
 
 static void
-crc32x_common(const char *op,
-    uint64_t pc, uint32_t insn,
-    uint64_t sf, uint64_t Rm, uint64_t Rn, uint64_t Rd)
+OPFUNC_DECL(op_crc32, sf, Rm, sz, Rn, Rd, UNUSED5)
 {
-	if (sf == 0) {
-		UNDEFINED(pc, insn, "illegal size");
-		return;
-	}
-
-	PRINTF("%s\t%s, %s, %s\n",
-	    op,
-	    ZREGNAME(0, Rd),
-	    ZREGNAME(0, Rn),
-	    ZREGNAME(1, Rm));
-}
-
-
-static void
-OPFUNC_DECL(op_crc32b, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32b", pc, insn, sf, Rm, Rn, Rd);
+	crc32_common("crc32", pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_crc32cb, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL(op_crc32c, sf, Rm, sz, Rn, Rd, UNUSED5)
 {
-	crc32w_common("crc32cb", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32ch, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32ch", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32cw, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32cw", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32cx, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32cx", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32h, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32h", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32w, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32w_common("crc32w", pc, insn, sf, Rm, Rn, Rd);
-}
-
-static void
-OPFUNC_DECL(op_crc32x, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
-{
-	crc32x_common("crc32x", pc, insn, sf, Rm, Rn, Rd);
+	crc32_common("crc32c", pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void

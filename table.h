@@ -69,6 +69,8 @@
 	{ {31, 1}, {10, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
 #define FMT_SF_RM_RN_RD			\
 	{ {31, 1}, {16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0} }
+#define FMT_SF_RM_SZ_RN_RD		\
+	{ {31, 1}, {16, 5}, {10, 2}, { 5, 5}, { 0, 5}, { 0, 0} }
 #define FMT_SF_RM_RA_RN_RD		\
 	{ {31, 1}, {16, 5}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0} }
 #define FMT_SF_IMM5_COND_RN_NZCV	\
@@ -229,14 +231,6 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7fe0fc00, 0x1a000000, FMT_SF_RM_RN_RD,                op_adc },
  { 0x7fe0fc00, 0x3a000000, FMT_SF_RM_RN_RD,                op_adcs },
  { 0x7fe0fc00, 0x1ac02800, FMT_SF_RM_RN_RD,                op_asr_reg },
- { 0x7fe0fc00, 0x1ac04000, FMT_SF_RM_RN_RD,                op_crc32b },
- { 0x7fe0fc00, 0x1ac04400, FMT_SF_RM_RN_RD,                op_crc32h },
- { 0x7fe0fc00, 0x1ac04800, FMT_SF_RM_RN_RD,                op_crc32w },
- { 0x7fe0fc00, 0x1ac04c00, FMT_SF_RM_RN_RD,                op_crc32x },
- { 0x7fe0fc00, 0x1ac05000, FMT_SF_RM_RN_RD,                op_crc32cb },
- { 0x7fe0fc00, 0x1ac05400, FMT_SF_RM_RN_RD,                op_crc32ch },
- { 0x7fe0fc00, 0x1ac05800, FMT_SF_RM_RN_RD,                op_crc32cw },
- { 0x7fe0fc00, 0x1ac05c00, FMT_SF_RM_RN_RD,                op_crc32cx },
  { 0x7fe0fc00, 0x1ac02000, FMT_SF_RM_RN_RD,                op_lsl_reg },
  { 0x7fe0fc00, 0x1ac02400, FMT_SF_RM_RN_RD,                op_lsr_reg },
  { 0x7fe0fc00, 0x5a000000, FMT_SF_RM_RN_RD,                op_ngc },
@@ -244,6 +238,8 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7fe0fc00, 0x1ac02c00, FMT_SF_RM_RN_RD,                op_ror_reg },
  { 0x7fe0fc00, 0x1ac00c00, FMT_SF_RM_RN_RD,                op_sdiv },
  { 0x7fe0fc00, 0x1ac00800, FMT_SF_RM_RN_RD,                op_udiv },
+ { 0x7fe0f000, 0x1ac04000, FMT_SF_RM_SZ_RN_RD,             op_crc32 },
+ { 0x7fe0f000, 0x1ac05000, FMT_SF_RM_SZ_RN_RD,             op_crc32c },
  { 0x7fe08000, 0x1b000000, FMT_SF_RM_RA_RN_RD,             op_madd },
  { 0x7fe08000, 0x1b008000, FMT_SF_RM_RA_RN_RD,             op_mneg },
  { 0x7fe00c10, 0x3a400800, FMT_SF_IMM5_COND_RN_NZCV,       op_ccmn_imm },

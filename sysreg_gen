@@ -6,7 +6,6 @@ use warnings;
 print <<__HEADER__;
 #define SYSREG_ENC(op0, op1, CRn, CRm, op2)		\\
 	(((op0)<<19)|((op1)<<16)|((CRn)<<12)|((CRm)<<8)|((op2)<<5))
-#define SYSREG_MASK	SYSREG_ENC(3,7,15,15,7)
 
 struct sysreg_table {
 	uint32_t code;

@@ -13,6 +13,7 @@ struct sysreg_table {
 	const char *regname;
 };
 
+/* must be sorted by code */
 struct sysreg_table sysreg_table[] = {
 	/*	         op0 op1 CRn CRm op2 name			*/
 __HEADER__

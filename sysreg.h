@@ -7,6 +7,7 @@ struct sysreg_table {
 	const char *regname;
 };
 
+/* must be sorted by code */
 struct sysreg_table sysreg_table[] = {
 	/*	         op0 op1 CRn CRm op2 name			*/
 	{	SYSREG_ENC(2, 0,  0,  0, 2), "osdtrrx_el1"		},

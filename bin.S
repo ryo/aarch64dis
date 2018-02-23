@@ -5,6 +5,26 @@
 
 
 knownbugs:
+	ldp	q0, q1, [x0]
+	ldp	q2, q3, [x0,#32]
+	ldp	q4, q5, [x0,#64]
+	ldp	q6, q7, [x0,#96]
+	ldp	q8, q9, [x0,#128]
+	ldp	q10, q11, [x0,#160]
+	ldp	q12, q13, [x0,#192]
+	ldp	q14, q15, [x0,#224]
+	ldp	q16, q17, [x0,#256]
+	ldp	q18, q19, [x0,#288]
+	ldp	q20, q21, [x0,#320]
+	ldp	q22, q23, [x0,#352]
+	ldp	q24, q25, [x0,#384]
+	ldp	q26, q27, [x0,#416]
+	ldp	q28, q29, [x0,#448]
+	ldp	q30, q31, [x0,#480]
+	ldr	w8, [x0,#512]
+	ldr	w9, [x0,#516]
+	msr	fpcr, x8
+	msr	fpsr, x9
 	nop
 
 objdump_bug:

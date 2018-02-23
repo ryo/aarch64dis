@@ -1,2 +1,6 @@
-aarch64 disassembler for netbsd (or *bsd?) ddb.
-this is not well tested, and not cleanuped.
+# aarch64 disassembler
+
+...for netbsd (and *bsd?) ddb.
+
+* A64 Base instructions are supported.
+* A64 SIMD instructions are not supported.

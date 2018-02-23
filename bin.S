@@ -5,6 +5,36 @@
 
 
 knownbugs:
+	nop
+
+objdump_bug:
+	msr	dbgdtrtx_el0, x0
+	mrs	x0, dbgdtrrx_el0
+
+objdump_dif:
+	mov	w1, #0x20002
+	mov	w8, #0x10001
+	.word	0x0d508711f & ~1
+
+testpattern:
+	orr	x10, xzr, #0x100000000
+	orr	x10, xzr, #0xfff00000000
+	orr	x10, xzr, #0xfff000000000
+	orr	x10, xzr, #0xfff0000000000
+	orr	x10, xzr, #0xfff00000000000
+	orr	x10, xzr, #0xfff000000000000
+	orr	x10, xzr, #0xfff0000000000000
+	nop
+
+	isb
+	isb	#0
+	isb	#1
+	isb	#2
+	isb	#3
+	isb	#13
+	isb	#14
+	isb	#15
+
 	ldrh	w2, [x25,w8,uxtw]
 	ldrsh	w9, [x21],#2
 	ldrsh	w8, [x20,#170]!
@@ -18,32 +48,28 @@ knownbugs:
 	stxrb	w11, w9, [x8]
 	stxrh	w3, w2, [x4]
 
+	hint	#0
+	hint	#1
+	hint	#2
+	hint	#3
+	hint	#4
+	hint	#5
+	hint	#6
+	hint	#7
+	hint	#8
+	hint	#100
 
-	nop
+	sys	#0, C0, C0, #0, x0
 
-objdump_bug:	/* ??? */
-	orr	x10, xzr, #0x100000000
-	orr	x10, xzr, #0xfff00000000
-	orr	x10, xzr, #0xfff000000000
-	orr	x10, xzr, #0xfff0000000000	//ok
-	orr	x10, xzr, #0xfff00000000000	//ok
-	orr	x10, xzr, #0xfff000000000000
-	orr	x10, xzr, #0xfff0000000000000
-	nop
-
-
-testpattern:
 	ldrsw	x28, [x8,x27,lsl #2]
 	ldrsw	x9, [x20,x8]
 	nop
 
-	mov	w1, #0x20002
 	and	w9, w22, #0x10001
 	cmp	w10, #0xfff
 	cmp	w9, #0xf01
 	ldr	w8, [x19,#12608]
 	ldrsw	x21, [x20,#24]!
-	mov	w8, #0x10001
 	mov	x8, #0xffff1000ffffffff
 	rev16	w0, w0
 	smaddl	x25, w8, w27, x22
@@ -62,6 +88,9 @@ testpattern:
 	umull	x8, w0, w24
 	sdiv	w19, w10, w8
 
+	mov	x9, #0x4000400040004
+	mov	x9, #0x700000007
+
 	ldar	w1, [x5]
 	ldar	w2, [x6,#0]
 	ldar	x3, [x7]
@@ -69,6 +98,8 @@ testpattern:
 
 	crc32b	w0, w1, w2
 	crc32x	w0, w1, x2
+	crc32cb	w0, w1, w2
+	crc32cx	w0, w1, x2
 
 	ldr	x1, [sp, x0, lsl #0]
 	ldr	w2, [sp, x0, lsl #0]
@@ -102,10 +133,6 @@ testpattern:
 	prfm	PLDL1KEEP, [x0, xzr, sxtx #3]
 
 
-	mov	x9, #0x4000400040004
-	mov	x9, #0x700000007
-	mov	w1, #0x20002
-
 	asr	w24, w10, #1
 	asr	w24, w10, #2
 	asr	w24, w10, #3
@@ -124,17 +151,10 @@ testpattern:
 
 	ic	IALLUIS
 	ic	IALLUIS
-	.word	0x0d508711f & ~1
-
-	sys	#0, C0, C0, #0, x0
-
 
 	msr	SPsel, #1
 	msr	DAIFset, #10
 	msr	DAIFclr, #15
-
-	msr	dbgdtrtx_el0, x0
-	mrs	x0, dbgdtrrx_el0
 
 	mrs	x9, ccsidr_el1
 	mrs	x9, ccsidr_el1
@@ -224,7 +244,7 @@ testpattern:
 	mrs	x9, teehbr32_el1
 	mrs	x9, mdccsr_el0
 	mrs	x9, dbgdtr_el0
-	mrs	x9, dbgdtrrx_el0
+//	mrs	x9, dbgdtrrx_el0
 	mrs	x9, dbgvcr32_el2
 	mrs	x9, midr_el1
 	mrs	x9, mpidr_el1
@@ -445,7 +465,6 @@ testpattern:
 	mrs	x9, cntps_cval_el1
 
 	msr	oslar_el1, x0
-	msr	dbgdtrtx_el0, x0
 	msr	pmswinc_el0, x0
 
 	nop
@@ -467,6 +486,11 @@ testpattern:
 	lsl	x0, x1, #61
 	lsl	x0, x1, #62
 	lsl	x0, x1, #63
+
+	bfm	w2, w3, #10, #12
+	bfm	x0, x1, #3, #4
+	bfi	x1, x2, #3, #4
+	bfxil	x1, x2, #3, #4
 
 	subs	x0, xzr, x1, lsl #4
 	subs	xzr, x0, x1, lsl #4
@@ -517,19 +541,7 @@ testpattern:
 	add	sp, sp, x0, sxtx #4
 
 
-	nop
 
-	bfm	w2, w3, #10, #12
-	bfm	x0, x1, #3, #4
-	bfi	x1, x2, #3, #4
-	bfxil	x1, x2, #3, #4
-
-
-
-memo:
-	mov	x9, #0x4000400040004
-	mov	x9, #0x1000000010
-	mov	w1, #0x20002
 	nop
 	nop
 	nop

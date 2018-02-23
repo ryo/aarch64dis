@@ -115,7 +115,7 @@ if (0) {
 		unless (defined($alias)) {
 			push(@decl_output, insn_decl($insn));
 
-			push(@table_output, sprintf(" { 0x%08x, 0x%08x, FMT_%-27s op_%s },\n",
+			push(@table_output, sprintf(" { 0x%08x, 0x%08x, FMT_%-24s op_%s },\n",
 			    $insn->{mask},
 			    $insn->{code},
 			    $insn->{symbol} . ",",
@@ -134,8 +134,8 @@ print "\n";
 
 print <<__HEADER__;
 struct aarch64_insn_info insn_tables[] = {
- /* mask,      pattern,    opcode format,                  opfunc             */
- /* ---------  ----------  ------------------------------  ------------------ */
+ /* mask,      pattern,    opcode format,               opfunc             */
+ /* ---------  ----------  ---------------------------  ------------------ */
 __HEADER__
 
 	print @table_output;

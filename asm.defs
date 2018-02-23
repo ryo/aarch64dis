@@ -3,11 +3,11 @@
 adc		:	sf<1>	00		11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>
 adcs		:	sf<1>	01		11010 00		0	Rm<5>	000000			Rn<5>	Rd<5>
 
-add_extreg	:	sf<1>	00		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+add_extreg	:	sf<1>	00		01011 00		1	Rm<5>	opt<3>		imm3<3>	Rn<5>	Rd<5>
 add_imm		:	sf<1>	00		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
 add_shiftreg	:	sf<1>	00		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
-adds_extreg	:	sf<1>	01		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+adds_extreg	:	sf<1>	01		01011 00		1	Rm<5>	op<3>		imm3<3>	Rn<5>	Rd<5>
 adds_imm	:	sf<1>	01		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
 adds_shiftreg	:	sf<1>	01		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
@@ -60,11 +60,11 @@ clrex		:	1	10		10101 00		0 00 011	0011	CRm<4>	010		11111
 cls		:	sf<1>	10		11010 110			00000	00010 1			Rn<5> Rd<5>
 clz		:	sf<1>	10		11010 110			00000	00010 0			Rn<5> Rd<5>
 
-cmn_extreg	:	sf<1>	01		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+cmn_extreg	:	sf<1>	01		01011 00		1	Rm<5>	opt<3>		imm3<3>	Rn<5>	Rd<5>
 cmn_imm		:	sf<1>	01		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
 cmn_shiftreg	:	sf<1>	01		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
-cmp_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+cmp_extreg	:	sf<1>	11		01011 00		1	Rm<5>	opt<3>		imm3<3>	Rn<5>	Rd<5>
 cmp_imm		:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
 cmp_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
@@ -131,33 +131,33 @@ ldr_immpostidx	:	1 size<1>	111 0 00 01			0 imm9<9> 01			Rn<5>	Rt<5>
 ldr_immpreidx	:	1 size<1>	111 0 00 01			0 imm9<9> 11			Rn<5>	Rt<5>
 ldr_immunsign	:	1 size<1>	111 0 01 01			imm12<12>			Rn<5>	Rt<5>
 ldr_literal	:	0 size<1>	011 0 00		imm19<19>						Rt<5>
-ldr_reg		:	1 size<1>	111 0 00 01 1		Rm<5>			option<3> shift<1> 10	Rn<5>	Rt<5>
+ldr_reg		:	1 size<1>	111 0 00 01 1		Rm<5>			opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldrb_immpostidx	:	0 0		1	11000 01			0 imm9<9> 01			Rn<5>	Rt<5>
 ldrb_immpreidx	:	0 0		1	11000 01			0 imm9<9> 11			Rn<5>	Rt<5>
 ldrb_immunsign	:	0 0		1	11001 01			imm12<12>			Rn<5>	Rt<5>
-ldrb_reg	:	0 0		1	11000 01	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+ldrb_reg	:	0 0		1	11000 01	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldrh_immpostidx	:	0 1		1	11000 01			0 imm9<9> 01			Rn<5>	Rt<5>
 ldrh_immpreidx	:	0 1		1	11000 01			0 imm9<9> 11			Rn<5>	Rt<5>
 ldrh_immunsign	:	0 1		1	11001 01			imm12<12>			Rn<5>	Rt<5>
-ldrh_reg	:	0 1		1	11000 01	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+ldrh_reg	:	0 1		1	11000 01	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldrsb_immpostidx:	0 0		1	11000 1 opc<1>			0 imm9<9> 01			Rn<5>	Rt<5>
 ldrsb_immpreidx	:	0 0		1	11000 1 opc<1>			0 imm9<9> 11			Rn<5>	Rt<5>
 ldrsb_immunsign	:	0 0		1	11001 1 opc<1>			imm12<12>			Rn<5>	Rt<5>
-ldrsb_reg	:	0 0		1	11000 1 opc<1>	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+ldrsb_reg	:	0 0		1	11000 1 opc<1>	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldrsh_immpostidx:	0 1		1	11000 1 opc<1>			0 imm9<9> 01			Rn<5>	Rt<5>
 ldrsh_immpreidx	:	0 1		1	11000 1 opc<1>			0 imm9<9> 11			Rn<5>	Rt<5>
 ldrsh_immunsign	:	0 1		1	11001 1 opc<1>			imm12<12>			Rn<5>	Rt<5>
-ldrsh_reg	:	0 1		1	11000 1 opc<1>	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+ldrsh_reg	:	0 1		1	11000 1 opc<1>	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldrsw_immpostidx:	1 0		1	11000 10			0 imm9<9> 01			Rn<5>	Rt<5>
 ldrsw_immpreidx	:	1 0		1	11000 10			0 imm9<9> 11			Rn<5>	Rt<5>
 ldrsw_immunsign	:	1 0		1	11001 10			imm12<12>			Rn<5>	Rt<5>
 ldrsw_literal	:	1 0		0	11000		imm19<19>						Rt<5>
-ldrsw_reg	:	1 0		1	11000 10	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+ldrsw_reg	:	1 0		1	11000 10	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 ldtr		:	1 size<1>	1	11000 01			0 imm9<9> 10			Rn<5>	Rt<5>
 ldtrb		:	0 0		1	11000 01			0 imm9<9> 10			Rn<5>	Rt<5>
@@ -235,7 +235,7 @@ orr_reg		:	sf<1> 0		1	01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# =mov(reg)	
 #--------------------------------------------------------------------------          16|15          -------------------------
 prfm_imm	:	11 111 001 10						imm12<12>			Rn<5>	Rt<5>
 prfm_literal	:	11 011 000						imm19<19>				Rt<5>
-prfm_reg	:	11 111 000 10	1				Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+prfm_reg	:	11 111 000 10	1				Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 prfum		:	11 111 000 10						0 imm9<9>	00		Rn<5>	Rt<5>
 
 
@@ -299,17 +299,17 @@ stp_signed	:	sf<1> 0 101 0 010 0			imm7<7>	Rt2<5>			Rn<5>	Rt<5>
 str_immpostidx	:	1 size<1>	111 0 00 00			0 imm9<9> 01			Rn<5>	Rt<5>
 str_immpreidx	:	1 size<1>	111 0 00 00			0 imm9<9> 11			Rn<5>	Rt<5>
 str_immunsign	:	1 size<1>	111 0 01 00			imm12<12>			Rn<5>	Rt<5>
-str_reg		:	1 size<1>	111 0 00 00		1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+str_reg		:	1 size<1>	111 0 00 00		1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 strb_immpostidx	:	0 0		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
 strb_immpreidx	:	0 0		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
 strb_immunsign	:	0 0		1	11001 00			imm12<12>			Rn<5>	Rt<5>
-strb_reg	:	0 0		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+strb_reg	:	0 0		1	11000 00	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 strh_immpostidx	:	0 1		1	11000 00			0 imm9<9> 01			Rn<5>	Rt<5>
 strh_immpreidx	:	0 1		1	11000 00			0 imm9<9> 11			Rn<5>	Rt<5>
 strh_immunsign	:	0 1		1	11001 00			imm12<12>			Rn<5>	Rt<5>
-strh_reg	:	0 1		1	11000 00	1	Rm<5>		option<3> shift<1> 10	Rn<5>	Rt<5>
+strh_reg	:	0 1		1	11000 00	1	Rm<5>		opt<3> shift<1> 10	Rn<5>	Rt<5>
 
 sttr		:	1 size<1>	1	11000 00			0 imm9<9> 10			Rn<5>	Rt<5>
 sttrb		:	0 0		1	11000 00			0 imm9<9> 10			Rn<5>	Rt<5>
@@ -325,11 +325,11 @@ stxrb		:	0 0		0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
 stxrh		:	0 1		0	01000 00			0 Rs<5> 0	11111		Rn<5>	Rt<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-sub_extreg	:	sf<1>	10		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>
+sub_extreg	:	sf<1>	10		01011 00		1	Rm<5>	opt<3>		imm3<3>	Rn<5>	Rd<5>
 sub_imm		:	sf<1>	10		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>
 sub_shiftreg	:	sf<1>	10		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# MAINNAME
 
-subs_extreg	:	sf<1>	11		01011 00		1	Rm<5>	option<3>	imm3<3>	Rn<5>	Rd<5>	# MAINNAME
+subs_extreg	:	sf<1>	11		01011 00		1	Rm<5>	opt<3>		imm3<3>	Rn<5>	Rd<5>	# MAINNAME
 subs_imm	:	sf<1>	11		10001 shift<2>		imm12<12>				Rn<5>	Rd<5>	# MAINNAME
 subs_shiftreg	:	sf<1>	11		01011 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>	# MAINNAME
 
@@ -375,4 +375,5 @@ umull		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umaddl
 wfe		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 wfi		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 yield		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+
 

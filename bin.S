@@ -5,6 +5,119 @@
 
 
 knownbugs:
+	nop
+
+objdump_bug:
+	msr	dbgdtrtx_el0, x0
+	mrs	x0, dbgdtrrx_el0
+	nop
+
+objdump_dif:
+	mov	w1, #0x20002
+	mov	w8, #0x10001
+	.word	0x0d508711f & ~1
+	nop
+
+testpattern:
+	ldr	x0, [x0,w1,uxtw #0]
+	ldr	x0, [x0,w1,uxtw]
+
+	ldr	q0, [x0, x1]
+	ldr	q0, [x0, x1, lsl #0]
+	ldr	q0, [x0, x1, lsl #4]
+	ldr	q0, [x0, w1, uxtw #0]
+	ldr	q0, [x0, w1, uxtw #4]
+	ldr	q0, [x0, w1, sxtw #0]
+	ldr	q0, [x0, w1, sxtw #4]
+	ldr	q0, [x0, x1, sxtx]
+	ldr	q0, [x0, x1, sxtx]
+	ldr	q0, [x0, x1, sxtx #4]
+	ldr	q0, [x0, x1, sxtx #4]
+
+	ldr	d0, [x0, x1]
+	ldr	d0, [x0, x1, lsl #0]
+	ldr	d0, [x0, x1, lsl #3]
+	ldr	d0, [x0, w1, uxtw #0]
+	ldr	d0, [x0, w1, uxtw #3]
+	ldr	d0, [x0, w1, sxtw #0]
+	ldr	d0, [x0, w1, sxtw #3]
+	ldr	d0, [x0, x1, sxtx]
+	ldr	d0, [x0, x1, sxtx]
+	ldr	d0, [x0, x1, sxtx #3]
+	ldr	d0, [x0, x1, sxtx #3]
+
+	ldr	s0, [x0, x1]
+	ldr	s0, [x0, x1, lsl #0]
+	ldr	s0, [x0, x1, lsl #2]
+	ldr	s0, [x0, w1, uxtw #0]
+	ldr	s0, [x0, w1, uxtw #2]
+	ldr	s0, [x0, w1, sxtw #0]
+	ldr	s0, [x0, w1, sxtw #2]
+	ldr	s0, [x0, x1, sxtx]
+	ldr	s0, [x0, x1, sxtx]
+	ldr	s0, [x0, x1, sxtx #2]
+	ldr	s0, [x0, x1, sxtx #2]
+
+	ldr	h0, [x0, x1]
+	ldr	h0, [x0, x1, lsl #0]
+	ldr	h0, [x0, x1, lsl #1]
+	ldr	h0, [x0, w1, uxtw #0]
+	ldr	h0, [x0, w1, uxtw #1]
+	ldr	h0, [x0, w1, sxtw #0]
+	ldr	h0, [x0, w1, sxtw #1]
+	ldr	h0, [x0, x1, sxtx]
+	ldr	h0, [x0, x1, sxtx]
+	ldr	h0, [x0, x1, sxtx #1]
+	ldr	h0, [x0, x1, sxtx #1]
+
+	ldr	b0, [x0, x1]
+	ldr	b0, [x0, x1, lsl #0]
+	ldr	b0, [x0, w1, uxtw #0]
+	ldr	b0, [x0, w1, uxtw]
+	ldr	b0, [x0, w1, sxtw #0]
+	ldr	b0, [x0, w1, sxtw]
+	ldr	b0, [x0, x1, sxtx]
+	ldr	b0, [x0, x1, sxtx]
+	ldr	b0, [x0, x1, sxtx #0]
+	ldr	b0, [x0, x1, sxtx]
+
+
+	ldnp	s0, s1, [sp, #128]
+	ldnp	d0, d1, [sp, #128]
+	ldnp	q0, q1, [sp, #128]
+	nop
+
+	ldp	s0, s1, [sp, #128]!
+	ldp	d0, d1, [sp, #128]!
+	ldp	q0, q1, [sp, #128]!
+	nop
+
+	ldp	s0, s1, [sp], #128
+	ldp	d0, d1, [sp], #128
+	ldp	q0, q1, [sp], #128
+	nop
+
+	ldr	b0, [sp, #128]
+	ldr	h0, [sp, #128]
+	ldr	s0, [sp, #128]
+	ldr	d0, [sp, #128]
+	ldr	q0, [sp, #128]
+	nop
+
+	ldr	b0, [sp, #128]!
+	ldr	h0, [sp, #128]!
+	ldr	s0, [sp, #128]!
+	ldr	d0, [sp, #128]!
+	ldr	q0, [sp, #128]!
+	nop
+
+	ldr	b0, [sp], #128
+	ldr	h0, [sp], #128
+	ldr	s0, [sp], #128
+	ldr	d0, [sp], #128
+	ldr	q0, [sp], #128
+	nop
+
 	ldp	q0, q1, [x0]
 	ldp	q2, q3, [x0,#32]
 	ldp	q4, q5, [x0,#64]
@@ -23,20 +136,29 @@ knownbugs:
 	ldp	q30, q31, [x0,#480]
 	ldr	w8, [x0,#512]
 	ldr	w9, [x0,#516]
+
+	stp	q0, q1, [x0]
+	stp	q2, q3, [x0,#32]
+	stp	q4, q5, [x0,#64]
+	stp	q6, q7, [x0,#96]
+	stp	q8, q9, [x0,#128]
+	stp	q10, q11, [x0,#160]
+	stp	q12, q13, [x0,#192]
+	stp	q14, q15, [x0,#224]
+	stp	q16, q17, [x0,#256]
+	stp	q18, q19, [x0,#288]
+	stp	q20, q21, [x0,#320]
+	stp	q22, q23, [x0,#352]
+	stp	q24, q25, [x0,#384]
+	stp	q26, q27, [x0,#416]
+	stp	q28, q29, [x0,#448]
+	stp	q30, q31, [x0,#480]
+	str	w8, [x0,#512]
+	str	w9, [x0,#516]
 	msr	fpcr, x8
 	msr	fpsr, x9
 	nop
 
-objdump_bug:
-	msr	dbgdtrtx_el0, x0
-	mrs	x0, dbgdtrrx_el0
-
-objdump_dif:
-	mov	w1, #0x20002
-	mov	w8, #0x10001
-	.word	0x0d508711f & ~1
-
-testpattern:
 	orr	x10, xzr, #0x100000000
 	orr	x10, xzr, #0xfff00000000
 	orr	x10, xzr, #0xfff000000000

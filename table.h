@@ -101,14 +101,14 @@
 	{{31, 1}, { 5,19}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_B5_B40_IMM14_RT		\
 	{{31, 1}, {19, 5}, { 5,14}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
-#define FMT_OPC_IMM7_RT2_RN_RT		\
-	{{30, 2}, {15, 7}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_OPC_L_IMM7_RT2_RN_RT	\
+	{{30, 2}, {22, 1}, {15, 7}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}}
 #define FMT_SIZE_OPC_IMM9_RN_RT		\
-	{{30, 2}, {23, 1}, {12, 9}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
+	{{30, 2}, {22, 2}, {12, 9}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_SIZE_OPC_RM_OPT_S_RN_RT	\
-	{{30, 2}, {23, 1}, {16, 5}, {13, 3}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0}}
+	{{30, 2}, {22, 2}, {16, 5}, {13, 3}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0}}
 #define FMT_SIZE_OPC_IMM12_RN_RT	\
-	{{30, 2}, {23, 1}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
+	{{30, 2}, {22, 2}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 
 struct aarch64_insn_info insn_tables[] = {
  /* mask,      pattern,    opcode format,               opfunc             */
@@ -303,22 +303,14 @@ struct aarch64_insn_info insn_tables[] = {
  { 0x7f000000, 0x51000000, FMT_SF_SHIFT_IMM12_RN_RD,    op_sub_imm },
  { 0x7f000000, 0x37000000, FMT_B5_B40_IMM14_RT,         op_tbnz },
  { 0x7f000000, 0x36000000, FMT_B5_B40_IMM14_RT,         op_tbz },
- { 0x3fc00000, 0x2c000000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_stnp },
- { 0x3fc00000, 0x2c800000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_stp_postidx },
- { 0x3fc00000, 0x2d800000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_stp_preidx },
- { 0x3fc00000, 0x2d000000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_stp_signed },
- { 0x3fc00000, 0x2c400000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_ldnp },
- { 0x3fc00000, 0x2cc00000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_ldp_postidx },
- { 0x3fc00000, 0x2dc00000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_ldp_preidx },
- { 0x3fc00000, 0x2d400000, FMT_OPC_IMM7_RT2_RN_RT,      op_simd_ldp_signed },
- { 0x3f600c00, 0x3c000400, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_str_immpostidx },
- { 0x3f600c00, 0x3c000c00, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_str_immpreidx },
- { 0x3f600c00, 0x3c200800, FMT_SIZE_OPC_RM_OPT_S_RN_RT, op_simd_str_reg },
- { 0x3f600c00, 0x3c400400, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldr_immpostidx },
- { 0x3f600c00, 0x3c400c00, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldr_immpreidx },
- { 0x3f600c00, 0x3c600800, FMT_SIZE_OPC_RM_OPT_S_RN_RT, op_simd_ldr_reg },
- { 0x3f400000, 0x3d000000, FMT_SIZE_OPC_IMM12_RN_RT,    op_simd_str_immunsign },
- { 0x3f400000, 0x3d400000, FMT_SIZE_OPC_IMM12_RN_RT,    op_simd_ldr_immunsign },
+ { 0x3f800000, 0x2c000000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstnp },
+ { 0x3f800000, 0x2c800000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_postidx },
+ { 0x3f800000, 0x2d800000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_preidx },
+ { 0x3f800000, 0x2d000000, FMT_OPC_L_IMM7_RT2_RN_RT,    op_simd_ldstp_signed },
+ { 0x3f200c00, 0x3c000400, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldstr_immpostidx },
+ { 0x3f200c00, 0x3c000c00, FMT_SIZE_OPC_IMM9_RN_RT,     op_simd_ldstr_immpreidx },
+ { 0x3f200c00, 0x3c200800, FMT_SIZE_OPC_RM_OPT_S_RN_RT, op_simd_ldstr_reg },
+ { 0x3f000000, 0x3d000000, FMT_SIZE_OPC_IMM12_RN_RT,    op_simd_ldstr_immunsign },
  { 0x00000000, 0x00000000, FMT_NOARG,                   op_undefined }
 };
 

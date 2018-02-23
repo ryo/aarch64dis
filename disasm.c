@@ -128,6 +128,40 @@ static const char *s_wxregs[2][32] = {
 #define ZREGNAME(s, n)	(z_wxregs[(s) & 1][(n) & 31])
 #define SREGNAME(s, n)	(s_wxregs[(s) & 1][(n) & 31])
 
+static const char *simdregs[5][32] = {
+	{
+		 "b0",  "b1",  "b2",  "b3",  "b4",  "b5",  "b6",  "b7",
+		 "b8",  "b9", "b10", "b11", "b12", "b13", "b14", "b15",
+		"b16", "b17", "b18", "b19", "b20", "b21", "b22", "b23",
+		"b24", "b25", "b26", "b27", "b28", "b29", "b30", "b31"
+	},
+	{
+		 "h0",  "h1",  "h2",  "h3",  "h4",  "h5",  "h6",  "h7",
+		 "h8",  "h9", "h10", "h11", "h12", "h13", "h14", "h15",
+		"h16", "h17", "h18", "h19", "h20", "h21", "h22", "h23",
+		"h24", "h25", "h26", "h27", "h28", "h29", "h30", "h31"
+	},
+	{
+		 "s0",  "s1",  "s2",  "s3",  "s4",  "s5",  "s6",  "s7",
+		 "s8",  "s9", "s10", "s11", "s12", "s13", "s14", "s15",
+		"s16", "s17", "s18", "s19", "s20", "s21", "s22", "s23",
+		"s24", "s25", "s26", "s27", "s28", "s29", "s30", "s31"
+	},
+	{
+		 "d0",  "d1",  "d2",  "d3",  "d4",  "d5",  "d6",  "d7",
+		 "d8",  "d9", "d10", "d11", "d12", "d13", "d14", "d15",
+		"d16", "d17", "d18", "d19", "d20", "d21", "d22", "d23",
+		"d24", "d25", "d26", "d27", "d28", "d29", "d30", "d31"
+	},
+	{
+		 "q0",  "q1",  "q2",  "q3",  "q4",  "q5",  "q6",  "q7",
+		 "q8",  "q9", "q10", "q11", "q12", "q13", "q14", "q15",
+		"q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23",
+		"q24", "q25", "q26", "q27", "q28", "q29", "q30", "q31"
+	}
+};
+#define FREGNAME(s, n)	(simdregs[(s)][(n) & 31])
+
 static const char *cregs[16] = {
 	 "C0",  "C1",  "C2",  "C3",  "C4",  "C5",  "C6",  "C7",
 	 "C8",  "C9", "C10", "C11", "C12", "C13", "C14", "C15"
@@ -2932,104 +2966,198 @@ OPFUNC_DECL3(op_umulh, Rm, Rn, Rd)
 }
 
 /*
- * SIMD instruction are not supported (yet?)
+ * SIMD instruction except load/store insns are not supported (yet?),
+ * and disassembled as 'undefined'.
  */
 static void
-OPFUNC_DECL5(op_simd_ldnp, opc, imm7, Rt2, Rn, Rt)
+OPFUNC_DECL6(op_simd_ldstnp, opc, l, imm7, Rt2, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldnp\n", insn);
+	const char *op = (l == 0) ? "stnp" : "ldnp";
+	const int regsz = (opc & 3) + 2;
+
+	if (opc == 3) {
+		UNDEFINED(pc, insn, "illegal opc");
+		return;
+	}
+
+	if (imm7 == 0) {
+		PRINTF("%s\t%s, %s, [%s]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    FREGNAME(regsz, Rt2),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%s\t%s, %s, [%s,#%ld]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    FREGNAME(regsz, Rt2),
+		    SREGNAME(1, Rn),
+		    SignExtend(7, imm7, (4 << opc)));
+	}
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldp_postidx, opc, imm7, Rt2, Rn, Rt)
+OPFUNC_DECL6(op_simd_ldstp_postidx, opc, l, imm7, Rt2, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+	const char *op = (l == 0) ? "stp" : "ldp";
+	const int regsz = (opc & 3) + 2;
+
+	PRINTF("%s\t%s, %s, [%s],#%ld\n",
+	    op,
+	    FREGNAME(regsz, Rt),
+	    FREGNAME(regsz, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (4 << opc)));
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldp_preidx, opc, imm7, Rt2, Rn, Rt)
+OPFUNC_DECL6(op_simd_ldstp_preidx, opc, l, imm7, Rt2, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+	const char *op = (l == 0) ? "stp" : "ldp";
+	const int regsz = (opc & 3) + 2;
+
+	PRINTF("%s\t%s, %s, [%s,#%ld]!\n",
+	    op,
+	    FREGNAME(regsz, Rt),
+	    FREGNAME(regsz, Rt2),
+	    SREGNAME(1, Rn),
+	    SignExtend(7, imm7, (4 << opc)));
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldp_signed, opc, imm7, Rt2, Rn, Rt)
+OPFUNC_DECL6(op_simd_ldstp_signed, opc, l, imm7, Rt2, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+	const char *op = (l == 0) ? "stp" : "ldp";
+	const int regsz = (opc & 3) + 2;
+
+	if (opc == 3) {
+		UNDEFINED(pc, insn, "illegal opc");
+		return;
+	}
+
+	if (imm7 == 0) {
+		PRINTF("%s\t%s, %s, [%s]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    FREGNAME(regsz, Rt2),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%s\t%s, %s, [%s,#%ld]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    FREGNAME(regsz, Rt2),
+		    SREGNAME(1, Rn),
+		    SignExtend(7, imm7, (4 << opc)));
+	}
+}
+
+static inline int
+simd_ldstr_regsz(uint64_t size, uint64_t opc)
+{
+	if ((opc & 2) == 0)
+		return size;
+	if (size == 0)
+		return 4;
+	return -1;
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldr_immpostidx, size, opc, imm9, Rn, Rt)
+OPFUNC_DECL5(op_simd_ldstr_immpostidx, size, opc, imm9, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
+	int regsz;
+
+	if ((regsz = simd_ldstr_regsz(size, opc)) < 0) {
+		UNDEFINED(pc, insn, "illegal size/opc");
+		return;
+	}
+
+	PRINTF("%s\t%s, [%s],#%ld\n",
+	    op,
+	    FREGNAME(regsz, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldr_immpreidx, size, opc, imm9, Rn, Rt)
+OPFUNC_DECL5(op_simd_ldstr_immpreidx, size, opc, imm9, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
+	int regsz;
+
+	if ((regsz = simd_ldstr_regsz(size, opc)) < 0) {
+		UNDEFINED(pc, insn, "illegal size/opc");
+		return;
+	}
+
+	PRINTF("%s\t%s, [%s,#%ld]!\n",
+	    op,
+	    FREGNAME(regsz, Rt),
+	    SREGNAME(1, Rn),
+	    SignExtend(9, imm9, 1));
 }
 
 static void
-OPFUNC_DECL5(op_simd_ldr_immunsign, size, opc, imm12, Rn, Rt)
+OPFUNC_DECL5(op_simd_ldstr_immunsign, size, opc, imm12, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
+	int regsz;
+
+	if ((regsz = simd_ldstr_regsz(size, opc)) < 0) {
+		UNDEFINED(pc, insn, "illegal size/opc");
+		return;
+	}
+
+	if (imm12 == 0) {
+		PRINTF("%s\t%s, [%s]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    SREGNAME(1, Rn));
+	} else {
+		PRINTF("%s\t%s, [%s,#%ld]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    SREGNAME(1, Rn),
+		    ZeroExtend(12, imm12, 1 << regsz));
+	}
 }
 
 static void
-OPFUNC_DECL7(op_simd_ldr_reg, size, opc, Rm, opt, S, Rn, Rt)
+OPFUNC_DECL7(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
 {
-	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
-}
+	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
+	int regsz, r;
 
-static void
-OPFUNC_DECL5(op_simd_stnp, opc, imm7, Rt2, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD stnp\n", insn);
-}
+	if ((regsz = simd_ldstr_regsz(size, opc)) < 0) {
+		UNDEFINED(pc, insn, "illegal size/opc");
+		return;
+	}
 
-static void
-OPFUNC_DECL5(op_simd_stp_postidx, opc, imm7, Rt2, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
-}
+	if ((r = regoffset_option_to_r(option)) < 0) {
+		UNDEFINED(pc, insn, "illegal option");
+		return;
+	}
 
-static void
-OPFUNC_DECL5(op_simd_stp_preidx, opc, imm7, Rt2, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
+	if (S == 0) {
+		PRINTF("%s\t%s, [%s,%s%s]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option,
+		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
+	} else {
+		uint64_t amount = regsz;
+		PRINTF("%s\t%s, [%s,%s,%s #%lu]\n",
+		    op,
+		    FREGNAME(regsz, Rt),
+		    SREGNAME(1, Rn),
+		    ZREGNAME(r, Rm),
+		    SHIFTOP8(option,
+		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
+		    amount);
+	}
 }
-
-static void
-OPFUNC_DECL5(op_simd_stp_signed, opc, imm7, Rt2, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
-}
-
-static void
-OPFUNC_DECL5(op_simd_str_immpostidx, size, opc, imm9, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
-}
-
-static void
-OPFUNC_DECL5(op_simd_str_immpreidx, size, opc, imm9, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
-}
-
-static void
-OPFUNC_DECL5(op_simd_str_immunsign, size, opc, imm12, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
-}
-
-static void
-OPFUNC_DECL7(op_simd_str_reg, size, opc, Rm, opt, S, Rn, Rt)
-{
-	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
-}
-
 
 #include "table.h"
 

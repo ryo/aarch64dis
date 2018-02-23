@@ -381,21 +381,11 @@ yield		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 #
 # SIMD instructions
 #
-simd_stnp	:	opc<2>	101 1 000 0		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_stp_postidx:	opc<2>	101 1 001 0		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_stp_preidx	:	opc<2>	101 1 011 0		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_stp_signed	:	opc<2>	101 1 010 0		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_str_immpostidx:	size<2> 111 1 00 opc<1> 0 0	imm9<9>	01		Rn<5>	Rt<5>
-simd_str_immpreidx:	size<2> 111 1 00 opc<1> 0 0	imm9<9>	11		Rn<5>	Rt<5>
-simd_str_immunsign:	size<2> 111 1 01 opc<1> 0	imm12<12>		Rn<5>	Rt<5>
-simd_str_reg:		size<2> 111 1 00 opc<1> 0 1	Rm<5> opt<3> S<1> 10	Rn<5>	Rt<5>
-
-simd_ldnp	:	opc<2>	101 1 000 1		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_ldp_postidx:	opc<2>	101 1 001 1		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_ldp_preidx	:	opc<2>	101 1 011 1		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_ldp_signed	:	opc<2>	101 1 010 1		imm7<7>		Rt2<5>	Rn<5>	Rt<5>
-simd_ldr_immpostidx:	size<2> 111 1 00 opc<1> 1 0	imm9<9>	01		Rn<5>	Rt<5>
-simd_ldr_immpreidx:	size<2> 111 1 00 opc<1> 1 0	imm9<9>	11		Rn<5>	Rt<5>
-simd_ldr_immunsign:	size<2> 111 1 01 opc<1> 1	imm12<12>		Rn<5>	Rt<5>
-simd_ldr_reg:		size<2> 111 1 00 opc<1> 1 1	Rm<5> opt<3> S<1> 10	Rn<5>	Rt<5>
-
+simd_ldstnp	:	opc<2>	101 1 000 L<1>		imm7<7>		Rt2<5>	Rn<5>	Rt<5>			# MAINNAME
+simd_ldstp_postidx:	opc<2>	101 1 001 L<1>		imm7<7>		Rt2<5>	Rn<5>	Rt<5>			# MAINNAME
+simd_ldstp_preidx:	opc<2>	101 1 011 L<1>		imm7<7>		Rt2<5>	Rn<5>	Rt<5>			# MAINNAME
+simd_ldstp_signed:	opc<2>	101 1 010 L<1>		imm7<7>		Rt2<5>	Rn<5>	Rt<5>			# MAINNAME
+simd_ldstr_immpostidx:	size<2> 111 1 00 opc<2> 0	imm9<9>	01		Rn<5>	Rt<5>			# MAINNAME
+simd_ldstr_immpreidx:	size<2> 111 1 00 opc<2> 0	imm9<9>	11		Rn<5>	Rt<5>			# MAINNAME
+simd_ldstr_immunsign:	size<2> 111 1 01 opc<2>		imm12<12>		Rn<5>	Rt<5>			# MAINNAME
+simd_ldstr_reg:		size<2> 111 1 00 opc<2> 1	Rm<5> opt<3> S<1> 10	Rn<5>	Rt<5>			# MAINNAME

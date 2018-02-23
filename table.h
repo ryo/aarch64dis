@@ -110,7 +110,7 @@
 #define FMT_SIZE_OPC_IMM12_RN_RT	\
 	{{30, 2}, {22, 2}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 
-struct insn_info insn_tables[] = {
+static struct insn_info insn_tables[] = {
  /* mask,      pattern,    opcode format,               opfunc             */
  /* ---------  ----------  ---------------------------  ------------------ */
  { 0xffffffff, 0xd6bf03e0, FMT_NOARG,                   op_drps },

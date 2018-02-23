@@ -85,19 +85,6 @@ func(disasm_interface_t *di,				\
 #define OPFUNC_DECL8(func,a,b,c,d,e,f,g,h)		\
 	OPFUNC_DECL(func,a,b,c,d,e,f,g,h)
 
-struct bitpos {
-	uint8_t pos;
-	uint8_t width;
-};
-
-struct insn_info {
-	uint32_t mask;
-	uint32_t pattern;
-#define INSN_MAXARG	8
-	struct bitpos bitinfo[INSN_MAXARG];
-	OPFUNC_DECL(void (*opfunc),,,,,,,,);
-};
-
 static const char *z_wxregs[2][32] = {
 	{
 		 "w0",  "w1",  "w2",  "w3",  "w4",  "w5",  "w6",  "w7",
@@ -3168,6 +3155,19 @@ OPFUNC_DECL7(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
  * SIMD instructions except load/store insns are not supported (yet?),
  * and disassembled as 'undefined'.
  */
+struct bitpos {
+	uint8_t pos;
+	uint8_t width;
+};
+
+struct insn_info {
+	uint32_t mask;
+	uint32_t pattern;
+#define INSN_MAXARG	8
+	struct bitpos bitinfo[INSN_MAXARG];
+	OPFUNC_DECL(void (*opfunc),,,,,,,,);
+};
+
 #include "table.h"
 
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))

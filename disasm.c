@@ -1,3 +1,5 @@
+/*	$NetBSD$	*/
+
 /*
  * Copyright (c) 2018 Ryo Shimizu <ryo@nerv.org>
  * All rights reserved.
@@ -34,10 +36,11 @@
 
 #include "disasm.h"
 
-#define PRINTF	pr
+#define PRINTF		di->di_printf
+#define PRINTADDR	di->di_printaddr
 
 #define OPFUNC_DECL(func,a,b,c,d,e,f,g,h)		\
-func(int (*pr)(const char *, ...) __printflike(1, 2),	\
+func(disasm_interface_t *di,				\
     uint64_t pc, uint32_t insn,				\
     uint64_t a, uint64_t b, uint64_t c, uint64_t d,	\
     uint64_t e, uint64_t f, uint64_t g, uint64_t h)
@@ -377,7 +380,7 @@ DecodeShift(uint64_t shift)
 
 static void
 extendreg_common(const char *op, const char *z_op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn, uint64_t sf, uint64_t Rm,
     uint64_t option, uint64_t imm3, uint64_t Rn, uint64_t Rd)
 {
@@ -420,7 +423,7 @@ extendreg_common(const char *op, const char *z_op,
 
 static void
 shiftreg_common(const char *dnm_op, const char *dzm_op, const char *znm_op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn, uint64_t sf, uint64_t shift,
     uint64_t Rm, uint64_t imm6, uint64_t Rn, uint64_t Rd)
 {
@@ -468,7 +471,7 @@ regoffset_option_to_r(uint64_t option)
 
 static void
 regoffset_b_common(const char *op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt)
 {
@@ -501,7 +504,7 @@ regoffset_b_common(const char *op,
 
 static void
 regoffset_h_common(const char *op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift,
     uint64_t Rn, uint64_t Rt)
@@ -541,7 +544,7 @@ regoffset_h_common(const char *op,
 
 static void
 regoffset_w_common(const char *op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift,
     uint64_t Rn, uint64_t Rt)
@@ -581,7 +584,7 @@ regoffset_w_common(const char *op,
 
 static void
 regoffset_x_common(const char *op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn,
     uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
     uint64_t Rn, uint64_t Rt)
@@ -642,7 +645,7 @@ static void
 OPFUNC_DECL6(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common("add", NULL,
-	    pr, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
@@ -675,7 +678,7 @@ OPFUNC_DECL6(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		return;
 	}
 	shiftreg_common("add", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -683,7 +686,7 @@ OPFUNC_DECL6(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmn_extreg */
 	extendreg_common("adds", "cmn",
-	    pr, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
@@ -718,7 +721,7 @@ OPFUNC_DECL6(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	}
 	/* ALIAS: cmn_shiftreg */
 	shiftreg_common("adds", NULL, "cmn",
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -726,9 +729,9 @@ OPFUNC_DECL3(op_adr, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
 
-	PRINTF("adr\t%s, %lx\n",
-	    ZREGNAME(1, Rd),
-	    SignExtend(21, imm, 1) + pc);
+	PRINTF("adr\t%s, ", ZREGNAME(1, Rd));
+	PRINTADDR(SignExtend(21, imm, 1) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -759,7 +762,7 @@ static void
 OPFUNC_DECL6(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("and", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -788,7 +791,7 @@ OPFUNC_DECL6(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
 	shiftreg_common("ands", NULL, "tst",
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -958,15 +961,17 @@ OPFUNC_DECL5(op_sys, op1, CRn, CRm, op2, Rt)
 static void
 OPFUNC_DECL1(op_b, imm26)
 {
-	PRINTF("b\t%lx\n", SignExtend(26, imm26, 4) + pc);
+	PRINTF("b\t");
+	PRINTADDR(SignExtend(26, imm26, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
 OPFUNC_DECL2(op_b_cond, imm19, cond)
 {
-	PRINTF("b.%s\t%lx\n",
-	    CONDNAME(cond),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("b.%s\t", CONDNAME(cond));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -995,20 +1000,22 @@ static void
 OPFUNC_DECL6(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("bic", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL6(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("bics", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL1(op_bl, imm26)
 {
-	PRINTF("bl\t%lx\n", SignExtend(26, imm26, 4) + pc);
+	PRINTF("bl\t");
+	PRINTADDR(SignExtend(26, imm26, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -1032,17 +1039,17 @@ OPFUNC_DECL1(op_brk, imm16)
 static void
 OPFUNC_DECL3(op_cbnz, sf, imm19, Rt)
 {
-	PRINTF("cbnz\t%s, %lx\n",
-	    ZREGNAME(sf, Rt),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("cbnz\t%s, ", ZREGNAME(sf, Rt));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
 OPFUNC_DECL3(op_cbz, sf, imm19, Rt)
 {
-	PRINTF("cbz\t%s, %lx\n",
-	    ZREGNAME(sf, Rt),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("cbz\t%s, ", ZREGNAME(sf, Rt));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -1160,7 +1167,7 @@ OPFUNC_DECL6(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmp_extreg */
 	extendreg_common("subs", "cmp",
-	    pr, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
@@ -1196,7 +1203,7 @@ OPFUNC_DECL6(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 
 	/* ALIAS: negs,cmp_shiftreg */
 	shiftreg_common("subs", "negs", "cmp",
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1219,7 +1226,7 @@ OPFUNC_DECL5(op_csneg, sf, Rm, cond, Rn, Rd)
 
 static void
 crc32_common(const char *op,
-    int (*pr)(const char *, ...) __printflike(1, 2),
+    disasm_interface_t *di,
     uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t Rm, uint64_t sz, uint64_t Rn, uint64_t Rd)
 {
@@ -1241,13 +1248,13 @@ crc32_common(const char *op,
 static void
 OPFUNC_DECL5(op_crc32, sf, Rm, sz, Rn, Rd)
 {
-	crc32_common("crc32", pr, pc, insn, sf, Rm, sz, Rn, Rd);
+	crc32_common("crc32", di, pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL5(op_crc32c, sf, Rm, sz, Rn, Rd)
 {
-	crc32_common("crc32c", pr, pc, insn, sf, Rm, sz, Rn, Rd);
+	crc32_common("crc32c", di, pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void
@@ -1309,7 +1316,7 @@ static void
 OPFUNC_DECL6(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("eon", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1330,7 +1337,7 @@ static void
 OPFUNC_DECL6(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("eor", NULL, NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1598,16 +1605,16 @@ OPFUNC_DECL4(op_ldr_immunsign, size, imm12, Rn, Rt)
 static void
 OPFUNC_DECL3(op_ldr_literal, size, imm19, Rt)
 {
-	PRINTF("ldr\t%s, %lx\n",
-	    ZREGNAME(size, Rt),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("ldr\t%s, ", ZREGNAME(size, Rt));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
 OPFUNC_DECL6(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
 	regoffset_x_common("ldr",
-	    pr, pc, insn, size, Rm, option, shift, Rn, Rt);
+	    di, pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1646,7 +1653,7 @@ OPFUNC_DECL3(op_ldrb_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_ldrb_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("ldrb", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common("ldrb", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1685,7 +1692,7 @@ OPFUNC_DECL3(op_ldrh_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_ldrh_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("ldrh", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common("ldrh", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1724,7 +1731,7 @@ OPFUNC_DECL4(op_ldrsb_immunsign, opc, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("ldrsb", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common("ldrsb", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1763,7 +1770,7 @@ OPFUNC_DECL4(op_ldrsh_immunsign, opc, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("ldrsh", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common("ldrsh", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -1802,15 +1809,15 @@ OPFUNC_DECL3(op_ldrsw_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL2(op_ldrsw_literal, imm19, Rt)
 {
-	PRINTF("ldrsw\t%s, %lx\n",
-	    ZREGNAME(1, Rt),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("ldrsw\t%s, ", ZREGNAME(1, Rt));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
 OPFUNC_DECL5(op_ldrsw_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_w_common("ldrsw", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_w_common("ldrsw", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2187,7 +2194,7 @@ OPFUNC_DECL6(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 		    ZREGNAME(sf, Rm));
 	} else {
 		shiftreg_common("orr", NULL, NULL,
-		    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+		    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 	}
 }
 
@@ -2281,7 +2288,7 @@ OPFUNC_DECL6(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mvn */
 	shiftreg_common("orn", "mvn", NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -2289,7 +2296,7 @@ OPFUNC_DECL6(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: neg */
 	shiftreg_common("sub", "neg", NULL,
-	    pr, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -2342,9 +2349,9 @@ OPFUNC_DECL3(op_prfm_imm, imm12, Rn, Rt)
 static void
 OPFUNC_DECL2(op_prfm_literal, imm19, Rt)
 {
-	PRINTF("prfm\t%s, %lx\n",
-	    PREFETCHNAME(Rt),
-	    SignExtend(19, imm19, 4) + pc);
+	PRINTF("prfm\t%s, ", PREFETCHNAME(Rt));
+	PRINTADDR(SignExtend(19, imm19, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -2649,7 +2656,7 @@ OPFUNC_DECL4(op_str_immunsign, size, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
-	regoffset_x_common("str", pr, pc, insn, size, Rm, option, shift, Rn, Rt);
+	regoffset_x_common("str", di, pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2688,7 +2695,7 @@ OPFUNC_DECL3(op_strb_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_strb_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("strb", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common("strb", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2727,7 +2734,7 @@ OPFUNC_DECL3(op_strh_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_strh_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("strh", pr, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common("strh", di, pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
@@ -2860,7 +2867,7 @@ static void
 OPFUNC_DECL6(op_sub_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common("sub", NULL,
-	    pr, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
@@ -2901,10 +2908,11 @@ OPFUNC_DECL4(op_tbnz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
-	PRINTF("tbnz\t%s, #%lu, %lx\n",
+	PRINTF("tbnz\t%s, #%lu, ",
 	    ZREGNAME(b5, Rt),
-	    bit,
-	    SignExtend(14, imm14, 4) + pc);
+	    bit);
+	PRINTADDR(SignExtend(14, imm14, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -2912,10 +2920,12 @@ OPFUNC_DECL4(op_tbz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
-	PRINTF("tbz\t%s, #%lu, %lx\n",
+	PRINTF("tbz\t%s, #%lu, ",
 	    ZREGNAME(b5, Rt),
-	    bit,
-	    SignExtend(14, imm14, 4) + pc);
+	    bit);
+
+	PRINTADDR(SignExtend(14, imm14, 4) + pc);
+	PRINTF("\n");
 }
 
 static void
@@ -3170,9 +3180,8 @@ OPFUNC_DECL7(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
 
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))
 
-static void
-disasm_insn(int (*pr)(const char *, ...) __printflike(1, 2),
-    uint64_t loc, uint32_t insn)
+void
+disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 {
 	uint64_t args[INSN_MAXARG];
 	unsigned int i, j;
@@ -3188,7 +3197,7 @@ disasm_insn(int (*pr)(const char *, ...) __printflike(1, 2),
 			args[j] = (insn >> insn_tables[i].bitinfo[j].pos) &
 			    WIDTHMASK(insn_tables[i].bitinfo[j].width);
 		}
-		insn_tables[i].opfunc(pr, loc, insn,
+		insn_tables[i].opfunc(di, loc, insn,
 		    args[0], args[1], args[2], args[3],
 		    args[4], args[5], args[6], args[7]);
 		break;
@@ -3203,7 +3212,7 @@ disasm_insn(int (*pr)(const char *, ...) __printflike(1, 2),
 char *printf_buffer = NULL;
 size_t printf_size;
 
-static int
+static void
 test_printf(char const *fmt, ...)
 {
 		va_list ap;
@@ -3217,17 +3226,25 @@ test_printf(char const *fmt, ...)
 			ret = vprintf(fmt, ap);
 		}
 		va_end(ap);
-		return ret;
+}
+
+static void
+test_printaddr(uintptr_t loc)
+{
+	test_printf("%lx <0x%lx>", loc, loc);
 }
 
 int
 disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize)
 {
+	disasm_interface_t di;
 	uint32_t insn;
 
 	printf_buffer = buf;
 	printf_size = bufsize;
 
+	di.di_printaddr = test_printaddr;
+	di.di_printf = test_printf;
 
 	/* fetch instruction */
 	insn = *(uint32_t *)insnp;
@@ -3236,7 +3253,7 @@ disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize)
 	test_printf("%12lx:\t%08x\t", loc, insn);
 
 	/* print insn */
-	disasm_insn(test_printf, loc, insn);
+	disasm_insn(&di, loc, insn);
 
 
 	printf_buffer = NULL;

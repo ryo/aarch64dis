@@ -19,6 +19,12 @@ objdump_dif:
 	nop
 
 testpattern:
+	clrex
+	clrex	#0
+	clrex	#10
+	clrex	#15
+
+
 	ldr	x0, [x0,w1,uxtw #0]
 	ldr	x0, [x0,w1,uxtw]
 

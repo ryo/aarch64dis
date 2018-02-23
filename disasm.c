@@ -1133,7 +1133,7 @@ OPFUNC_DECL1(op_clrex, CRm)
 	if (CRm == 15) {
 		PRINTF("clrex\n");
 	} else {
-		PRINTF("clrex\t#%lu\n", CRm);
+		PRINTF("clrex\t#0x%lx\n", CRm);
 	}
 }
 

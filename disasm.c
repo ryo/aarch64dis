@@ -602,8 +602,8 @@ OPFUNC_DECL(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		UNDEFINED(pc, insn, "illegal shift");
 		return;
 	}
-	shiftreg_common("add", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("add", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -645,8 +645,8 @@ OPFUNC_DECL(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		return;
 	}
 	/* ALIAS: cmn_shiftreg */
-	shiftreg_common("adds", NULL, "cmn", pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("adds", NULL, "cmn",
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -686,8 +686,8 @@ OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("and", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("and", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -715,8 +715,8 @@ static void
 OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
-	shiftreg_common("ands", NULL, "tst", pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("ands", NULL, "tst",
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -922,15 +922,15 @@ OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bic", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("bic", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bics", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("bics", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1123,8 +1123,8 @@ OPFUNC_DECL(op_cmp_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	}
 
 	/* ALIAS: negs,subs_shiftreg */
-	shiftreg_common("subs", "negs", "cmp", pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("subs", "negs", "cmp",
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1235,8 +1235,8 @@ OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eon", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("eon", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1256,8 +1256,8 @@ OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eor", NULL, NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("eor", NULL, NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -1338,7 +1338,7 @@ OPFUNC_DECL(op_isb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 	if (CRm == 15)
 		PRINTF("isb\n");
 	else
-		PRINTF("isb\t#d\n", CRm);
+		PRINTF("isb\t#0x%lx\n", CRm);
 }
 
 static void
@@ -1528,7 +1528,6 @@ OPFUNC_DECL(op_ldr_literal, size, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 	PRINTF("ldr\t%s, %lx\n",
 	    ZREGNAME(size, Rt),
 	    SignExtend(19, imm19, 4) + pc);
-
 }
 
 static void
@@ -2113,8 +2112,8 @@ OPFUNC_DECL(op_mov_reg, sf, shift, Rm, imm6, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rm));
 	} else {
-		shiftreg_common("orr", NULL, NULL, pc, insn,
-		    sf, shift, Rm, imm6, Rn, Rd);
+		shiftreg_common("orr", NULL, NULL,
+		    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 	}
 }
 
@@ -2207,16 +2206,16 @@ static void
 OPFUNC_DECL(op_mvn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: orn */
-	shiftreg_common("orn", "mvn", NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("orn", "mvn", NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
 OPFUNC_DECL(op_neg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: sub_shiftreg */
-	shiftreg_common("sub", "neg", NULL, pc, insn,
-	    sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common("sub", "neg", NULL,
+	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
@@ -2399,8 +2398,7 @@ OPFUNC_DECL(op_smaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 static void
 OPFUNC_DECL(op_smc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
-	PRINTF("smc\t#0x%lx\n",
-	    imm16);
+	PRINTF("smc\t#0x%lx\n", imm16);
 }
 
 static void

@@ -77,7 +77,7 @@ csel		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
 cset		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# = csinc
 csetm		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>	# = csinv
 csinc		:	sf<1>	00		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>
-csinv		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>
+csinv		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 00		Rn<5>	Rd<5>	# MAINNAME
 csneg		:	sf<1>	10		1101 0 100			Rm<5>	cond<4> 01		Rn<5>	Rd<5>	# MAINNAME
 
 dc		:	1	10		10101 00		0 01 op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>

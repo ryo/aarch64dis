@@ -379,10 +379,10 @@ DecodeShift(uint64_t shift)
 	PRINTF(".insn\t0x%08x\t# %s\n", insn, comment);
 
 static void
-extendreg_common(const char *op, const char *z_op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn, uint64_t sf, uint64_t Rm,
-    uint64_t option, uint64_t imm3, uint64_t Rn, uint64_t Rd)
+extendreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t Rm, uint64_t option, uint64_t imm3,
+    uint64_t Rn, uint64_t Rd,
+    const char *op, const char *z_op)
 {
 	const int r = (sf == 0) ? 0 : ((option & 3) == 3) ? 1 : 0;
 
@@ -422,10 +422,10 @@ extendreg_common(const char *op, const char *z_op,
 }
 
 static void
-shiftreg_common(const char *dnm_op, const char *dzm_op, const char *znm_op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn, uint64_t sf, uint64_t shift,
-    uint64_t Rm, uint64_t imm6, uint64_t Rn, uint64_t Rd)
+shiftreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t shift, uint64_t Rm, uint64_t imm6,
+    uint64_t Rn, uint64_t Rd,
+    const char *dnm_op, const char *dzm_op, const char *znm_op)
 {
 	if ((sf == 0) && (imm6 >= 32)) {
 		UNDEFINED(pc, insn, "illegal imm6");
@@ -470,10 +470,9 @@ regoffset_option_to_r(uint64_t option)
 }
 
 static void
-regoffset_b_common(const char *op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn,
-    uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt)
+regoffset_b_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
+    const char *op)
 {
 	int r;
 
@@ -503,11 +502,9 @@ regoffset_b_common(const char *op,
 }
 
 static void
-regoffset_h_common(const char *op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn,
-    uint64_t Rm, uint64_t option, uint64_t shift,
-    uint64_t Rn, uint64_t Rt)
+regoffset_h_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
+    const char *op)
 {
 	int r;
 
@@ -543,11 +540,9 @@ regoffset_h_common(const char *op,
 }
 
 static void
-regoffset_w_common(const char *op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn,
-    uint64_t Rm, uint64_t option, uint64_t shift,
-    uint64_t Rn, uint64_t Rt)
+regoffset_w_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
+    const char *op)
 {
 	int r;
 
@@ -583,11 +578,10 @@ regoffset_w_common(const char *op,
 }
 
 static void
-regoffset_x_common(const char *op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn,
+regoffset_x_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
-    uint64_t Rn, uint64_t Rt)
+    uint64_t Rn, uint64_t Rt,
+    const char *op)
 {
 	int r;
 
@@ -618,6 +612,59 @@ regoffset_x_common(const char *op,
 }
 
 static void
+addcmp_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t shift, uint64_t imm12, uint64_t Rn, uint64_t Rd,
+    const char *op, const char *zop)
+{
+	if (shift & 2) {
+		UNDEFINED(pc, insn, "illegal shift");
+		return;
+	}
+
+	/* ALIAS: cmn_imm */
+	if (Rd == 31) {
+		PRINTF("%s\t%s, #0x%lx%s\n",
+		    zop,
+		    SREGNAME(sf, Rn),
+		    ZeroExtend(12, imm12, 1),
+		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
+	} else {
+		PRINTF("%s\t%s, %s, #0x%lx%s\n",
+		    op,
+		    ZREGNAME(sf, Rd),
+		    SREGNAME(sf, Rn),
+		    ZeroExtend(12, imm12, 1),
+		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
+	}
+}
+
+static void
+csetsel_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t Rm, uint64_t cond, uint64_t Rn, uint64_t Rd,
+    const char *op, const char *op2, const char *op3)
+{
+	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
+		PRINTF("%s\t%s, %s, %s\n",
+		    op3,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    IVCONDNAME(cond));
+	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
+		PRINTF("%s\t%s, %s\n",
+		    op2,
+		    ZREGNAME(sf, Rd),
+		    IVCONDNAME(cond));
+	} else {
+		PRINTF("%s\t%s, %s, %s, %s\n",
+		    op,
+		    ZREGNAME(sf, Rd),
+		    ZREGNAME(sf, Rn),
+		    ZREGNAME(sf, Rm),
+		    CONDNAME(cond));
+	}
+}
+
+static void
 OPFUNC_DECL0(op_undefined)
 {
 	UNDEFINED(pc, insn, "undefined");
@@ -644,8 +691,8 @@ OPFUNC_DECL4(op_adcs, sf, Rm, Rn, Rd)
 static void
 OPFUNC_DECL6(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
-	extendreg_common("add", NULL,
-	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
+	    "add", NULL);
 }
 
 static void
@@ -666,7 +713,7 @@ OPFUNC_DECL5(op_add_imm, sf, shift, imm12, Rn, Rd)
 		    SREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
 		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP4(shift, "", ", lsl #12", "?", "?"));
+		    SHIFTOP2(shift, "", ", lsl #12"));
 	}
 }
 
@@ -677,39 +724,24 @@ OPFUNC_DECL6(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		UNDEFINED(pc, insn, "illegal shift");
 		return;
 	}
-	shiftreg_common("add", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "add", NULL, NULL);
 }
 
 static void
 OPFUNC_DECL6(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmn_extreg */
-	extendreg_common("adds", "cmn",
-	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
+	    "adds", "cmn");
 }
 
 static void
 OPFUNC_DECL5(op_adds_imm, sf, shift, imm12, Rn, Rd)
 {
-	if (shift & 2) {
-		UNDEFINED(pc, insn, "illegal shift");
-		return;
-	}
-
 	/* ALIAS: cmn_imm */
-	if (Rd == 31) {
-		PRINTF("cmn\t%s, #0x%lx%s\n",
-		    SREGNAME(sf, Rn),
-		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
-	} else {
-		PRINTF("adds\t%s, %s, #0x%lx%s\n",
-		    ZREGNAME(sf, Rd),
-		    SREGNAME(sf, Rn),
-		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
-	}
+	addcmp_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
+	    "adds", "cmn");
 }
 
 static void
@@ -720,8 +752,8 @@ OPFUNC_DECL6(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 		return;
 	}
 	/* ALIAS: cmn_shiftreg */
-	shiftreg_common("adds", NULL, "cmn",
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "adds", NULL, "cmn");
 }
 
 static void
@@ -761,8 +793,8 @@ OPFUNC_DECL6(op_and_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL6(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("and", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "and", NULL, NULL);
 }
 
 static void
@@ -790,8 +822,8 @@ static void
 OPFUNC_DECL6(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
-	shiftreg_common("ands", NULL, "tst",
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "ands", NULL, "tst");
 }
 
 static void
@@ -999,15 +1031,15 @@ OPFUNC_DECL6(op_bfi, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL6(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bic", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "bic", NULL, NULL);
 }
 
 static void
 OPFUNC_DECL6(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("bics", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "bics", NULL, NULL);
 }
 
 static void
@@ -1096,44 +1128,16 @@ static void
 OPFUNC_DECL5(op_cinc, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: cset,csinc */
-	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
-		PRINTF("cinc\t%s, %s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn),
-		    IVCONDNAME(cond));
-	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
-		PRINTF("cset\t%s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    IVCONDNAME(cond));
-	} else {
-		PRINTF("csinc\t%s, %s, %s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn),
-		    ZREGNAME(sf, Rm),
-		    CONDNAME(cond));
-	}
+	csetsel_common(di, pc, insn, sf, Rm, cond, Rn, Rd,
+	    "csinc", "cset", "cinc");
 }
 
 static void
-OPFUNC_DECL5(op_cinv, sf, Rm, cond, Rn, Rd)
+OPFUNC_DECL5(op_csinv, sf, Rm, cond, Rn, Rd)
 {
-	/* ALIAS: csetm,csinv */
-	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
-		PRINTF("cinv\t%s, %s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn),
-		    IVCONDNAME(cond));
-	} else if ((Rn == Rm) && (Rn == 31) && ((cond & 0xe) != 0x0e)) {
-		PRINTF("csetm\t%s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    IVCONDNAME(cond));
-	} else {
-		PRINTF("csinv\t%s, %s, %s, %s\n",
-		    ZREGNAME(sf, Rd),
-		    ZREGNAME(sf, Rn),
-		    ZREGNAME(sf, Rm),
-		    CONDNAME(cond));
-	}
+	/* ALIAS: csetm,cinv */
+	csetsel_common(di, pc, insn, sf, Rm, cond, Rn, Rd,
+	    "csinv", "csetm", "cinv");
 }
 
 static void
@@ -1166,31 +1170,16 @@ static void
 OPFUNC_DECL6(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmp_extreg */
-	extendreg_common("subs", "cmp",
-	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
+	    "subs", "cmp");
 }
 
 static void
 OPFUNC_DECL5(op_subs_imm, sf, shift, imm12, Rn, Rd)
 {
-	if (shift & 2) {
-		UNDEFINED(pc, insn, "illegal shift");
-		return;
-	}
-
 	/* ALIAS: cmp_imm */
-	if (Rd == 31) {
-		PRINTF("cmp\t%s, #0x%lx%s\n",
-		    SREGNAME(sf, Rn),
-		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP2(shift, "", ", lsl #12"));
-	} else {
-		PRINTF("subs\t%s, %s, #0x%lx%s\n",
-		    ZREGNAME(sf, Rd),
-		    SREGNAME(sf, Rn),
-		    ZeroExtend(12, imm12, 1),
-		    SHIFTOP2(shift, "", ", lsl #12"));
-	}
+	addcmp_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
+	    "subs", "cmp");
 }
 
 static void
@@ -1202,8 +1191,8 @@ OPFUNC_DECL6(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	}
 
 	/* ALIAS: negs,cmp_shiftreg */
-	shiftreg_common("subs", "negs", "cmp",
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "subs", "negs", "cmp");
 }
 
 static void
@@ -1225,10 +1214,9 @@ OPFUNC_DECL5(op_csneg, sf, Rm, cond, Rn, Rd)
 }
 
 static void
-crc32_common(const char *op,
-    disasm_interface_t *di,
-    uint64_t pc, uint32_t insn,
-    uint64_t sf, uint64_t Rm, uint64_t sz, uint64_t Rn, uint64_t Rd)
+crc32_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+    uint64_t sf, uint64_t Rm, uint64_t sz, uint64_t Rn, uint64_t Rd,
+    const char *op)
 {
 	const char bhwx[4] = "bhwx";	/* "crc32x" + SizeChar */
 
@@ -1248,13 +1236,13 @@ crc32_common(const char *op,
 static void
 OPFUNC_DECL5(op_crc32, sf, Rm, sz, Rn, Rd)
 {
-	crc32_common("crc32", di, pc, insn, sf, Rm, sz, Rn, Rd);
+	crc32_common(di, pc, insn, sf, Rm, sz, Rn, Rd, "crc32");
 }
 
 static void
 OPFUNC_DECL5(op_crc32c, sf, Rm, sz, Rn, Rd)
 {
-	crc32_common("crc32c", di, pc, insn, sf, Rm, sz, Rn, Rd);
+	crc32_common(di, pc, insn, sf, Rm, sz, Rn, Rd, "crc32c");
 }
 
 static void
@@ -1315,8 +1303,8 @@ OPFUNC_DECL1(op_dsb, CRm)
 static void
 OPFUNC_DECL6(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eon", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "eon", NULL, NULL);
 }
 
 static void
@@ -1336,8 +1324,8 @@ OPFUNC_DECL6(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 static void
 OPFUNC_DECL6(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
-	shiftreg_common("eor", NULL, NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "eor", NULL, NULL);
 }
 
 static void
@@ -1613,8 +1601,8 @@ OPFUNC_DECL3(op_ldr_literal, size, imm19, Rt)
 static void
 OPFUNC_DECL6(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
-	regoffset_x_common("ldr",
-	    di, pc, insn, size, Rm, option, shift, Rn, Rt);
+	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt,
+	    "ldr");
 }
 
 static void
@@ -1653,7 +1641,7 @@ OPFUNC_DECL3(op_ldrb_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_ldrb_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("ldrb", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrb");
 }
 
 static void
@@ -1692,7 +1680,7 @@ OPFUNC_DECL3(op_ldrh_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_ldrh_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("ldrh", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrh");
 }
 
 static void
@@ -1731,7 +1719,7 @@ OPFUNC_DECL4(op_ldrsb_immunsign, opc, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("ldrsb", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsb");
 }
 
 static void
@@ -1770,7 +1758,7 @@ OPFUNC_DECL4(op_ldrsh_immunsign, opc, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("ldrsh", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsh");
 }
 
 static void
@@ -1817,7 +1805,7 @@ OPFUNC_DECL2(op_ldrsw_literal, imm19, Rt)
 static void
 OPFUNC_DECL5(op_ldrsw_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_w_common("ldrsw", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_w_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsw");
 }
 
 static void
@@ -2193,8 +2181,8 @@ OPFUNC_DECL6(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rm));
 	} else {
-		shiftreg_common("orr", NULL, NULL,
-		    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+		shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+		    "orr", NULL, NULL);
 	}
 }
 
@@ -2287,16 +2275,16 @@ static void
 OPFUNC_DECL6(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mvn */
-	shiftreg_common("orn", "mvn", NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "orn", "mvn", NULL);
 }
 
 static void
 OPFUNC_DECL6(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: neg */
-	shiftreg_common("sub", "neg", NULL,
-	    di, pc, insn, sf, shift, Rm, imm6, Rn, Rd);
+	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
+	    "sub", "neg", NULL);
 }
 
 static void
@@ -2656,7 +2644,7 @@ OPFUNC_DECL4(op_str_immunsign, size, imm12, Rn, Rt)
 static void
 OPFUNC_DECL6(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
-	regoffset_x_common("str", di, pc, insn, size, Rm, option, shift, Rn, Rt);
+	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt, "str");
 }
 
 static void
@@ -2695,7 +2683,7 @@ OPFUNC_DECL3(op_strb_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_strb_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_b_common("strb", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "strb");
 }
 
 static void
@@ -2734,7 +2722,7 @@ OPFUNC_DECL3(op_strh_immunsign, imm12, Rn, Rt)
 static void
 OPFUNC_DECL5(op_strh_reg, Rm, option, shift, Rn, Rt)
 {
-	regoffset_h_common("strh", di, pc, insn, Rm, option, shift, Rn, Rt);
+	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "strh");
 }
 
 static void
@@ -2866,8 +2854,8 @@ OPFUNC_DECL3(op_stxrh, Rs, Rn, Rt)
 static void
 OPFUNC_DECL6(op_sub_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
-	extendreg_common("sub", NULL,
-	    di, pc, insn, sf, Rm, option, imm3, Rn, Rd);
+	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
+	    "sub", NULL);
 }
 
 static void
@@ -2983,8 +2971,7 @@ OPFUNC_DECL3(op_umulh, Rm, Rn, Rd)
 }
 
 /*
- * SIMD instruction except load/store insns are not supported (yet?),
- * and disassembled as 'undefined'.
+ * load/store SIMD instructions
  */
 static void
 OPFUNC_DECL6(op_simd_ldstnp, opc, l, imm7, Rt2, Rn, Rt)
@@ -3176,6 +3163,11 @@ OPFUNC_DECL7(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
 	}
 }
 
+
+/*
+ * SIMD instructions except load/store insns are not supported (yet?),
+ * and disassembled as 'undefined'.
+ */
 #include "table.h"
 
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))
@@ -3231,7 +3223,11 @@ test_printf(char const *fmt, ...)
 static void
 test_printaddr(uintptr_t loc)
 {
+#if 0
 	test_printf("%lx <0x%lx>", loc, loc);
+#else
+	test_printf("%lx", loc);
+#endif
 }
 
 int

@@ -1191,27 +1191,27 @@ static void
 OPFUNC_DECL(op_dcps1, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	if (imm16 == 0)
-		PRINTF("dpcs1\n");
+		PRINTF("dcps1\n");
 	else
-		PRINTF("dpcs1\t#0x%lx\n", imm16);
+		PRINTF("dcps1\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_dcps2, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	if (imm16 == 0)
-		PRINTF("dpcs2\n");
+		PRINTF("dcps2\n");
 	else
-		PRINTF("dpcs2\t#0x%lx\n", imm16);
+		PRINTF("dcps2\t#0x%lx\n", imm16);
 }
 
 static void
 OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 {
 	if (imm16 == 0)
-		PRINTF("dpcs3\n");
+		PRINTF("dcps3\n");
 	else
-		PRINTF("dpcs3\t#0x%lx\n", imm16);
+		PRINTF("dcps3\t#0x%lx\n", imm16);
 }
 
 static void

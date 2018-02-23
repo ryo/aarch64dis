@@ -38,10 +38,50 @@ static int test_printf(char const *fmt, ...);
 #define PRINTF	test_printf
 
 
-#define OPFUNC_DECL(func,a,b,c,d,e,f)		\
-func(uint64_t pc, uint32_t insn,		\
-    uint64_t a, uint64_t b, uint64_t c,	\
-    uint64_t d, uint64_t e, uint64_t f)
+#define OPFUNC_DECL(func,a,b,c,d,e,f,g,h)		\
+func(uint64_t pc, uint32_t insn,			\
+    uint64_t a, uint64_t b, uint64_t c, uint64_t d,	\
+    uint64_t e, uint64_t f, uint64_t g, uint64_t h)
+
+#define UNUSED0	arg0 __unused
+#define UNUSED1	arg1 __unused
+#define UNUSED2	arg2 __unused
+#define UNUSED3	arg3 __unused
+#define UNUSED4	arg4 __unused
+#define UNUSED5	arg5 __unused
+#define UNUSED6	arg6 __unused
+#define UNUSED7	arg7 __unused
+
+#define OPFUNC_DECL0(func)				\
+	OPFUNC_DECL(func,				\
+	    UNUSED0, UNUSED1, UNUSED2, UNUSED3,		\
+	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
+#define OPFUNC_DECL1(func,a)				\
+	OPFUNC_DECL(func,a,				\
+	    UNUSED1, UNUSED2, UNUSED3, UNUSED4,		\
+	    UNUSED5, UNUSED6, UNUSED7)
+#define OPFUNC_DECL2(func,a,b)				\
+	OPFUNC_DECL(func,a,b,				\
+	    UNUSED2, UNUSED3, UNUSED4, UNUSED5,		\
+	    UNUSED6, UNUSED7)
+#define OPFUNC_DECL3(func,a,b,c)			\
+	OPFUNC_DECL(func,a,b,c,				\
+	    UNUSED3, UNUSED4, UNUSED5, UNUSED6,		\
+	    UNUSED7)
+#define OPFUNC_DECL4(func,a,b,c,d)			\
+	OPFUNC_DECL(func,a,b,c,d,			\
+	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
+#define OPFUNC_DECL5(func,a,b,c,d,e)			\
+	OPFUNC_DECL(func,a,b,c,d,e,			\
+	    UNUSED5, UNUSED6, UNUSED7)
+#define OPFUNC_DECL6(func,a,b,c,d,e,f)			\
+	OPFUNC_DECL(func,a,b,c,d,e,f,			\
+	    UNUSED6, UNUSED7)
+#define OPFUNC_DECL7(func,a,b,c,d,e,f,g)		\
+	OPFUNC_DECL(func,a,b,c,d,e,f,g,			\
+	    UNUSED7)
+#define OPFUNC_DECL8(func,a,b,c,d,e,f,g,h)		\
+	OPFUNC_DECL(func,a,b,c,d,e,f,g,h)
 
 struct bitpos {
 	uint8_t pos;
@@ -51,17 +91,10 @@ struct bitpos {
 struct aarch64_insn_info {
 	uint32_t mask;
 	uint32_t code;
-#define INSN_MAXARG	6
+#define INSN_MAXARG	8
 	struct bitpos bitinfo[INSN_MAXARG];
-	OPFUNC_DECL(void (*opfunc),,,,,,);
+	OPFUNC_DECL(void (*opfunc),,,,,,,,);
 };
-
-#define UNUSED1	arg1 __unused
-#define UNUSED2	arg2 __unused
-#define UNUSED3	arg3 __unused
-#define UNUSED4	arg4 __unused
-#define UNUSED5	arg5 __unused
-#define UNUSED6	arg6 __unused
 
 static const char *z_wxregs[2][32] = {
 	{
@@ -543,13 +576,13 @@ regoffset_x_common(const char *op,
 }
 
 static void
-OPFUNC_DECL(op_undefined, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL0(op_undefined)
 {
 	UNDEFINED(pc, insn, "undefined");
 }
 
 static void
-OPFUNC_DECL(op_adc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_adc, sf, Rm, Rn, Rd)
 {
 	PRINTF("adc\t%s, %s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -558,7 +591,7 @@ OPFUNC_DECL(op_adc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_adcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_adcs, sf, Rm, Rn, Rd)
 {
 	PRINTF("adcs\t%s, %s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -567,14 +600,14 @@ OPFUNC_DECL(op_adcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
+OPFUNC_DECL6(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common("add", NULL,
 	    pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_add_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_add_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -596,7 +629,7 @@ OPFUNC_DECL(op_add_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -607,7 +640,7 @@ OPFUNC_DECL(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
+OPFUNC_DECL6(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmn_extreg */
 	extendreg_common("adds", "cmn",
@@ -615,7 +648,7 @@ OPFUNC_DECL(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_adds_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_adds_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -638,7 +671,7 @@ OPFUNC_DECL(op_adds_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -650,7 +683,7 @@ OPFUNC_DECL(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_adr, immlo, immhi, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_adr, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
 
@@ -660,7 +693,7 @@ OPFUNC_DECL(op_adr, immlo, immhi, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_adrp, immlo, immhi, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_adrp, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
 
@@ -670,7 +703,7 @@ OPFUNC_DECL(op_adrp, immlo, immhi, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_and_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
@@ -684,14 +717,14 @@ OPFUNC_DECL(op_and_imm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("and", NULL, NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_ands_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
@@ -712,7 +745,7 @@ OPFUNC_DECL(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
 	shiftreg_common("ands", NULL, "tst",
@@ -720,7 +753,7 @@ OPFUNC_DECL(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_sbfm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_sbfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
@@ -765,7 +798,7 @@ OPFUNC_DECL(op_sbfm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_asr_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_asr_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: asrv */
 	/* "asr" always the preferred disassembly */
@@ -843,7 +876,7 @@ static struct op_sys_table op_sys_table[] = {
 };
 
 static void
-OPFUNC_DECL(op_sys, op1, CRn, CRm, op2, Rt, UNUSED5)
+OPFUNC_DECL5(op_sys, op1, CRn, CRm, op2, Rt)
 {
 	uint32_t code;
 	size_t i;
@@ -884,13 +917,13 @@ OPFUNC_DECL(op_sys, op1, CRn, CRm, op2, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_b, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_b, imm26)
 {
 	PRINTF("b\t%lx\n", SignExtend(26, imm26, 4) + pc);
 }
 
 static void
-OPFUNC_DECL(op_b_cond, imm19, cond, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_b_cond, imm19, cond)
 {
 	PRINTF("b.%s\t%lx\n",
 	    CONDNAME(cond),
@@ -898,7 +931,7 @@ OPFUNC_DECL(op_b_cond, imm19, cond, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_bfi, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
@@ -920,45 +953,45 @@ OPFUNC_DECL(op_bfi, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("bic", NULL, NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("bics", NULL, NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_bl, imm26, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_bl, imm26)
 {
 	PRINTF("bl\t%lx\n", SignExtend(26, imm26, 4) + pc);
 }
 
 static void
-OPFUNC_DECL(op_blr, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_blr, Rn)
 {
 	PRINTF("blr\t%s\n", ZREGNAME(1, Rn));
 }
 
 static void
-OPFUNC_DECL(op_br, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_br, Rn)
 {
 	PRINTF("br\t%s\n", ZREGNAME(1, Rn));
 }
 
 static void
-OPFUNC_DECL(op_brk, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_brk, imm16)
 {
 	PRINTF("brk\t#0x%lx\n", imm16);
 }
 
 static void
-OPFUNC_DECL(op_cbnz, sf, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_cbnz, sf, imm19, Rt)
 {
 	PRINTF("cbnz\t%s, %lx\n",
 	    ZREGNAME(sf, Rt),
@@ -966,7 +999,7 @@ OPFUNC_DECL(op_cbnz, sf, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cbz, sf, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_cbz, sf, imm19, Rt)
 {
 	PRINTF("cbz\t%s, %lx\n",
 	    ZREGNAME(sf, Rt),
@@ -974,7 +1007,7 @@ OPFUNC_DECL(op_cbz, sf, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ccmn_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
+OPFUNC_DECL5(op_ccmn_imm, sf, imm5, cond, Rn, nzcv)
 {
 	PRINTF("ccmn\t%s, #0x%lx, #0x%lx, %s\n",
 	    ZREGNAME(sf, Rn),
@@ -984,7 +1017,7 @@ OPFUNC_DECL(op_ccmn_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ccmn_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
+OPFUNC_DECL5(op_ccmn_reg, sf, Rm, cond, Rn, nzcv)
 {
 	PRINTF("ccmn\t%s, %s, #0x%lx, %s\n",
 	    ZREGNAME(sf, Rn),
@@ -994,7 +1027,7 @@ OPFUNC_DECL(op_ccmn_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ccmp_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
+OPFUNC_DECL5(op_ccmp_imm, sf, imm5, cond, Rn, nzcv)
 {
 	PRINTF("ccmp\t%s, #0x%lx, #0x%lx, %s\n",
 	    ZREGNAME(sf, Rn),
@@ -1004,7 +1037,7 @@ OPFUNC_DECL(op_ccmp_imm, sf, imm5, cond, Rn, nzcv, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ccmp_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
+OPFUNC_DECL5(op_ccmp_reg, sf, Rm, cond, Rn, nzcv)
 {
 	PRINTF("ccmp\t%s, %s, #0x%lx, %s\n",
 	    ZREGNAME(sf, Rn),
@@ -1014,7 +1047,7 @@ OPFUNC_DECL(op_ccmp_reg, sf, Rm, cond, Rn, nzcv, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cinc, sf, Rm, cond, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_cinc, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: cset,csinc */
 	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
@@ -1036,7 +1069,7 @@ OPFUNC_DECL(op_cinc, sf, Rm, cond, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cinv, sf, Rm, cond, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_cinv, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: csetm,csinv */
 	if ((Rn == Rm) && (Rn != 31) && ((cond & 0xe) != 0x0e)) {
@@ -1058,7 +1091,7 @@ OPFUNC_DECL(op_cinv, sf, Rm, cond, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_clrex, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_clrex, CRm)
 {
 	if (CRm == 15) {
 		PRINTF("clrex\n");
@@ -1068,7 +1101,7 @@ OPFUNC_DECL(op_clrex, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_cls, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_cls, sf, Rn, Rd)
 {
 	PRINTF("cls\t%s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -1076,7 +1109,7 @@ OPFUNC_DECL(op_cls, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_clz, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_clz, sf, Rn, Rd)
 {
 	PRINTF("clz\t%s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -1084,7 +1117,7 @@ OPFUNC_DECL(op_clz, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
+OPFUNC_DECL6(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmp_extreg */
 	extendreg_common("subs", "cmp",
@@ -1092,7 +1125,7 @@ OPFUNC_DECL(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_subs_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_subs_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -1115,7 +1148,7 @@ OPFUNC_DECL(op_subs_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -1128,7 +1161,7 @@ OPFUNC_DECL(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_csneg, sf, Rm, cond, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_csneg, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: cneg */
 	if ((Rn == Rm) && ((cond & 0xe) != 0x0e)) {
@@ -1166,19 +1199,19 @@ crc32_common(const char *op,
 }
 
 static void
-OPFUNC_DECL(op_crc32, sf, Rm, sz, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_crc32, sf, Rm, sz, Rn, Rd)
 {
 	crc32_common("crc32", pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_crc32c, sf, Rm, sz, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_crc32c, sf, Rm, sz, Rn, Rd)
 {
 	crc32_common("crc32c", pc, insn, sf, Rm, sz, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_csel, sf, Rm, cond, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_csel, sf, Rm, cond, Rn, Rd)
 {
 	PRINTF("csel\t%s, %s, %s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -1188,7 +1221,7 @@ OPFUNC_DECL(op_csel, sf, Rm, cond, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_dcps1, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_dcps1, imm16)
 {
 	if (imm16 == 0)
 		PRINTF("dcps1\n");
@@ -1197,7 +1230,7 @@ OPFUNC_DECL(op_dcps1, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_dcps2, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_dcps2, imm16)
 {
 	if (imm16 == 0)
 		PRINTF("dcps2\n");
@@ -1206,7 +1239,7 @@ OPFUNC_DECL(op_dcps2, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_dcps3, imm16)
 {
 	if (imm16 == 0)
 		PRINTF("dcps3\n");
@@ -1215,32 +1248,32 @@ OPFUNC_DECL(op_dcps3, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_dmb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_dmb, CRm)
 {
 	PRINTF("dmb\t%s\n", BARRIERNAME(CRm));
 }
 
 static void
-OPFUNC_DECL(op_drps, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL0(op_drps)
 {
 	PRINTF("drps\n");
 }
 
 static void
-OPFUNC_DECL(op_dsb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_dsb, CRm)
 {
 	PRINTF("dsb\t%s\n", BARRIERNAME(CRm));
 }
 
 static void
-OPFUNC_DECL(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("eon", NULL, NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
@@ -1254,20 +1287,20 @@ OPFUNC_DECL(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common("eor", NULL, NULL,
 	    pc, insn, sf, shift, Rm, imm6, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_eret, UNUSED0, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL0(op_eret)
 {
 	PRINTF("eret\n", insn);
 }
 
 static void
-OPFUNC_DECL(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
+OPFUNC_DECL6(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 {
 	if (((sf ^ n) != 0) || (n == 0 && imms >= 0x20)) {
 		UNDEFINED(pc, insn, "illegal sf and N");
@@ -1290,7 +1323,7 @@ OPFUNC_DECL(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_hint, CRm, op2)
 {
 	const uint64_t op = CRm << 3 | op2;
 
@@ -1321,19 +1354,19 @@ OPFUNC_DECL(op_hint, CRm, op2, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_hlt, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_hlt, imm16)
 {
 	PRINTF("hlt\t#0x%lx\n", imm16);
 }
 
 static void
-OPFUNC_DECL(op_hvc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_hvc, imm16)
 {
 	PRINTF("hvc\t#0x%lx\n", imm16);
 }
 
 static void
-OPFUNC_DECL(op_isb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_isb, CRm)
 {
 	if (CRm == 15)
 		PRINTF("isb\n");
@@ -1342,7 +1375,7 @@ OPFUNC_DECL(op_isb, CRm, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldar, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldar, size, Rn, Rt)
 {
 	PRINTF("ldar\t%s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -1350,7 +1383,7 @@ OPFUNC_DECL(op_ldar, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldarb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldarb, Rn, Rt)
 {
 	PRINTF("ldarb\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1358,7 +1391,7 @@ OPFUNC_DECL(op_ldarb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldarh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldarh, Rn, Rt)
 {
 	PRINTF("ldarh\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1366,7 +1399,7 @@ OPFUNC_DECL(op_ldarh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldaxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldaxp, size, Rt2, Rn, Rt)
 {
 	PRINTF("ldaxp\t%s, %s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -1375,7 +1408,7 @@ OPFUNC_DECL(op_ldaxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldaxr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldaxr, size, Rn, Rt)
 {
 	PRINTF("ldaxr\t%s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -1383,7 +1416,7 @@ OPFUNC_DECL(op_ldaxr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldaxrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldaxrb, Rn, Rt)
 {
 	PRINTF("ldaxrb\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1391,7 +1424,7 @@ OPFUNC_DECL(op_ldaxrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldaxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldaxrh, Rn, Rt)
 {
 	PRINTF("ldaxrh\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1399,7 +1432,7 @@ OPFUNC_DECL(op_ldaxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldnp, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
 		PRINTF("ldnp\t%s, %s, [%s]\n",
@@ -1416,7 +1449,7 @@ OPFUNC_DECL(op_ldnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldp_postidx, sf, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("ldp\t%s, %s, [%s],#%ld\n",
 	    ZREGNAME(sf, Rt),
@@ -1426,7 +1459,7 @@ OPFUNC_DECL(op_ldp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldp_preidx, sf, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("ldp\t%s, %s, [%s,#%ld]!\n",
 	    ZREGNAME(sf, Rt),
@@ -1436,7 +1469,7 @@ OPFUNC_DECL(op_ldp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldp_signed, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
 		PRINTF("ldp\t%s, %s, [%s]\n",
@@ -1453,7 +1486,7 @@ OPFUNC_DECL(op_ldp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldpsw_postidx, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldpsw_postidx, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("ldpsw\t%s, %s, [%s],#%ld\n",
 	    ZREGNAME(1, Rt),
@@ -1463,7 +1496,7 @@ OPFUNC_DECL(op_ldpsw_postidx, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldpsw_preidx, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldpsw_preidx, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("ldpsw\t%s, %s, [%s,#%ld]!\n",
 	    ZREGNAME(1, Rt),
@@ -1473,7 +1506,7 @@ OPFUNC_DECL(op_ldpsw_preidx, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldpsw_signed, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldpsw_signed, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
 		PRINTF("ldpsw\t%s, %s, [%s]\n",
@@ -1490,7 +1523,7 @@ OPFUNC_DECL(op_ldpsw_signed, imm7, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldr_immpostidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldr_immpostidx, size, imm9, Rn, Rt)
 {
 	PRINTF("ldr\t%s, [%s],#%ld\n",
 	    ZREGNAME(size, Rt),
@@ -1499,7 +1532,7 @@ OPFUNC_DECL(op_ldr_immpostidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldr_immpreidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldr_immpreidx, size, imm9, Rn, Rt)
 {
 	PRINTF("ldr\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(size, Rt),
@@ -1508,7 +1541,7 @@ OPFUNC_DECL(op_ldr_immpreidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldr_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldr_immunsign, size, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldr\t%s, [%s]\n",
@@ -1523,7 +1556,7 @@ OPFUNC_DECL(op_ldr_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldr_literal, size, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldr_literal, size, imm19, Rt)
 {
 	PRINTF("ldr\t%s, %lx\n",
 	    ZREGNAME(size, Rt),
@@ -1531,13 +1564,13 @@ OPFUNC_DECL(op_ldr_literal, size, imm19, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
+OPFUNC_DECL6(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
 	regoffset_x_common("ldr", pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldrb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrb_immpostidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrb\t%s, [%s],#%ld\n",
 	    ZREGNAME(0, Rt),
@@ -1546,7 +1579,7 @@ OPFUNC_DECL(op_ldrb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrb_immpreidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrb\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(0, Rt),
@@ -1555,7 +1588,7 @@ OPFUNC_DECL(op_ldrb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrb_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldrb\t%s, [%s]\n",
@@ -1570,13 +1603,13 @@ OPFUNC_DECL(op_ldrb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrb_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldrb_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common("ldrb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldrh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrh_immpostidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrh\t%s, [%s],#%ld\n",
 	    ZREGNAME(0, Rt),
@@ -1585,7 +1618,7 @@ OPFUNC_DECL(op_ldrh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrh_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrh_immpreidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrh\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(0, Rt),
@@ -1594,7 +1627,7 @@ OPFUNC_DECL(op_ldrh_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrh_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldrh\t%s, [%s]\n",
@@ -1609,13 +1642,13 @@ OPFUNC_DECL(op_ldrh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrh_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldrh_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common("ldrh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldrsb_immpostidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsb_immpostidx, opc, imm9, Rn, Rt)
 {
 	PRINTF("ldrsb\t%s, [%s],#%ld\n",
 	    ZREGNAME((opc ^ 1), Rt),
@@ -1624,7 +1657,7 @@ OPFUNC_DECL(op_ldrsb_immpostidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsb_immpreidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsb_immpreidx, opc, imm9, Rn, Rt)
 {
 	PRINTF("ldrsb\t%s, [%s,#%ld]!\n",
 	    ZREGNAME((opc ^ 1), Rt),
@@ -1633,7 +1666,7 @@ OPFUNC_DECL(op_ldrsb_immpreidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsb_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsb_immunsign, opc, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldrsb\t%s, [%s]\n",
@@ -1648,13 +1681,13 @@ OPFUNC_DECL(op_ldrsb_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
+OPFUNC_DECL6(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common("ldrsb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldrsh_immpostidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsh_immpostidx, opc, imm9, Rn, Rt)
 {
 	PRINTF("ldrsh\t%s, [%s],#%ld\n",
 	    ZREGNAME((opc ^ 1), Rt),
@@ -1663,7 +1696,7 @@ OPFUNC_DECL(op_ldrsh_immpostidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsh_immpreidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsh_immpreidx, opc, imm9, Rn, Rt)
 {
 	PRINTF("ldrsh\t%s, [%s,#%ld]!\n",
 	    ZREGNAME((opc ^ 1), Rt),
@@ -1672,7 +1705,7 @@ OPFUNC_DECL(op_ldrsh_immpreidx, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsh_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldrsh_immunsign, opc, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldrsh\t%s, [%s]\n",
@@ -1687,13 +1720,13 @@ OPFUNC_DECL(op_ldrsh_immunsign, opc, imm12, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
+OPFUNC_DECL6(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common("ldrsh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldrsw_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrsw_immpostidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrsw\t%s, [%s],#%ld\n",
 	    ZREGNAME(1, Rt),
@@ -1702,7 +1735,7 @@ OPFUNC_DECL(op_ldrsw_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsw_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrsw_immpreidx, imm9, Rn, Rt)
 {
 	PRINTF("ldrsw\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(1, Rt),
@@ -1711,7 +1744,7 @@ OPFUNC_DECL(op_ldrsw_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsw_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldrsw_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("ldrsw\t%s, [%s]\n",
@@ -1726,7 +1759,7 @@ OPFUNC_DECL(op_ldrsw_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsw_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldrsw_literal, imm19, Rt)
 {
 	PRINTF("ldrsw\t%s, %lx\n",
 	    ZREGNAME(1, Rt),
@@ -1734,13 +1767,13 @@ OPFUNC_DECL(op_ldrsw_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldrsw_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_ldrsw_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_w_common("ldrsw", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_ldtr, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldtr, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtr\t%s, [%s]\n",
@@ -1755,7 +1788,7 @@ OPFUNC_DECL(op_ldtr, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldtrb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldtrb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtrb\t%s, [%s]\n",
@@ -1770,7 +1803,7 @@ OPFUNC_DECL(op_ldtrb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldtrh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldtrh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtrh\t%s, [%s]\n",
@@ -1785,7 +1818,7 @@ OPFUNC_DECL(op_ldtrh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldtrsb, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldtrsb, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtrsb\t%s, [%s]\n",
@@ -1800,7 +1833,7 @@ OPFUNC_DECL(op_ldtrsb, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldtrsh, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldtrsh, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtrsh\t%s, [%s]\n",
@@ -1815,7 +1848,7 @@ OPFUNC_DECL(op_ldtrsh, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldtrsw, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldtrsw, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldtrsw\t%s, [%s]\n",
@@ -1830,7 +1863,7 @@ OPFUNC_DECL(op_ldtrsw, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldur, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldur, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldur\t%s, [%s]\n",
@@ -1845,7 +1878,7 @@ OPFUNC_DECL(op_ldur, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldurb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldurb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldurb\t%s, [%s]\n",
@@ -1860,7 +1893,7 @@ OPFUNC_DECL(op_ldurb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldurh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldurh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldurh\t%s, [%s]\n",
@@ -1875,7 +1908,7 @@ OPFUNC_DECL(op_ldurh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldursb, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldursb, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldursb\t%s, [%s]\n",
@@ -1890,7 +1923,7 @@ OPFUNC_DECL(op_ldursb, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldursh, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldursh, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldursh\t%s, [%s]\n",
@@ -1905,7 +1938,7 @@ OPFUNC_DECL(op_ldursh, opc, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldursw, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldursw, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("ldursw\t%s, [%s]\n",
@@ -1920,7 +1953,7 @@ OPFUNC_DECL(op_ldursw, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ldxp, size, Rt2, Rn, Rt)
 {
 	PRINTF("ldxp\t%s, %s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -1929,7 +1962,7 @@ OPFUNC_DECL(op_ldxp, size, Rt2, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldxr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_ldxr, size, Rn, Rt)
 {
 	PRINTF("ldxr\t%s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -1937,7 +1970,7 @@ OPFUNC_DECL(op_ldxr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldxrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldxrb, Rn, Rt)
 {
 	PRINTF("ldxrb\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1945,7 +1978,7 @@ OPFUNC_DECL(op_ldxrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ldxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_ldxrh, Rn, Rt)
 {
 	PRINTF("ldxrh\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -1953,7 +1986,7 @@ OPFUNC_DECL(op_ldxrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ubfm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_ubfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
@@ -1994,7 +2027,7 @@ OPFUNC_DECL(op_ubfm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_lsl_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_lsl_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: lslv */
 	/* "lsl" always the preferred disassembly */
@@ -2005,7 +2038,7 @@ OPFUNC_DECL(op_lsl_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_lsr_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_lsr_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: lsrv */
 	/* "lsr" always the preferred disassembly */
@@ -2016,7 +2049,7 @@ OPFUNC_DECL(op_lsr_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_madd, sf, Rm, Ra, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_madd, sf, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: mul */
 	if (Ra == 31) {
@@ -2034,7 +2067,7 @@ OPFUNC_DECL(op_madd, sf, Rm, Ra, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_msub, sf, Rm, Ra, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_msub, sf, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: mneg */
 	if (Ra == 31) {
@@ -2052,7 +2085,7 @@ OPFUNC_DECL(op_msub, sf, Rm, Ra, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_orr_imm, sf, n, immr, imms, Rn, Rd)
+OPFUNC_DECL6(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
 		UNDEFINED(pc, insn, "illegal bitmasks");
@@ -2080,7 +2113,7 @@ OPFUNC_DECL(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_movn, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_movn, sf, hw, imm16, Rd)
 {
 	const uint64_t mask = (sf == 0) ? 0xffffffff : 0xffffffffffffffffUL;
 
@@ -2104,7 +2137,7 @@ OPFUNC_DECL(op_movn, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mov_reg */
 	if ((Rn == 31) && (imm6 == 0)) {
@@ -2118,7 +2151,7 @@ OPFUNC_DECL(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_movz, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_movz, sf, hw, imm16, Rd)
 {
 	/* ALIAS: mov_wimm */
 	if ((hw == 0) || (imm16 == 0)) {
@@ -2141,7 +2174,7 @@ OPFUNC_DECL(op_movz, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_movk, sf, hw, imm16, Rd)
 {
 	const int shift = hw * 16;
 
@@ -2157,7 +2190,7 @@ OPFUNC_DECL(op_movk, sf, hw, imm16, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_mrs, op0, op1, CRn, CRm, op2, Rt)
+OPFUNC_DECL6(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 {
 	char buf[SYSREGNAMEBUFLEN];
 
@@ -2167,7 +2200,7 @@ OPFUNC_DECL(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 }
 
 static void
-OPFUNC_DECL(op_msr, op0, op1, CRn, CRm, op2, Rt)
+OPFUNC_DECL6(op_msr, op0, op1, CRn, CRm, op2, Rt)
 {
 	char buf[SYSREGNAMEBUFLEN];
 
@@ -2177,7 +2210,7 @@ OPFUNC_DECL(op_msr, op0, op1, CRn, CRm, op2, Rt)
 }
 
 static void
-OPFUNC_DECL(op_msr_imm, op1, CRm, op2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_msr_imm, op1, CRm, op2)
 {
 	const char *pstatefield;
 
@@ -2203,7 +2236,7 @@ OPFUNC_DECL(op_msr_imm, op1, CRm, op2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_orn, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mvn */
 	shiftreg_common("orn", "mvn", NULL,
@@ -2211,7 +2244,7 @@ OPFUNC_DECL(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
+OPFUNC_DECL6(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: neg */
 	shiftreg_common("sub", "neg", NULL,
@@ -2219,7 +2252,7 @@ OPFUNC_DECL(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 }
 
 static void
-OPFUNC_DECL(op_sbc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_sbc, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: ngc */
 	if (Rn == 31) {
@@ -2235,7 +2268,7 @@ OPFUNC_DECL(op_sbc, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sbcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_sbcs, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: ngcs */
 	if (Rn == 31) {
@@ -2251,7 +2284,7 @@ OPFUNC_DECL(op_sbcs, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_prfm_imm, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_prfm_imm, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("prfm\t%s, [%s]\n",
@@ -2266,7 +2299,7 @@ OPFUNC_DECL(op_prfm_imm, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_prfm_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_prfm_literal, imm19, Rt)
 {
 	PRINTF("prfm\t%s, %lx\n",
 	    PREFETCHNAME(Rt),
@@ -2274,7 +2307,7 @@ OPFUNC_DECL(op_prfm_literal, imm19, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_prfm_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_prfm_reg, Rm, option, shift, Rn, Rt)
 {
 	int r;
 
@@ -2302,7 +2335,7 @@ OPFUNC_DECL(op_prfm_reg, Rm, option, shift, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_prfum, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_prfum, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("prfum\t%s, [%s]\n",
@@ -2317,7 +2350,7 @@ OPFUNC_DECL(op_prfum, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_rbit, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_rbit, sf, Rn, Rd)
 {
 	PRINTF("rbit\t%s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -2325,7 +2358,7 @@ OPFUNC_DECL(op_rbit, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ret, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_ret, Rn)
 {
 	if (Rn == 30)
 		PRINTF("ret\n");
@@ -2334,7 +2367,7 @@ OPFUNC_DECL(op_ret, Rn, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_rev, sf, x, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_rev, sf, x, Rn, Rd)
 {
 	PRINTF("rev\t%s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -2342,7 +2375,7 @@ OPFUNC_DECL(op_rev, sf, x, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_rev16, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_rev16, sf, Rn, Rd)
 {
 	PRINTF("rev16\t%s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -2350,7 +2383,7 @@ OPFUNC_DECL(op_rev16, sf, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_rev32, Rn, Rd, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_rev32, Rn, Rd)
 {
 	PRINTF("rev\t%s, %s\n",
 	    ZREGNAME(1, Rd),
@@ -2358,7 +2391,7 @@ OPFUNC_DECL(op_rev32, Rn, Rd, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_ror_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_ror_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: rorv */
 	/* "ror" always the preferred disassembly */
@@ -2369,7 +2402,7 @@ OPFUNC_DECL(op_ror_reg, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sdiv, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_sdiv, sf, Rm, Rn, Rd)
 {
 	PRINTF("sdiv\t%s, %s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -2378,7 +2411,7 @@ OPFUNC_DECL(op_sdiv, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_smaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_smaddl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: smull */
 	if (Ra == 31) {
@@ -2396,13 +2429,13 @@ OPFUNC_DECL(op_smaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_smc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_smc, imm16)
 {
 	PRINTF("smc\t#0x%lx\n", imm16);
 }
 
 static void
-OPFUNC_DECL(op_smsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_smsubl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: smnegl */
 	if (Ra == 31) {
@@ -2420,7 +2453,7 @@ OPFUNC_DECL(op_smsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_smulh, Rm, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_smulh, Rm, Rn, Rd)
 {
 	PRINTF("smulh\t%s, %s, %s\n",
 	    ZREGNAME(1, Rd),
@@ -2429,7 +2462,7 @@ OPFUNC_DECL(op_smulh, Rm, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_stlr, size, Rn, Rt)
 {
 	PRINTF("stlr\t%s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -2437,7 +2470,7 @@ OPFUNC_DECL(op_stlr, size, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_stlrb, Rn, Rt)
 {
 	PRINTF("stlrb\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -2445,7 +2478,7 @@ OPFUNC_DECL(op_stlrb, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL2(op_stlrh, Rn, Rt)
 {
 	PRINTF("stlrh\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -2453,7 +2486,7 @@ OPFUNC_DECL(op_stlrh, Rn, Rt, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlxp, size, Rs, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stlxp, size, Rs, Rt2, Rn, Rt)
 {
 	PRINTF("stlxp\t%s, %s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -2462,7 +2495,7 @@ OPFUNC_DECL(op_stlxp, size, Rs, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlxr, size, Rs, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_stlxr, size, Rs, Rn, Rt)
 {
 	PRINTF("stlxr\t%s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -2470,7 +2503,7 @@ OPFUNC_DECL(op_stlxr, size, Rs, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlxrb, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_stlxrb, Rs, Rn, Rt)
 {
 	PRINTF("stlxrb\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -2478,7 +2511,7 @@ OPFUNC_DECL(op_stlxrb, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stlxrh, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_stlxrh, Rs, Rn, Rt)
 {
 	PRINTF("stlxrh\t%s, [%s]\n",
 	    ZREGNAME(0, Rt),
@@ -2486,7 +2519,7 @@ OPFUNC_DECL(op_stlxrh, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stnp, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
 		PRINTF("stnp\t%s, %s, [%s]\n",
@@ -2503,7 +2536,7 @@ OPFUNC_DECL(op_stnp, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stp_postidx, sf, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("stp\t%s, %s, [%s],#%ld\n",
 	    ZREGNAME(sf, Rt),
@@ -2513,7 +2546,7 @@ OPFUNC_DECL(op_stp_postidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stp_preidx, sf, imm7, Rt2, Rn, Rt)
 {
 	PRINTF("stp\t%s, %s, [%s,#%ld]!\n",
 	    ZREGNAME(sf, Rt),
@@ -2523,7 +2556,7 @@ OPFUNC_DECL(op_stp_preidx, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stp_signed, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
 		PRINTF("stp\t%s, %s, [%s]\n",
@@ -2540,7 +2573,7 @@ OPFUNC_DECL(op_stp_signed, sf, imm7, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_str_immpostidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_str_immpostidx, size, imm9, Rn, Rt)
 {
 	PRINTF("str\t%s, [%s],#%ld\n",
 	    ZREGNAME(size, Rt),
@@ -2549,7 +2582,7 @@ OPFUNC_DECL(op_str_immpostidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_str_immpreidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_str_immpreidx, size, imm9, Rn, Rt)
 {
 	PRINTF("str\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(size, Rt),
@@ -2558,7 +2591,7 @@ OPFUNC_DECL(op_str_immpreidx, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_str_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_str_immunsign, size, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("str\t%s, [%s]\n",
@@ -2573,13 +2606,13 @@ OPFUNC_DECL(op_str_immunsign, size, imm12, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_str_reg, size, Rm, option, shift, Rn, Rt)
+OPFUNC_DECL6(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
 	regoffset_x_common("str", pc, insn, size, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_strb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strb_immpostidx, imm9, Rn, Rt)
 {
 	PRINTF("strb\t%s, [%s],#%ld\n",
 	    ZREGNAME(0, Rt),
@@ -2588,7 +2621,7 @@ OPFUNC_DECL(op_strb_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strb_immpreidx, imm9, Rn, Rt)
 {
 	PRINTF("strb\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(0, Rt),
@@ -2597,7 +2630,7 @@ OPFUNC_DECL(op_strb_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strb_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("strb\t%s, [%s]\n",
@@ -2612,13 +2645,13 @@ OPFUNC_DECL(op_strb_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strb_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_strb_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common("strb", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_strh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strh_immpostidx, imm9, Rn, Rt)
 {
 	PRINTF("strh\t%s, [%s],#%ld\n",
 	    ZREGNAME(0, Rt),
@@ -2627,7 +2660,7 @@ OPFUNC_DECL(op_strh_immpostidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strh_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strh_immpreidx, imm9, Rn, Rt)
 {
 	PRINTF("strh\t%s, [%s,#%ld]!\n",
 	    ZREGNAME(0, Rt),
@@ -2636,7 +2669,7 @@ OPFUNC_DECL(op_strh_immpreidx, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_strh_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
 		PRINTF("strh\t%s, [%s]\n",
@@ -2651,13 +2684,13 @@ OPFUNC_DECL(op_strh_immunsign, imm12, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_strh_reg, Rm, option, shift, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_strh_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common("strh", pc, insn, Rm, option, shift, Rn, Rt);
 }
 
 static void
-OPFUNC_DECL(op_sttr, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_sttr, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("sttr\t%s, [%s]\n",
@@ -2672,7 +2705,7 @@ OPFUNC_DECL(op_sttr, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sttrb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_sttrb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("sttrb\t%s, [%s]\n",
@@ -2687,7 +2720,7 @@ OPFUNC_DECL(op_sttrb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sttrh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_sttrh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("sttrh\t%s, [%s]\n",
@@ -2702,7 +2735,7 @@ OPFUNC_DECL(op_sttrh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stur, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_stur, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("stur\t%s, [%s]\n",
@@ -2717,7 +2750,7 @@ OPFUNC_DECL(op_stur, size, imm9, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sturb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_sturb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("sturb\t%s, [%s]\n",
@@ -2732,7 +2765,7 @@ OPFUNC_DECL(op_sturb, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sturh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_sturh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
 		PRINTF("sturh\t%s, [%s]\n",
@@ -2747,7 +2780,7 @@ OPFUNC_DECL(op_sturh, imm9, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stxp, size, Rs, Rt2, Rn, Rt, UNUSED5)
+OPFUNC_DECL5(op_stxp, size, Rs, Rt2, Rn, Rt)
 {
 	PRINTF("stxp\t%s, %s, [%s]\n",
 	    ZREGNAME(size, Rt),
@@ -2756,7 +2789,7 @@ OPFUNC_DECL(op_stxp, size, Rs, Rt2, Rn, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stxr, size, Rs, Rn, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_stxr, size, Rs, Rn, Rt)
 {
 	PRINTF("stxr\t%s, %s, [%s]\n",
 	    ZREGNAME(0, Rs),
@@ -2765,7 +2798,7 @@ OPFUNC_DECL(op_stxr, size, Rs, Rn, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stxrb, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_stxrb, Rs, Rn, Rt)
 {
 	PRINTF("stxrb\t%s, %s, [%s]\n",
 	    ZREGNAME(0, Rs),
@@ -2774,7 +2807,7 @@ OPFUNC_DECL(op_stxrb, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_stxrh, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_stxrh, Rs, Rn, Rt)
 {
 	PRINTF("stxrh\t%s, %s, [%s]\n",
 	    ZREGNAME(0, Rs),
@@ -2783,14 +2816,14 @@ OPFUNC_DECL(op_stxrh, Rs, Rn, Rt, UNUSED3, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_sub_extreg, sf, Rm, option, imm3, Rn, Rd)
+OPFUNC_DECL6(op_sub_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common("sub", NULL,
 	    pc, insn, sf, Rm, option, imm3, Rn, Rd);
 }
 
 static void
-OPFUNC_DECL(op_sub_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
+OPFUNC_DECL5(op_sub_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
 		UNDEFINED(pc, insn, "illegal shift");
@@ -2805,14 +2838,14 @@ OPFUNC_DECL(op_sub_imm, sf, shift, imm12, Rn, Rd, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_svc, imm16, UNUSED1, UNUSED2, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL1(op_svc, imm16)
 {
 	PRINTF("svc\t#0x%lx\n",
 	    imm16);
 }
 
 static void
-OPFUNC_DECL(op_sysl, op1, CRn, CRm, op2, Rt, UNUSED5)
+OPFUNC_DECL5(op_sysl, op1, CRn, CRm, op2, Rt)
 {
 	PRINTF("sysl\t%s, #%lu, %s, %s, #%lu\n",
 	    ZREGNAME(1, Rt),
@@ -2823,7 +2856,7 @@ OPFUNC_DECL(op_sysl, op1, CRn, CRm, op2, Rt, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_tbnz, b5, b40, imm14, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_tbnz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
@@ -2834,7 +2867,7 @@ OPFUNC_DECL(op_tbnz, b5, b40, imm14, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_tbz, b5, b40, imm14, Rt, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_tbz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
@@ -2845,7 +2878,7 @@ OPFUNC_DECL(op_tbz, b5, b40, imm14, Rt, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_udiv, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_udiv, sf, Rm, Rn, Rd)
 {
 	PRINTF("udiv\t%s, %s, %s\n",
 	    ZREGNAME(sf, Rd),
@@ -2854,7 +2887,7 @@ OPFUNC_DECL(op_udiv, sf, Rm, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_umaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_umaddl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: umull */
 	if (Ra == 31) {
@@ -2872,7 +2905,7 @@ OPFUNC_DECL(op_umaddl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_umsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
+OPFUNC_DECL4(op_umsubl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: umnegl */
 	if (Ra == 31) {
@@ -2890,13 +2923,113 @@ OPFUNC_DECL(op_umsubl, Rm, Ra, Rn, Rd, UNUSED4, UNUSED5)
 }
 
 static void
-OPFUNC_DECL(op_umulh, Rm, Rn, Rd, UNUSED3, UNUSED4, UNUSED5)
+OPFUNC_DECL3(op_umulh, Rm, Rn, Rd)
 {
 	PRINTF("umulh\t%s, %s, %s\n",
 	    ZREGNAME(1, Rd),
 	    ZREGNAME(1, Rn),
 	    ZREGNAME(1, Rm));
 }
+
+/*
+ * SIMD instruction are not supported (yet?)
+ */
+static void
+OPFUNC_DECL5(op_simd_ldnp, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldnp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldp_postidx, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldp_preidx, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldp_signed, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldr_immpostidx, size, opc, imm9, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldr_immpreidx, size, opc, imm9, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_ldr_immunsign, size, opc, imm12, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+}
+
+static void
+OPFUNC_DECL7(op_simd_ldr_reg, size, opc, Rm, opt, S, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD ldr\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_stnp, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD stnp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_stp_postidx, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_stp_preidx, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_stp_signed, opc, imm7, Rt2, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD stp\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_str_immpostidx, size, opc, imm9, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_str_immpreidx, size, opc, imm9, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
+}
+
+static void
+OPFUNC_DECL5(op_simd_str_immunsign, size, opc, imm12, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
+}
+
+static void
+OPFUNC_DECL7(op_simd_str_reg, size, opc, Rm, opt, S, Rn, Rt)
+{
+	PRINTF(".word\t0x%08x\t# SIMD str\n", insn);
+}
+
 
 #include "table.h"
 
@@ -2920,7 +3053,8 @@ disasm_insn(uint64_t loc, uint32_t insn)
 			    WIDTHMASK(insn_tables[i].bitinfo[j].width);
 		}
 		insn_tables[i].opfunc(loc, insn,
-		    args[0], args[1], args[2], args[3], args[4], args[5]);
+		    args[0], args[1], args[2], args[3],
+		    args[4], args[5], args[6], args[7]);
 		break;
 	}
 }

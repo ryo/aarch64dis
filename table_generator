@@ -2,7 +2,18 @@
 
 use strict;
 use warnings;
+use Getopt::Std;
 use Data::Dumper;
+
+my $INSN_MAXARG = 8;
+
+
+sub usage {
+	die "table_generater [-AD] asm.def\n";
+}
+
+my %opts;
+getopts('AD', \%opts) or usage();
 
 chop(my @INPUT = <>);
 
@@ -70,7 +81,7 @@ for my $insn (@insns) {
 #print Dumper(\%fmts); exit;
 #print Dumper(\@insns); exit;
 
-if (0) {
+if (exists($opts{A})) {
 	# detect unintended
 	for my $target (@insns) {
 		my @alias;
@@ -125,10 +136,13 @@ if (0) {
 	}
 
 
-#print sort @decl_output;
+if (exists($opts{D})) {
+	print sort @decl_output;
+	exit;
+}
 
 
-print "/* define code format  { {bitpos, bitwidth}, ... (maximum 6 args) } */\n";
+print "/* define code format  { {bitpos, bitwidth}, ... (maximum $INSN_MAXARG args) } */\n";
 print @fmt_output;
 print "\n";
 
@@ -140,7 +154,7 @@ __HEADER__
 
 	print @table_output;
 
-	print " { 0x00000000, 0x00000000, FMT_NOARG,                      op_undefined }\n";
+	print " { 0x00000000, 0x00000000, FMT_NOARG,                   op_undefined }\n";
 	print "};\n";
 
 	print "\n\n\n\n\n";
@@ -167,7 +181,7 @@ sub insn_decl {
 	push(@output, "static void\n");
 	push(@output, sprintf("OPFUNC_DECL(op_%s, ", $insn->{sym}));
 
-	for (($#vars + 1) .. 5) {
+	for (($#vars + 1) .. ($INSN_MAXARG - 1)) {
 		push(@vars, join(", ", sprintf("UNUSED%d", $_)));
 	}
 	push(@output, join(", ", @vars));
@@ -182,7 +196,7 @@ sub insn_decl {
 		push(@output, sprintf("\t/* ALIAS: %s */\n", join(",", @alias)));
 	}
 
-	push(@output, q'	printf("%12x:\t%08x \t.word\t0x%08x\t# %s:%d\n", pc, insn, insn, __func__, __LINE__);' . "\n");
+	push(@output, q'	PRINTF(".word\t0x%08x\t# %s:%d\n", insn, __func__, __LINE__);' . "\n");
 
 
 	push(@output, "}\n");
@@ -204,8 +218,10 @@ sub insn_fragment_fmt {
 			push(@bitinfo, sprintf("{%2d,%2d}", $_->{end}, $_->{width}));
 		}
 	}
-	push(@bitinfo, "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}", "{ 0, 0}");
-	splice(@bitinfo, 6);
+	for (1 .. $INSN_MAXARG) {
+		push(@bitinfo, "{ 0, 0}");
+	}
+	splice(@bitinfo, $INSN_MAXARG);
 
 	my $len = length("FMT_$fmt");
 	my $tab = '';
@@ -213,7 +229,7 @@ sub insn_fragment_fmt {
 	$len = ($len + 7) & -8;
 	$tab .= "\t" x ((32 - $len) / 8);
 
-	sprintf "#define FMT_%s%s\\\n\t{ %s }\n", $fmt, $tab, join(", ", @bitinfo);
+	sprintf "#define FMT_%s%s\\\n\t{%s}\n", $fmt, $tab, join(", ", @bitinfo);
 }
 
 sub dump_insn {

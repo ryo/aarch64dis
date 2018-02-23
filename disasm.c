@@ -374,7 +374,7 @@ DecodeShift(uint64_t shift)
 }
 
 #define UNDEFINED(pc, insn, comment)	\
-	PRINTF(".word\t0x%08x\t# %s\n", insn, comment);
+	PRINTF(".insn\t0x%08x\t# %s\n", insn, comment);
 
 static void
 extendreg_common(const char *op, const char *z_op,

@@ -39,10 +39,9 @@
 #define PRINTF		di->di_printf
 #define PRINTADDR	di->di_printaddr
 
-#define OPFUNC_DECL(func,a,b,c,d,e,f,g,h)		\
-func(disasm_interface_t *di,				\
-    uint64_t pc, uint32_t insn,				\
-    uint64_t a, uint64_t b, uint64_t c, uint64_t d,	\
+#define OPFUNC_DECL(func, a, b, c, d, e, f, g, h)		\
+func(disasm_interface_t *di, uint64_t pc, uint32_t insn,	\
+    uint64_t a, uint64_t b, uint64_t c, uint64_t d,		\
     uint64_t e, uint64_t f, uint64_t g, uint64_t h)
 
 #define UNUSED0	arg0 __unused
@@ -54,36 +53,36 @@ func(disasm_interface_t *di,				\
 #define UNUSED6	arg6 __unused
 #define UNUSED7	arg7 __unused
 
-#define OPFUNC_DECL0(func)				\
-	OPFUNC_DECL(func,				\
-	    UNUSED0, UNUSED1, UNUSED2, UNUSED3,		\
+#define OPFUNC_DECL0(func)					\
+	OPFUNC_DECL( func,					\
+	    UNUSED0, UNUSED1, UNUSED2, UNUSED3,			\
 	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
-#define OPFUNC_DECL1(func,a)				\
-	OPFUNC_DECL(func,a,				\
-	    UNUSED1, UNUSED2, UNUSED3, UNUSED4,		\
+#define OPFUNC_DECL1(func, a)					\
+	OPFUNC_DECL( func, a,					\
+	    UNUSED1, UNUSED2, UNUSED3, UNUSED4,			\
 	    UNUSED5, UNUSED6, UNUSED7)
-#define OPFUNC_DECL2(func,a,b)				\
-	OPFUNC_DECL(func,a,b,				\
-	    UNUSED2, UNUSED3, UNUSED4, UNUSED5,		\
+#define OPFUNC_DECL2(func, a, b)				\
+	OPFUNC_DECL( func, a, b,				\
+	    UNUSED2, UNUSED3, UNUSED4, UNUSED5,			\
 	    UNUSED6, UNUSED7)
-#define OPFUNC_DECL3(func,a,b,c)			\
-	OPFUNC_DECL(func,a,b,c,				\
-	    UNUSED3, UNUSED4, UNUSED5, UNUSED6,		\
+#define OPFUNC_DECL3(func, a, b, c)				\
+	OPFUNC_DECL( func, a, b, c,				\
+	    UNUSED3, UNUSED4, UNUSED5, UNUSED6,			\
 	    UNUSED7)
-#define OPFUNC_DECL4(func,a,b,c,d)			\
-	OPFUNC_DECL(func,a,b,c,d,			\
+#define OPFUNC_DECL4(func, a, b, c, d)				\
+	OPFUNC_DECL( func, a, b, c, d,				\
 	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
-#define OPFUNC_DECL5(func,a,b,c,d,e)			\
-	OPFUNC_DECL(func,a,b,c,d,e,			\
+#define OPFUNC_DECL5(func, a, b, c, d, e)			\
+	OPFUNC_DECL( func, a, b, c, d, e,			\
 	    UNUSED5, UNUSED6, UNUSED7)
-#define OPFUNC_DECL6(func,a,b,c,d,e,f)			\
-	OPFUNC_DECL(func,a,b,c,d,e,f,			\
+#define OPFUNC_DECL6(func, a, b, c, d, e, f)			\
+	OPFUNC_DECL( func, a, b, c, d, e, f,			\
 	    UNUSED6, UNUSED7)
-#define OPFUNC_DECL7(func,a,b,c,d,e,f,g)		\
-	OPFUNC_DECL(func,a,b,c,d,e,f,g,			\
+#define OPFUNC_DECL7(func, a, b, c, d, e, f, g)			\
+	OPFUNC_DECL( func, a, b, c, d, e, f, g,			\
 	    UNUSED7)
-#define OPFUNC_DECL8(func,a,b,c,d,e,f,g,h)		\
-	OPFUNC_DECL(func,a,b,c,d,e,f,g,h)
+#define OPFUNC_DECL8(func, a, b, c, d, e, f, g, h)		\
+	OPFUNC_DECL( func, a, b, c, d, e, f, g, h)
 
 static const char *z_wxregs[2][32] = {
 	{

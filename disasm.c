@@ -599,7 +599,7 @@ regoffset_x_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-addcmp_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+addsub_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t shift, uint64_t imm12, uint64_t Rn, uint64_t Rd,
     const char *op, const char *zop)
 {
@@ -608,7 +608,6 @@ addcmp_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		return;
 	}
 
-	/* ALIAS: cmn_imm */
 	if (Rd == 31) {
 		PRINTF("%s\t%s, #0x%lx%s\n",
 		    zop,
@@ -727,7 +726,7 @@ static void
 OPFUNC_DECL5(op_adds_imm, sf, shift, imm12, Rn, Rd)
 {
 	/* ALIAS: cmn_imm */
-	addcmp_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
+	addsub_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
 	    "adds", "cmn");
 }
 
@@ -854,7 +853,7 @@ OPFUNC_DECL6(op_sbfm, sf, n, immr, imms, Rn, Rd)
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(0, Rn));
 	} else {
-		UNDEFINED(pc, insn, "unknown");
+		UNDEFINED(pc, insn, "undefined");
 	}
 }
 
@@ -1165,7 +1164,7 @@ static void
 OPFUNC_DECL5(op_subs_imm, sf, shift, imm12, Rn, Rd)
 {
 	/* ALIAS: cmp_imm */
-	addcmp_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
+	addsub_imm_common(di, pc, insn, sf, shift, imm12, Rn, Rd,
 	    "subs", "cmp");
 }
 
@@ -2045,7 +2044,7 @@ OPFUNC_DECL6(op_ubfm, sf, n, immr, imms, Rn, Rd)
 		    ZREGNAME(0, Rd),
 		    ZREGNAME(0, Rn));
 	} else {
-		UNDEFINED(pc, insn, "unknown");
+		UNDEFINED(pc, insn, "undefined");
 	}
 }
 
@@ -2373,14 +2372,6 @@ OPFUNC_DECL3(op_prfum, imm9, Rn, Rt)
 }
 
 static void
-OPFUNC_DECL3(op_rbit, sf, Rn, Rd)
-{
-	PRINTF("rbit\t%s, %s\n",
-	    ZREGNAME(sf, Rd),
-	    ZREGNAME(sf, Rn));
-}
-
-static void
 OPFUNC_DECL1(op_ret, Rn)
 {
 	if (Rn == 30)
@@ -2390,27 +2381,35 @@ OPFUNC_DECL1(op_ret, Rn)
 }
 
 static void
-OPFUNC_DECL4(op_rev, sf, x, Rn, Rd)
+OPFUNC_DECL4(op_rev, sf, opc, Rn, Rd)
 {
-	PRINTF("rev\t%s, %s\n",
+	/*
+	 * sf opc insn
+	 * -- --- -------------
+	 * 0  00  rbit    Wd,Wn
+	 * 0  01  rev16   Wd,Wn
+	 * 0  10  rev     Wd,Wn
+	 * 0  11  undefined
+	 * 1  00  rbit    Xd,Xn
+	 * 1  01  rev16   Xd,Xn
+	 * 1  10  rev32   Xd,Xn
+	 * 1  11  rev     Xd,Xn
+	 */
+	const char *const opcode[2][4] = {
+		{ "rbit", "rev16", "rev",   NULL  },
+		{ "rbit", "rev16", "rev32", "rev" }
+	};
+	const char *const op = opcode[sf][opc];
+
+	if (op == NULL) {
+		UNDEFINED(pc, insn, "undefined");
+		return;
+	}
+
+	PRINTF("%s\t%s, %s\n",
+	    op,
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn));
-}
-
-static void
-OPFUNC_DECL3(op_rev16, sf, Rn, Rd)
-{
-	PRINTF("rev16\t%s, %s\n",
-	    ZREGNAME(sf, Rd),
-	    ZREGNAME(sf, Rn));
-}
-
-static void
-OPFUNC_DECL2(op_rev32, Rn, Rd)
-{
-	PRINTF("rev\t%s, %s\n",
-	    ZREGNAME(1, Rd),
-	    ZREGNAME(1, Rn));
 }
 
 static void
@@ -3230,26 +3229,47 @@ test_printaddr(uintptr_t loc)
 #endif
 }
 
+static uint32_t
+test_readword(uintptr_t loc)
+{
+	uint32_t *p;
+
+	p = (uint32_t *)loc;
+	return *p;
+}
+
+disasm_interface_t test_di = {
+	.di_readword = test_readword,
+	.di_printaddr = test_printaddr,
+	.di_printf = test_printf
+};
+
 int
 disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize)
 {
-	disasm_interface_t di;
 	uint32_t insn;
 
 	printf_buffer = buf;
 	printf_size = bufsize;
 
-	di.di_printaddr = test_printaddr;
-	di.di_printf = test_printf;
 
 	/* fetch instruction */
+#if 0
+	insn = test_di.di_readword(loc);
+#else
 	insn = *(uint32_t *)insnp;
+#endif
 
+#if 1
 	/* print address/insn */
 	test_printf("%12lx:\t%08x\t", loc, insn);
+#else
+	test_di.di_printaddr(loc);
+	test_di.di_printf(":\t%08x\t", insn);
+#endif
 
 	/* print insn */
-	disasm_insn(&di, loc, insn);
+	disasm_insn(&test_di, loc, insn);
 
 
 	printf_buffer = NULL;

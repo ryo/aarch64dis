@@ -5,8 +5,6 @@
 	{{ 5, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_RN_RT			\
 	{{ 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
-#define FMT_RN_RD			\
-	{{ 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_CRM				\
 	{{ 8, 4}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_CRM_OP2			\
@@ -65,8 +63,8 @@
 	{{29, 2}, { 5,19}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_SF_RN_RD			\
 	{{31, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
-#define FMT_SF_X_RN_RD			\
-	{{31, 1}, {10, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_SF_OPC_RN_RD		\
+	{{31, 1}, {10, 2}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_SF_RM_RN_RD			\
 	{{31, 1}, {16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_SF_RM_SZ_RN_RD		\
@@ -124,7 +122,6 @@ static struct insn_info insn_tables[] = {
  { 0xfffffc00, 0x485ffc00, FMT_RN_RT,                   op_ldaxrh },
  { 0xfffffc00, 0x085f7c00, FMT_RN_RT,                   op_ldxrb },
  { 0xfffffc00, 0x485f7c00, FMT_RN_RT,                   op_ldxrh },
- { 0xfffffc00, 0xdac00800, FMT_RN_RD,                   op_rev32 },
  { 0xfffffc00, 0x089ffc00, FMT_RN_RT,                   op_stlrb },
  { 0xfffffc00, 0x489ffc00, FMT_RN_RT,                   op_stlrh },
  { 0xfffff0ff, 0xd503305f, FMT_CRM,                     op_clrex },
@@ -235,9 +232,7 @@ static struct insn_info insn_tables[] = {
  { 0x9f000000, 0x90000000, FMT_IMMLO_IMMHI_RD,          op_adrp },
  { 0x7ffffc00, 0x5ac01400, FMT_SF_RN_RD,                op_cls },
  { 0x7ffffc00, 0x5ac01000, FMT_SF_RN_RD,                op_clz },
- { 0x7ffffc00, 0x5ac00000, FMT_SF_RN_RD,                op_rbit },
- { 0x7ffffc00, 0x5ac00400, FMT_SF_RN_RD,                op_rev16 },
- { 0x7ffff800, 0x5ac00800, FMT_SF_X_RN_RD,              op_rev },
+ { 0x7ffff000, 0x5ac00000, FMT_SF_OPC_RN_RD,            op_rev },
  { 0x7fe0fc00, 0x5a000000, FMT_SF_RM_RN_RD,             op_sbc },
  { 0x7fe0fc00, 0x7a000000, FMT_SF_RM_RN_RD,             op_sbcs },
  { 0x7fe0fc00, 0x1a000000, FMT_SF_RM_RN_RD,             op_adc },

@@ -877,7 +877,6 @@ struct op_sys_table {
 
 static struct op_sys_table op_sys_table[] = {
 	{ SYSREG_ENC(1, 0, 7,  1, 0), OPE_NONE,	"ic\tialluis"		},
-	{ SYSREG_ENC(1, 0, 7,  1, 0), OPE_NONE,	"ic\tialluis"		},
 	{ SYSREG_ENC(1, 0, 7,  5, 0), OPE_NONE,	"ic\tiallu"		},
 	{ SYSREG_ENC(1, 3, 7,  5, 1), OPE_XT,	"ic\tivau"		},
 	{ SYSREG_ENC(1, 0, 7,  6, 1), OPE_XT,	"dc\tivac"		},
@@ -957,7 +956,7 @@ OP5FUNC(op_sys, op1, CRn, CRm, op2, Rt)
 			UNDEFINED(pc, insn, "illegal Rt");
 #else
 			/* fallback to sys instruction */
-			continue;
+			break;
 #endif
 		} else {
 			PRINTF("%s\n",

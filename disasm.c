@@ -2628,7 +2628,8 @@ OP4FUNC(op_str_immunsign, size, imm12, Rn, Rt)
 static void
 OP6FUNC(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
-	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt, "str");
+	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt,
+	    "str");
 }
 
 static void

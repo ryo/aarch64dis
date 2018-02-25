@@ -2117,7 +2117,7 @@ OP6FUNC(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
 #else
-	/* same as objdump? */
+	/* "orr Rd, XZR, #imm" -> "mov Rd, #imm" */
 	(void)MoveWidePreferred;
 	if (Rn == 31) {
 #endif

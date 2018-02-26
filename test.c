@@ -9,6 +9,81 @@
 
 #include "disasm.h"
 
+
+/*
+ * for test
+ */
+char *printf_buffer = NULL;
+size_t printf_size;
+
+static void
+test_printf(char const *fmt, ...)
+{
+		va_list ap;
+		int ret;
+
+		va_start(ap, fmt);
+		if (printf_buffer != NULL) {
+			ret = vsnprintf(printf_buffer, printf_size, fmt, ap);
+			printf_buffer += ret;
+		} else {
+			ret = vprintf(fmt, ap);
+		}
+		va_end(ap);
+}
+
+static void
+test_printaddr(uintptr_t loc)
+{
+#if 0
+	test_printf("%lx <0x%lx>", loc, loc);
+#else
+	test_printf("%lx", loc);
+#endif
+}
+
+static uint32_t
+test_readword(uintptr_t loc)
+{
+	uint32_t *p;
+
+	p = (uint32_t *)loc;
+	return *p;
+}
+
+disasm_interface_t test_di = {
+	.di_readword = test_readword,
+	.di_printaddr = test_printaddr,
+	.di_printf = test_printf
+};
+
+static int
+strdisasm(uint64_t loc, uint32_t insn, char *buf, size_t bufsize)
+{
+	printf_buffer = buf;
+	printf_size = bufsize;
+
+#if 1
+	/* print address/insn */
+	test_printf("%12lx:\t%08x\t", loc, insn);
+#else
+	test_di.di_printaddr(loc);
+	test_di.di_printf(":\t%08x\t", insn);
+#endif
+
+	/* print insn */
+	disasm_insn(&test_di, loc, insn);
+
+
+	printf_buffer = NULL;
+	printf_size = 0;
+
+	return sizeof(uint32_t);
+}
+
+
+
+
 static int __unused
 chop(char *p)
 {
@@ -122,7 +197,7 @@ parse_disasm(char *p)
 
 	origline = p;
 
-	disasm(loc, &insn, asmbuf, sizeof(asmbuf));
+	strdisasm(loc, insn, asmbuf, sizeof(asmbuf));
 	snprintf(origbuf, sizeof(origbuf), "%12llx:	%08x	%s", (unsigned long long)loc, (uint32_t)insn, origline);
 	strncpy(asmbuf_cmp, asmbuf, sizeof(asmbuf_cmp));
 	strncpy(origbuf_cmp, origbuf, sizeof(origbuf_cmp));
@@ -175,6 +250,7 @@ parse_disasm(char *p)
 
 	return true;
 }
+
 
 int
 main(int argc, char *argv[])

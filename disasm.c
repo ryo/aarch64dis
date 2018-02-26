@@ -2998,85 +2998,14 @@ disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 	}
 }
 
-
-
-/*
- * for test
- */
-char *printf_buffer = NULL;
-size_t printf_size;
-
-static void
-test_printf(char const *fmt, ...)
-{
-		va_list ap;
-		int ret;
-
-		va_start(ap, fmt);
-		if (printf_buffer != NULL) {
-			ret = vsnprintf(printf_buffer, printf_size, fmt, ap);
-			printf_buffer += ret;
-		} else {
-			ret = vprintf(fmt, ap);
-		}
-		va_end(ap);
-}
-
-static void
-test_printaddr(uintptr_t loc)
-{
-#if 0
-	test_printf("%lx <0x%lx>", loc, loc);
-#else
-	test_printf("%lx", loc);
-#endif
-}
-
-static uint32_t
-test_readword(uintptr_t loc)
-{
-	uint32_t *p;
-
-	p = (uint32_t *)loc;
-	return *p;
-}
-
-disasm_interface_t test_di = {
-	.di_readword = test_readword,
-	.di_printaddr = test_printaddr,
-	.di_printf = test_printf
-};
-
 int
-disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize)
+disasm(disasm_interface_t *di, uintptr_t loc)
 {
 	uint32_t insn;
 
-	printf_buffer = buf;
-	printf_size = bufsize;
+	insn = di->di_readword(loc);
+	disasm_insn(di, loc, insn);
 
-
-	/* fetch instruction */
-#if 0
-	insn = test_di.di_readword(loc);
-#else
-	insn = *(uint32_t *)insnp;
-#endif
-
-#if 1
-	/* print address/insn */
-	test_printf("%12lx:\t%08x\t", loc, insn);
-#else
-	test_di.di_printaddr(loc);
-	test_di.di_printf(":\t%08x\t", insn);
-#endif
-
-	/* print insn */
-	disasm_insn(&test_di, loc, insn);
-
-
-	printf_buffer = NULL;
-	printf_size = 0;
-
-	return sizeof(uint32_t);
+	/* return next address */
+	return loc + sizeof(insn);
 }

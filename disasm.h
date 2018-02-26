@@ -30,12 +30,12 @@
 #define _AARCH64_DISASM_H_
 
 typedef struct {
-	uint32_t (*di_readword)(uintptr_t);
+	uint32_t (*di_readword)(uintptr_t);	/* disasm_insn() doesn't use */
 	void (*di_printaddr)(uintptr_t);
 	void (*di_printf)(const char *, ...) __printflike(1, 2);
 } disasm_interface_t;
 
-int disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize);
-void disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn);
+void disasm_insn(disasm_interface_t *, uintptr_t, uint32_t);
+int disasm(disasm_interface_t *, uintptr_t);
 
 #endif /* _AARCH64_DISASM_H_ */

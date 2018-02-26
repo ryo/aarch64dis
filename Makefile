@@ -1,6 +1,6 @@
 
-CC	= gcc
-CXX	= g++
+CC	?= cc
+CXX	?= g++
 DBG	= -O3
 #DBG	+= -g
 CFLAGS	= ${DBG} -pipe -I/usr/local/include
@@ -9,7 +9,6 @@ CFLAGS +=-Wall \
 	-Wmissing-prototypes \
 	-Wpointer-arith \
 	-Wno-sign-compare \
-	-Wno-traditional \
 	-Wa,--fatal-warnings \
 	-Wreturn-type \
 	-Wswitch \
@@ -25,7 +24,7 @@ CFLAGS +=-Wall \
 	-Wno-format-zero-length \
 	-Werror
 CXXAGS	= ${CFLAGS:S/-Wno-traditional//}
-LD	= gcc
+LD	= ${CC}
 MKDEP	= mkdep
 LIBS	= -L/usr/local/lib
 

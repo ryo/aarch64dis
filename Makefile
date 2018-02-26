@@ -21,6 +21,7 @@ CFLAGS +=-Wall \
 	-Wold-style-definition \
 	-Wsign-compare \
 	-Wformat=2 \
+	-Wno-format-nonliteral \
 	-Wno-format-zero-length \
 	-Werror
 CXXAGS	= ${CFLAGS:S/-Wno-traditional//}

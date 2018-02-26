@@ -32,7 +32,7 @@
 typedef struct {
 	uint32_t (*di_readword)(uintptr_t);
 	void (*di_printaddr)(uintptr_t);
-	void (*di_printf)(const char *, ...);
+	void (*di_printf)(const char *, ...) __printflike(1, 2);
 } disasm_interface_t;
 
 int disasm(uint64_t loc, void *insnp, char *buf, size_t bufsize);

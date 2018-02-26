@@ -45,7 +45,7 @@ chomp(char *p)
 static bool
 ishex(char c)
 {
-	if (isdigit(c) ||
+	if (isdigit((int)c) ||
 	     (('a' <= c) && (c <= 'f')) ||
 	     (('A' <= c) && (c <= 'F')))
 		return true;
@@ -123,7 +123,7 @@ parse_disasm(char *p)
 	origline = p;
 
 	disasm(loc, &insn, asmbuf, sizeof(asmbuf));
-	snprintf(origbuf, sizeof(origbuf), "%12lx:	%08x	%s", loc, (uint32_t)insn, origline);
+	snprintf(origbuf, sizeof(origbuf), "%12llx:	%08x	%s", (unsigned long long)loc, (uint32_t)insn, origline);
 	strncpy(asmbuf_cmp, asmbuf, sizeof(asmbuf_cmp));
 	strncpy(origbuf_cmp, origbuf, sizeof(origbuf_cmp));
 

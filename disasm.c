@@ -33,6 +33,7 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <sys/bitops.h>
+#include <machine/int_fmtio.h>
 
 #include "disasm.h"
 
@@ -54,34 +55,43 @@ func(disasm_interface_t *di, uint64_t pc, uint32_t insn,	\
 #define UNUSED7	arg7 __unused
 
 #define OP0FUNC(func)						\
+	static void						\
 	OPFUNC_DECL(func,					\
 	    UNUSED0, UNUSED1, UNUSED2, UNUSED3,			\
 	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
 #define OP1FUNC(func, a)					\
+	static void						\
 	OPFUNC_DECL(func, a,					\
 	    UNUSED1, UNUSED2, UNUSED3, UNUSED4,			\
 	    UNUSED5, UNUSED6, UNUSED7)
 #define OP2FUNC(func, a, b)					\
+	static void						\
 	OPFUNC_DECL(func, a, b,					\
 	    UNUSED2, UNUSED3, UNUSED4, UNUSED5,			\
 	    UNUSED6, UNUSED7)
 #define OP3FUNC(func, a, b, c)					\
+	static void						\
 	OPFUNC_DECL(func, a, b, c,				\
 	    UNUSED3, UNUSED4, UNUSED5, UNUSED6,			\
 	    UNUSED7)
 #define OP4FUNC(func, a, b, c, d)				\
+	static void						\
 	OPFUNC_DECL(func, a, b, c, d,				\
 	    UNUSED4, UNUSED5, UNUSED6, UNUSED7)
 #define OP5FUNC(func, a, b, c, d, e)				\
+	static void						\
 	OPFUNC_DECL(  func, a, b, c, d, e,			\
 	    UNUSED5, UNUSED6, UNUSED7)
 #define OP6FUNC(func, a, b, c, d, e, f)				\
+	static void						\
 	OPFUNC_DECL(func, a, b, c, d, e, f,			\
 	    UNUSED6, UNUSED7)
 #define OP7FUNC(func, a, b, c, d, e, f, g)			\
+	static void						\
 	OPFUNC_DECL(func, a, b, c, d, e, f, g,			\
 	    UNUSED7)
 #define OP8FUNC(func, a, b, c, d, e, f, g, h)			\
+	static void						\
 	OPFUNC_DECL(func, a, b, c, d, e, f, g, h)
 
 static const char *z_wxregs[2][32] = {
@@ -231,8 +241,8 @@ sysregname(char *buf, size_t buflen, uint32_t rw,
 	name = sysregname_bsearch(code);
 	if (name == NULL) {
 #define SYSREGNAMEBUFLEN	sizeof("s99_99_c99_c99_99")
-		snprintf(buf, buflen, "s%lu_%lu_c%lu_c%lu_%lu",
-		    op0, op1, CRn, CRm, op2);
+		snprintf(buf, buflen, "s%u_%u_c%u_c%u_%u",
+		    (u_int)op0, (u_int)op1, (u_int)CRn, (u_int)CRm, (u_int)op2);
 		return buf;
 	}
 	return name;
@@ -243,7 +253,7 @@ sysregname(char *buf, size_t buflen, uint32_t rw,
 	sysregname(buf, buflen, SYSREG_OP_WRITE, op0, op1, CRn, CRm, op2)
 
 
-static int64_t
+static uint64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 {
 	const uint64_t signbit = (1 << (bitwidth - 1));
@@ -390,11 +400,11 @@ extendreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 				    "sxtb", "sxth", "sxtw", "sxtx"));
 			}
 		} else {
-			PRINTF(", %s #%lu",
+			PRINTF(", %s #%u",
 			    SHIFTOP8(option,
 			    "uxtb", "uxth", "lsl", "lsl",
 			    "sxtb", "sxth", "sxtw", "sxtx"),
-			    imm3);
+			    (u_int)imm3);
 		}
 	} else {
 		PRINTF(", %s",
@@ -402,7 +412,7 @@ extendreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		    "uxtb", "uxth", "uxtw", "uxtx",
 		    "sxtb", "sxth", "sxtw", "sxtx"));
 		if (imm3 != 0)
-			PRINTF(" #%lu", imm3);
+			PRINTF(" #%u", (u_int)imm3);
 	}
 	PRINTF("\n");
 }
@@ -436,7 +446,7 @@ shiftreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		    ZREGNAME(sf, Rm));
 	}
 	if (imm6 != 0)
-		PRINTF(", %s #%lu", DecodeShift(shift), imm6);
+		PRINTF(", %s #%u", DecodeShift(shift), (u_int)imm6);
 	PRINTF("\n");
 }
 
@@ -514,14 +524,14 @@ regoffset_h_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		    SHIFTOP8(option,
 		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
 	} else {
-		PRINTF("%s\t%s, [%s,%s,%s #%lu]\n",
+		PRINTF("%s\t%s, [%s,%s,%s #%u]\n",
 		    op,
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option,
 		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
-		    shift);
+		    (u_int)shift);
 	}
 }
 
@@ -552,14 +562,14 @@ regoffset_w_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		    SHIFTOP8(option,
 		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"));
 	} else {
-		PRINTF("%s\t%s, [%s,%s,%s #%lu]\n",
+		PRINTF("%s\t%s, [%s,%s,%s #%u]\n",
 		    op,
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option,
 		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
-		    shift * 2);
+		    (u_int)shift * 2);
 	}
 }
 
@@ -586,14 +596,14 @@ regoffset_x_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
 		uint64_t amount = 2 + size;
-		PRINTF("%s\t%s, [%s,%s,%s #%lu]\n",
+		PRINTF("%s\t%s, [%s,%s,%s #%u]\n",
 		    op,
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZREGNAME(r, Rm),
 		    SHIFTOP8(option,
 		        "", "", "uxtw", "lsl", "", "", "sxtw", "sxtx"),
-		    amount);
+		    (u_int)amount);
 	}
 }
 
@@ -608,13 +618,13 @@ addsub_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 	}
 
 	if (Rd == 31) {
-		PRINTF("%s\t%s, #0x%lx%s\n",
+		PRINTF("%s\t%s, #0x%"PRIx64"%s\n",
 		    zop,
 		    SREGNAME(sf, Rn),
 		    ZeroExtend(12, imm12, 1),
 		    SHIFTOP4(shift, "", ", lsl #12", "", ""));
 	} else {
-		PRINTF("%s\t%s, %s, #0x%lx%s\n",
+		PRINTF("%s\t%s, %s, #0x%"PRIx64"%s\n",
 		    op,
 		    ZREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
@@ -649,13 +659,11 @@ csetsel_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 	}
 }
 
-static void
 OP0FUNC(op_undefined)
 {
 	UNDEFINED(pc, insn, "undefined");
 }
 
-static void
 OP4FUNC(op_adc, sf, Rm, Rn, Rd)
 {
 	PRINTF("adc\t%s, %s, %s\n",
@@ -664,7 +672,6 @@ OP4FUNC(op_adc, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP4FUNC(op_adcs, sf, Rm, Rn, Rd)
 {
 	PRINTF("adcs\t%s, %s, %s\n",
@@ -673,14 +680,12 @@ OP4FUNC(op_adcs, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP6FUNC(op_add_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
 	    "add", NULL);
 }
 
-static void
 OP5FUNC(op_add_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
@@ -694,7 +699,7 @@ OP5FUNC(op_add_imm, sf, shift, imm12, Rn, Rd)
 		    SREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn));
 	} else {
-		PRINTF("add\t%s, %s, #0x%lx%s\n",
+		PRINTF("add\t%s, %s, #0x%"PRIx64"%s\n",
 		    SREGNAME(sf, Rd),
 		    SREGNAME(sf, Rn),
 		    ZeroExtend(12, imm12, 1),
@@ -702,7 +707,6 @@ OP5FUNC(op_add_imm, sf, shift, imm12, Rn, Rd)
 	}
 }
 
-static void
 OP6FUNC(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
@@ -713,7 +717,6 @@ OP6FUNC(op_add_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	    "add", NULL, NULL);
 }
 
-static void
 OP6FUNC(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmn_extreg */
@@ -721,7 +724,6 @@ OP6FUNC(op_adds_extreg, sf, Rm, option, imm3, Rn, Rd)
 	    "adds", "cmn");
 }
 
-static void
 OP5FUNC(op_adds_imm, sf, shift, imm12, Rn, Rd)
 {
 	/* ALIAS: cmn_imm */
@@ -729,7 +731,6 @@ OP5FUNC(op_adds_imm, sf, shift, imm12, Rn, Rd)
 	    "adds", "cmn");
 }
 
-static void
 OP6FUNC(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
@@ -741,7 +742,6 @@ OP6FUNC(op_adds_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	    "adds", NULL, "cmn");
 }
 
-static void
 OP3FUNC(op_adr, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
@@ -751,17 +751,15 @@ OP3FUNC(op_adr, immlo, immhi, Rd)
 	PRINTF("\n");
 }
 
-static void
 OP3FUNC(op_adrp, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
 
-	PRINTF("adrp\t%s, %lx\n",
+	PRINTF("adrp\t%s, %"PRIx64"\n",
 	    ZREGNAME(1, Rd),
 	    SignExtend(21, imm, 4096) + (pc & -4096));
 }
 
-static void
 OP6FUNC(op_and_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
@@ -769,20 +767,18 @@ OP6FUNC(op_and_imm, sf, n, immr, imms, Rn, Rd)
 		return;
 	}
 
-	PRINTF("and\t%s, %s, #0x%lx\n",
+	PRINTF("and\t%s, %s, #0x%"PRIx64"\n",
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
 	    DecodeBitMasks(sf, n, imms, immr));
 }
 
-static void
 OP6FUNC(op_and_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
 	    "and", NULL, NULL);
 }
 
-static void
 OP6FUNC(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
@@ -792,18 +788,17 @@ OP6FUNC(op_ands_imm, sf, n, immr, imms, Rn, Rd)
 
 	/* ALIAS: tst_imm */
 	if (Rd == 31) {
-		PRINTF("tst\t%s, #0x%lx\n",
+		PRINTF("tst\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, imms, immr));
 	} else {
-		PRINTF("ands\t%s, %s, #0x%lx\n",
+		PRINTF("ands\t%s, %s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, imms, immr));
 	}
 }
 
-static void
 OP6FUNC(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: tst_shiftreg */
@@ -811,30 +806,29 @@ OP6FUNC(op_ands_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	    "ands", NULL, "tst");
 }
 
-static void
 OP6FUNC(op_sbfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
 	/* ALIAS: asr_imm,sbfiz,sbfx,sxtb,sxth,sxtw */
 	if ((imms != (bitwidth - 1)) && ((imms + 1) == immr)) {
-		PRINTF("asr\t%s, %s, #%lu\n",
+		PRINTF("asr\t%s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    bitwidth - immr);
 	} else if (imms == (bitwidth - 1)) {
-		PRINTF("asr\t%s, %s, #%lu\n",
+		PRINTF("asr\t%s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr);
 	} else if (imms < immr) {
-		PRINTF("sbfiz\t%s, %s, #%lu, #%lu\n",
+		PRINTF("sbfiz\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    (bitwidth - immr) & (bitwidth - 1),
 		    (imms + 1) & (bitwidth - 1));
 	} else if (BFXPreferred(sf, 0, imms, immr)) {
-		PRINTF("sbfx\t%s, %s, #%lu, #%lu\n",
+		PRINTF("sbfx\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr,
@@ -856,7 +850,6 @@ OP6FUNC(op_sbfm, sf, n, immr, imms, Rn, Rd)
 	}
 }
 
-static void
 OP4FUNC(op_asr_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: asrv */
@@ -933,7 +926,6 @@ static struct op_sys_table op_sys_table[] = {
 	{ SYSREG_ENC(1, 6, 8,  7, 5), OPE_XT,	"tlbi\tvale3"		}
 };
 
-static void
 OP5FUNC(op_sys, op1, CRn, CRm, op2, Rt)
 {
 	uint32_t code;
@@ -966,7 +958,7 @@ OP5FUNC(op_sys, op1, CRn, CRm, op2, Rt)
 	}
 
 	/* default, sys instruction */
-	PRINTF("sys\t#%lu, %s, %s, #%lu, %s\n",
+	PRINTF("sys\t#%"PRIu64", %s, %s, #%"PRIu64", %s\n",
 	    op1,
 	    CREGNAME(CRn),
 	    CREGNAME(CRm),
@@ -974,7 +966,6 @@ OP5FUNC(op_sys, op1, CRn, CRm, op2, Rt)
 	    ZREGNAME(1,Rt));
 }
 
-static void
 OP1FUNC(op_b, imm26)
 {
 	PRINTF("b\t");
@@ -982,7 +973,6 @@ OP1FUNC(op_b, imm26)
 	PRINTF("\n");
 }
 
-static void
 OP2FUNC(op_b_cond, imm19, cond)
 {
 	PRINTF("b.%s\t", CONDNAME(cond));
@@ -990,7 +980,6 @@ OP2FUNC(op_b_cond, imm19, cond)
 	PRINTF("\n");
 }
 
-static void
 OP6FUNC(op_bfi, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
@@ -998,13 +987,13 @@ OP6FUNC(op_bfi, sf, n, immr, imms, Rn, Rd)
 	/* ALIAS: bfm,bfxil */
 	/* it is not disassembled as bfm */
 	if (imms < immr) {
-		PRINTF("bfi\t%s, %s, #%lu, #%lu\n",
+		PRINTF("bfi\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    (bitwidth - immr) & (bitwidth - 1),
 		    (imms + 1) & (bitwidth - 1));
 	} else {
-		PRINTF("bfxil\t%s, %s, #%lu, #%lu\n",
+		PRINTF("bfxil\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr,
@@ -1012,21 +1001,18 @@ OP6FUNC(op_bfi, sf, n, immr, imms, Rn, Rd)
 	}
 }
 
-static void
 OP6FUNC(op_bic_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
 	    "bic", NULL, NULL);
 }
 
-static void
 OP6FUNC(op_bics_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
 	    "bics", NULL, NULL);
 }
 
-static void
 OP1FUNC(op_bl, imm26)
 {
 	PRINTF("bl\t");
@@ -1034,25 +1020,21 @@ OP1FUNC(op_bl, imm26)
 	PRINTF("\n");
 }
 
-static void
 OP1FUNC(op_blr, Rn)
 {
 	PRINTF("blr\t%s\n", ZREGNAME(1, Rn));
 }
 
-static void
 OP1FUNC(op_br, Rn)
 {
 	PRINTF("br\t%s\n", ZREGNAME(1, Rn));
 }
 
-static void
 OP1FUNC(op_brk, imm16)
 {
-	PRINTF("brk\t#0x%lx\n", imm16);
+	PRINTF("brk\t#0x%"PRIx64"\n", imm16);
 }
 
-static void
 OP3FUNC(op_cbnz, sf, imm19, Rt)
 {
 	PRINTF("cbnz\t%s, ", ZREGNAME(sf, Rt));
@@ -1060,7 +1042,6 @@ OP3FUNC(op_cbnz, sf, imm19, Rt)
 	PRINTF("\n");
 }
 
-static void
 OP3FUNC(op_cbz, sf, imm19, Rt)
 {
 	PRINTF("cbz\t%s, ", ZREGNAME(sf, Rt));
@@ -1068,47 +1049,42 @@ OP3FUNC(op_cbz, sf, imm19, Rt)
 	PRINTF("\n");
 }
 
-static void
 OP5FUNC(op_ccmn_imm, sf, imm5, cond, Rn, nzcv)
 {
-	PRINTF("ccmn\t%s, #0x%lx, #0x%lx, %s\n",
+	PRINTF("ccmn\t%s, #0x%"PRIx64", #0x%"PRIx64", %s\n",
 	    ZREGNAME(sf, Rn),
 	    imm5,
 	    nzcv,
 	    CONDNAME(cond));
 }
 
-static void
 OP5FUNC(op_ccmn_reg, sf, Rm, cond, Rn, nzcv)
 {
-	PRINTF("ccmn\t%s, %s, #0x%lx, %s\n",
+	PRINTF("ccmn\t%s, %s, #0x%"PRIx64", %s\n",
 	    ZREGNAME(sf, Rn),
 	    ZREGNAME(sf, Rm),
 	    nzcv,
 	    CONDNAME(cond));
 }
 
-static void
 OP5FUNC(op_ccmp_imm, sf, imm5, cond, Rn, nzcv)
 {
-	PRINTF("ccmp\t%s, #0x%lx, #0x%lx, %s\n",
+	PRINTF("ccmp\t%s, #0x%"PRIx64", #0x%"PRIx64", %s\n",
 	    ZREGNAME(sf, Rn),
 	    imm5,
 	    nzcv,
 	    CONDNAME(cond));
 }
 
-static void
 OP5FUNC(op_ccmp_reg, sf, Rm, cond, Rn, nzcv)
 {
-	PRINTF("ccmp\t%s, %s, #0x%lx, %s\n",
+	PRINTF("ccmp\t%s, %s, #0x%"PRIx64", %s\n",
 	    ZREGNAME(sf, Rn),
 	    ZREGNAME(sf, Rm),
 	    nzcv,
 	    CONDNAME(cond));
 }
 
-static void
 OP5FUNC(op_cinc, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: cset,csinc */
@@ -1116,7 +1092,6 @@ OP5FUNC(op_cinc, sf, Rm, cond, Rn, Rd)
 	    "csinc", "cset", "cinc");
 }
 
-static void
 OP5FUNC(op_csinv, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: csetm,cinv */
@@ -1124,17 +1099,15 @@ OP5FUNC(op_csinv, sf, Rm, cond, Rn, Rd)
 	    "csinv", "csetm", "cinv");
 }
 
-static void
 OP1FUNC(op_clrex, CRm)
 {
 	if (CRm == 15) {
 		PRINTF("clrex\n");
 	} else {
-		PRINTF("clrex\t#0x%lx\n", CRm);
+		PRINTF("clrex\t#0x%"PRIx64"\n", CRm);
 	}
 }
 
-static void
 OP3FUNC(op_cls, sf, Rn, Rd)
 {
 	PRINTF("cls\t%s, %s\n",
@@ -1142,7 +1115,6 @@ OP3FUNC(op_cls, sf, Rn, Rd)
 	    ZREGNAME(sf, Rn));
 }
 
-static void
 OP3FUNC(op_clz, sf, Rn, Rd)
 {
 	PRINTF("clz\t%s, %s\n",
@@ -1150,7 +1122,6 @@ OP3FUNC(op_clz, sf, Rn, Rd)
 	    ZREGNAME(sf, Rn));
 }
 
-static void
 OP6FUNC(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	/* ALIAS: cmp_extreg */
@@ -1158,7 +1129,6 @@ OP6FUNC(op_subs_extreg, sf, Rm, option, imm3, Rn, Rd)
 	    "subs", "cmp");
 }
 
-static void
 OP5FUNC(op_subs_imm, sf, shift, imm12, Rn, Rd)
 {
 	/* ALIAS: cmp_imm */
@@ -1166,7 +1136,6 @@ OP5FUNC(op_subs_imm, sf, shift, imm12, Rn, Rd)
 	    "subs", "cmp");
 }
 
-static void
 OP6FUNC(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	if (shift == 3) {
@@ -1179,7 +1148,6 @@ OP6FUNC(op_subs_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	    "subs", "negs", "cmp");
 }
 
-static void
 OP5FUNC(op_csneg, sf, Rm, cond, Rn, Rd)
 {
 	/* ALIAS: cneg */
@@ -1217,19 +1185,16 @@ crc32_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP5FUNC(op_crc32, sf, Rm, sz, Rn, Rd)
 {
 	crc32_common(di, pc, insn, sf, Rm, sz, Rn, Rd, "crc32");
 }
 
-static void
 OP5FUNC(op_crc32c, sf, Rm, sz, Rn, Rd)
 {
 	crc32_common(di, pc, insn, sf, Rm, sz, Rn, Rd, "crc32c");
 }
 
-static void
 OP5FUNC(op_csel, sf, Rm, cond, Rn, Rd)
 {
 	PRINTF("csel\t%s, %s, %s, %s\n",
@@ -1239,7 +1204,6 @@ OP5FUNC(op_csel, sf, Rm, cond, Rn, Rd)
 	    CONDNAME(cond));
 }
 
-static void
 OP2FUNC(op_dcps, imm16, ll)
 {
 	if (ll == 0) {
@@ -1248,37 +1212,32 @@ OP2FUNC(op_dcps, imm16, ll)
 	}
 
 	if (imm16 == 0)
-		PRINTF("dcps%lu\n", ll);
+		PRINTF("dcps%"PRIu64"\n", ll);
 	else
-		PRINTF("dcps%lu\t#0x%lx\n", ll, imm16);
+		PRINTF("dcps%"PRIu64"\t#0x%"PRIx64"\n", ll, imm16);
 }
 
-static void
 OP0FUNC(op_drps)
 {
 	PRINTF("drps\n");
 }
 
-static void
 OP1FUNC(op_dmb, CRm)
 {
 	PRINTF("dmb\t%s\n", BARRIERNAME(CRm));
 }
 
-static void
 OP1FUNC(op_dsb, CRm)
 {
 	PRINTF("dsb\t%s\n", BARRIERNAME(CRm));
 }
 
-static void
 OP6FUNC(op_eon_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
 	    "eon", NULL, NULL);
 }
 
-static void
 OP6FUNC(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
@@ -1286,26 +1245,23 @@ OP6FUNC(op_eor_imm, sf, n, immr, imms, Rn, Rd)
 		return;
 	}
 
-	PRINTF("eor\t%s, %s, #0x%lx\n",
+	PRINTF("eor\t%s, %s, #0x%"PRIx64"\n",
 	    ZREGNAME(sf, Rd),
 	    ZREGNAME(sf, Rn),
 	    DecodeBitMasks(sf, n, imms, immr));
 }
 
-static void
 OP6FUNC(op_eor_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	shiftreg_common(di, pc, insn, sf, shift, Rm, imm6, Rn, Rd,
 	    "eor", NULL, NULL);
 }
 
-static void
 OP0FUNC(op_eret)
 {
 	PRINTF("eret\n");
 }
 
-static void
 OP6FUNC(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 {
 	if (((sf ^ n) != 0) || (n == 0 && imms >= 0x20)) {
@@ -1315,12 +1271,12 @@ OP6FUNC(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 
 	/* ALIAS: extr */
 	if (Rn == Rm) {
-		PRINTF("ror\t%s, %s, #%lu\n",
+		PRINTF("ror\t%s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    imms);
 	} else {
-		PRINTF("extr\t%s, %s, %s, #%lu\n",
+		PRINTF("extr\t%s, %s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    ZREGNAME(sf, Rm),
@@ -1328,7 +1284,6 @@ OP6FUNC(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 	}
 }
 
-static void
 OP2FUNC(op_hint, CRm, op2)
 {
 	const uint64_t op = CRm << 3 | op2;
@@ -1354,33 +1309,29 @@ OP2FUNC(op_hint, CRm, op2)
 		PRINTF("sevl\n");
 		break;
 	default:
-		PRINTF("hint\t#0x%lx\n", op);
+		PRINTF("hint\t#0x%"PRIx64"\n", op);
 		break;
 	}
 }
 
-static void
 OP1FUNC(op_hlt, imm16)
 {
-	PRINTF("hlt\t#0x%lx\n", imm16);
+	PRINTF("hlt\t#0x%"PRIx64"\n", imm16);
 }
 
-static void
 OP1FUNC(op_hvc, imm16)
 {
-	PRINTF("hvc\t#0x%lx\n", imm16);
+	PRINTF("hvc\t#0x%"PRIx64"\n", imm16);
 }
 
-static void
 OP1FUNC(op_isb, CRm)
 {
 	if (CRm == 15)
 		PRINTF("isb\n");
 	else
-		PRINTF("isb\t#0x%lx\n", CRm);
+		PRINTF("isb\t#0x%"PRIx64"\n", CRm);
 }
 
-static void
 OP3FUNC(op_ldar, size, Rn, Rt)
 {
 	PRINTF("ldar\t%s, [%s]\n",
@@ -1388,7 +1339,6 @@ OP3FUNC(op_ldar, size, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldarb, Rn, Rt)
 {
 	PRINTF("ldarb\t%s, [%s]\n",
@@ -1396,7 +1346,6 @@ OP2FUNC(op_ldarb, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldarh, Rn, Rt)
 {
 	PRINTF("ldarh\t%s, [%s]\n",
@@ -1404,7 +1353,6 @@ OP2FUNC(op_ldarh, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP4FUNC(op_ldaxp, size, Rt2, Rn, Rt)
 {
 	PRINTF("ldaxp\t%s, %s, [%s]\n",
@@ -1413,7 +1361,6 @@ OP4FUNC(op_ldaxp, size, Rt2, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_ldaxr, size, Rn, Rt)
 {
 	PRINTF("ldaxr\t%s, [%s]\n",
@@ -1421,7 +1368,6 @@ OP3FUNC(op_ldaxr, size, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldaxrb, Rn, Rt)
 {
 	PRINTF("ldaxrb\t%s, [%s]\n",
@@ -1429,7 +1375,6 @@ OP2FUNC(op_ldaxrb, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldaxrh, Rn, Rt)
 {
 	PRINTF("ldaxrh\t%s, [%s]\n",
@@ -1437,7 +1382,6 @@ OP2FUNC(op_ldaxrh, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP5FUNC(op_ldnp, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
@@ -1446,7 +1390,7 @@ OP5FUNC(op_ldnp, sf, imm7, Rt2, Rn, Rt)
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldnp\t%s, %s, [%s,#%ld]\n",
+		PRINTF("ldnp\t%s, %s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(sf, Rt),
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn),
@@ -1454,27 +1398,24 @@ OP5FUNC(op_ldnp, sf, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP5FUNC(op_ldp_postidx, sf, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("ldp\t%s, %s, [%s],#%ld\n",
+	PRINTF("ldp\t%s, %s, [%s],#%"PRId64"\n",
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
-static void
 OP5FUNC(op_ldp_preidx, sf, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("ldp\t%s, %s, [%s,#%ld]!\n",
+	PRINTF("ldp\t%s, %s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
-static void
 OP5FUNC(op_ldp_signed, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
@@ -1483,7 +1424,7 @@ OP5FUNC(op_ldp_signed, sf, imm7, Rt2, Rn, Rt)
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldp\t%s, %s, [%s,#%ld]\n",
+		PRINTF("ldp\t%s, %s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(sf, Rt),
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn),
@@ -1491,27 +1432,24 @@ OP5FUNC(op_ldp_signed, sf, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP4FUNC(op_ldpsw_postidx, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("ldpsw\t%s, %s, [%s],#%ld\n",
+	PRINTF("ldpsw\t%s, %s, [%s],#%"PRId64"\n",
 	    ZREGNAME(1, Rt),
 	    ZREGNAME(1, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, 4));
 }
 
-static void
 OP4FUNC(op_ldpsw_preidx, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("ldpsw\t%s, %s, [%s,#%ld]!\n",
+	PRINTF("ldpsw\t%s, %s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(1, Rt),
 	    ZREGNAME(1, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, 4));
 }
 
-static void
 OP4FUNC(op_ldpsw_signed, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
@@ -1520,7 +1458,7 @@ OP4FUNC(op_ldpsw_signed, imm7, Rt2, Rn, Rt)
 		    ZREGNAME(1, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldpsw\t%s, %s, [%s,#%ld]\n",
+		PRINTF("ldpsw\t%s, %s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(1, Rt),
 		    ZREGNAME(1, Rt2),
 		    SREGNAME(1, Rn),
@@ -1528,25 +1466,22 @@ OP4FUNC(op_ldpsw_signed, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP4FUNC(op_ldr_immpostidx, size, imm9, Rn, Rt)
 {
-	PRINTF("ldr\t%s, [%s],#%ld\n",
+	PRINTF("ldr\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(size, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldr_immpreidx, size, imm9, Rn, Rt)
 {
-	PRINTF("ldr\t%s, [%s,#%ld]!\n",
+	PRINTF("ldr\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(size, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldr_immunsign, size, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1554,14 +1489,13 @@ OP4FUNC(op_ldr_immunsign, size, imm12, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldr\t%s, [%s,#%ld]\n",
+		PRINTF("ldr\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, (size == 0) ? 4 : 8));
 	}
 }
 
-static void
 OP3FUNC(op_ldr_literal, size, imm19, Rt)
 {
 	PRINTF("ldr\t%s, ", ZREGNAME(size, Rt));
@@ -1569,32 +1503,28 @@ OP3FUNC(op_ldr_literal, size, imm19, Rt)
 	PRINTF("\n");
 }
 
-static void
 OP6FUNC(op_ldr_reg, size, Rm, option, shift, Rn, Rt)
 {
 	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt,
 	    "ldr");
 }
 
-static void
 OP3FUNC(op_ldrb_immpostidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrb\t%s, [%s],#%ld\n",
+	PRINTF("ldrb\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrb_immpreidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrb\t%s, [%s,#%ld]!\n",
+	PRINTF("ldrb\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrb_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1602,38 +1532,34 @@ OP3FUNC(op_ldrb_immunsign, imm12, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldrb\t%s, [%s,#%ld]\n",
+		PRINTF("ldrb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 1));
 	}
 }
 
-static void
 OP5FUNC(op_ldrb_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrb");
 }
 
-static void
 OP3FUNC(op_ldrh_immpostidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrh\t%s, [%s],#%ld\n",
+	PRINTF("ldrh\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrh_immpreidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrh\t%s, [%s,#%ld]!\n",
+	PRINTF("ldrh\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrh_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1641,38 +1567,34 @@ OP3FUNC(op_ldrh_immunsign, imm12, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldrh\t%s, [%s,#%ld]\n",
+		PRINTF("ldrh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 2));
 	}
 }
 
-static void
 OP5FUNC(op_ldrh_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrh");
 }
 
-static void
 OP4FUNC(op_ldrsb_immpostidx, opc, imm9, Rn, Rt)
 {
-	PRINTF("ldrsb\t%s, [%s],#%ld\n",
+	PRINTF("ldrsb\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME((opc ^ 1), Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldrsb_immpreidx, opc, imm9, Rn, Rt)
 {
-	PRINTF("ldrsb\t%s, [%s,#%ld]!\n",
+	PRINTF("ldrsb\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME((opc ^ 1), Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldrsb_immunsign, opc, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1680,38 +1602,34 @@ OP4FUNC(op_ldrsb_immunsign, opc, imm12, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldrsb\t%s, [%s,#%ld]\n",
+		PRINTF("ldrsb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 1));
 	}
 }
 
-static void
 OP6FUNC(op_ldrsb_reg, opc, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsb");
 }
 
-static void
 OP4FUNC(op_ldrsh_immpostidx, opc, imm9, Rn, Rt)
 {
-	PRINTF("ldrsh\t%s, [%s],#%ld\n",
+	PRINTF("ldrsh\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME((opc ^ 1), Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldrsh_immpreidx, opc, imm9, Rn, Rt)
 {
-	PRINTF("ldrsh\t%s, [%s,#%ld]!\n",
+	PRINTF("ldrsh\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME((opc ^ 1), Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_ldrsh_immunsign, opc, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1719,38 +1637,34 @@ OP4FUNC(op_ldrsh_immunsign, opc, imm12, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldrsh\t%s, [%s,#%ld]\n",
+		PRINTF("ldrsh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 2));
 	}
 }
 
-static void
 OP6FUNC(op_ldrsh_reg, opc, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsh");
 }
 
-static void
 OP3FUNC(op_ldrsw_immpostidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrsw\t%s, [%s],#%ld\n",
+	PRINTF("ldrsw\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(1, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrsw_immpreidx, imm9, Rn, Rt)
 {
-	PRINTF("ldrsw\t%s, [%s,#%ld]!\n",
+	PRINTF("ldrsw\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(1, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_ldrsw_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -1758,14 +1672,13 @@ OP3FUNC(op_ldrsw_immunsign, imm12, Rn, Rt)
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldrsw\t%s, [%s,#%ld]\n",
+		PRINTF("ldrsw\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 4));
 	}
 }
 
-static void
 OP2FUNC(op_ldrsw_literal, imm19, Rt)
 {
 	PRINTF("ldrsw\t%s, ", ZREGNAME(1, Rt));
@@ -1773,13 +1686,11 @@ OP2FUNC(op_ldrsw_literal, imm19, Rt)
 	PRINTF("\n");
 }
 
-static void
 OP5FUNC(op_ldrsw_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_w_common(di, pc, insn, Rm, option, shift, Rn, Rt, "ldrsw");
 }
 
-static void
 OP4FUNC(op_ldtr, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1787,14 +1698,13 @@ OP4FUNC(op_ldtr, size, imm9, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtr\t%s, [%s,#%ld]\n",
+		PRINTF("ldtr\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldtrb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1802,14 +1712,13 @@ OP3FUNC(op_ldtrb, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtrb\t%s, [%s,#%ld]\n",
+		PRINTF("ldtrb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldtrh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1817,14 +1726,13 @@ OP3FUNC(op_ldtrh, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtrh\t%s, [%s,#%ld]\n",
+		PRINTF("ldtrh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldtrsb, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1832,14 +1740,13 @@ OP4FUNC(op_ldtrsb, opc, imm9, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtrsb\t%s, [%s,#%ld]\n",
+		PRINTF("ldtrsb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldtrsh, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1847,14 +1754,13 @@ OP4FUNC(op_ldtrsh, opc, imm9, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtrsh\t%s, [%s,#%ld]\n",
+		PRINTF("ldtrsh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldtrsw, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1862,14 +1768,13 @@ OP3FUNC(op_ldtrsw, imm9, Rn, Rt)
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldtrsw\t%s, [%s,#%ld]\n",
+		PRINTF("ldtrsw\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldur, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1877,14 +1782,13 @@ OP4FUNC(op_ldur, size, imm9, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldur\t%s, [%s,#%ld]\n",
+		PRINTF("ldur\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldurb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1892,14 +1796,13 @@ OP3FUNC(op_ldurb, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldurb\t%s, [%s,#%ld]\n",
+		PRINTF("ldurb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldurh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1907,14 +1810,13 @@ OP3FUNC(op_ldurh, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldurh\t%s, [%s,#%ld]\n",
+		PRINTF("ldurh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldursb, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1922,14 +1824,13 @@ OP4FUNC(op_ldursb, opc, imm9, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldursb\t%s, [%s,#%ld]\n",
+		PRINTF("ldursb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldursh, opc, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1937,14 +1838,13 @@ OP4FUNC(op_ldursh, opc, imm9, Rn, Rt)
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldursh\t%s, [%s,#%ld]\n",
+		PRINTF("ldursh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME((opc ^ 1), Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_ldursw, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -1952,14 +1852,13 @@ OP3FUNC(op_ldursw, imm9, Rn, Rt)
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("ldursw\t%s, [%s,#%ld]\n",
+		PRINTF("ldursw\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(1, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_ldxp, size, Rt2, Rn, Rt)
 {
 	PRINTF("ldxp\t%s, %s, [%s]\n",
@@ -1968,7 +1867,6 @@ OP4FUNC(op_ldxp, size, Rt2, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_ldxr, size, Rn, Rt)
 {
 	PRINTF("ldxr\t%s, [%s]\n",
@@ -1976,7 +1874,6 @@ OP3FUNC(op_ldxr, size, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldxrb, Rn, Rt)
 {
 	PRINTF("ldxrb\t%s, [%s]\n",
@@ -1984,7 +1881,6 @@ OP2FUNC(op_ldxrb, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_ldxrh, Rn, Rt)
 {
 	PRINTF("ldxrh\t%s, [%s]\n",
@@ -1992,30 +1888,29 @@ OP2FUNC(op_ldxrh, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP6FUNC(op_ubfm, sf, n, immr, imms, Rn, Rd)
 {
 	const uint64_t bitwidth = (sf == 0) ? 32 : 64;
 
 	/* ALIAS: lsr_imm,ubfiz,ubfm,ubfx,uxtb,uxth */
 	if ((imms != (bitwidth - 1)) && ((imms + 1) == immr)) {
-		PRINTF("lsl\t%s, %s, #%lu\n",
+		PRINTF("lsl\t%s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    bitwidth - immr);
 	} else if (imms == (bitwidth - 1)) {
-		PRINTF("lsr\t%s, %s, #%lu\n",
+		PRINTF("lsr\t%s, %s, #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr);
 	} else if (imms < immr) {
-		PRINTF("ubfiz\t%s, %s, #%lu, #%lu\n",
+		PRINTF("ubfiz\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    (bitwidth - immr) & (bitwidth - 1),
 		    (imms + 1) & (bitwidth - 1));
 	} else if (BFXPreferred(sf, 1, imms, immr)) {
-		PRINTF("ubfx\t%s, %s, #%lu, #%lu\n",
+		PRINTF("ubfx\t%s, %s, #%"PRIu64", #%"PRIu64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    immr,
@@ -2033,7 +1928,6 @@ OP6FUNC(op_ubfm, sf, n, immr, imms, Rn, Rd)
 	}
 }
 
-static void
 OP4FUNC(op_lsl_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: lslv */
@@ -2044,7 +1938,6 @@ OP4FUNC(op_lsl_reg, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP4FUNC(op_lsr_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: lsrv */
@@ -2055,7 +1948,6 @@ OP4FUNC(op_lsr_reg, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP5FUNC(op_madd, sf, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: mul */
@@ -2073,7 +1965,6 @@ OP5FUNC(op_madd, sf, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP5FUNC(op_msub, sf, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: mneg */
@@ -2091,7 +1982,6 @@ OP5FUNC(op_msub, sf, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP6FUNC(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 {
 	if (!ValidBitMasks(sf, n, imms, immr)) {
@@ -2108,18 +1998,17 @@ OP6FUNC(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 	(void)MoveWidePreferred;
 	if (Rn == 31) {
 #endif
-		PRINTF("mov\t%s, #0x%lx\n",
+		PRINTF("mov\t%s, #0x%"PRIx64"\n",
 		    SREGNAME(sf, Rd),
 		    DecodeBitMasks(sf, n, imms, immr));
 	} else {
-		PRINTF("orr\t%s, %s, #0x%lx\n",
+		PRINTF("orr\t%s, %s, #0x%"PRIx64"\n",
 		    SREGNAME(sf, Rd),
 		    ZREGNAME(sf, Rn),
 		    DecodeBitMasks(sf, n, imms, immr));
 	}
 }
 
-static void
 OP4FUNC(op_movn, sf, hw, imm16, Rd)
 {
 	const uint64_t mask = (sf == 0) ? 0xffffffff : 0xffffffffffffffffUL;
@@ -2131,19 +2020,18 @@ OP4FUNC(op_movn, sf, hw, imm16, Rd)
 
 	/* ALIAS: mov_iwimm */
 	if ((hw == 0) || (imm16 == 0)) {
-		PRINTF("mov\t%s, #0x%lx\n",
+		PRINTF("mov\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    (~(ZeroExtend(16, imm16, 1) & mask)) & mask);
 	} else {
 		/* movn */
 		const uint64_t shift = hw * 16;
-		PRINTF("mov\t%s, #0x%lx\n",
+		PRINTF("mov\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    ~(ZeroExtend(16, imm16, 1) << shift) & mask);
 	}
 }
 
-static void
 OP6FUNC(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mov_reg */
@@ -2157,12 +2045,11 @@ OP6FUNC(op_orr_reg, sf, shift, Rm, imm6, Rn, Rd)
 	}
 }
 
-static void
 OP4FUNC(op_movz, sf, hw, imm16, Rd)
 {
 	/* ALIAS: mov_wimm */
 	if ((hw == 0) || (imm16 == 0)) {
-		PRINTF("mov\t%s, #0x%lx\n",
+		PRINTF("mov\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, imm16, 1));
 	} else {
@@ -2173,30 +2060,28 @@ OP4FUNC(op_movz, sf, hw, imm16, Rd)
 		    ZeroExtend(16, imm16, 1), shift);
 #else
 		/* same as objdump */
-		PRINTF("mov\t%s, #0x%lx\n",
+		PRINTF("mov\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, imm16, 1) << shift);
 #endif
 	}
 }
 
-static void
 OP4FUNC(op_movk, sf, hw, imm16, Rd)
 {
 	const int shift = hw * 16;
 
 	if (hw == 0) {
-		PRINTF("movk\t%s, #0x%lx\n",
+		PRINTF("movk\t%s, #0x%"PRIx64"\n",
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, imm16, 1));
 	} else {
-		PRINTF("movk\t%s, #0x%lx, lsl #%d\n",
+		PRINTF("movk\t%s, #0x%"PRIx64", lsl #%d\n",
 		    ZREGNAME(sf, Rd),
 		    ZeroExtend(16, imm16, 1), shift);
 	}
 }
 
-static void
 OP6FUNC(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 {
 	char buf[SYSREGNAMEBUFLEN];
@@ -2206,7 +2091,6 @@ OP6FUNC(op_mrs, op0, op1, CRn, CRm, op2, Rt)
 	    RSYSREGNAME(buf, sizeof(buf), op0, op1, CRn, CRm, op2));
 }
 
-static void
 OP6FUNC(op_msr, op0, op1, CRn, CRm, op2, Rt)
 {
 	char buf[SYSREGNAMEBUFLEN];
@@ -2216,7 +2100,6 @@ OP6FUNC(op_msr, op0, op1, CRn, CRm, op2, Rt)
 	    ZREGNAME(1, Rt));
 }
 
-static void
 OP3FUNC(op_msr_imm, op1, CRm, op2)
 {
 	const char *pstatefield;
@@ -2238,11 +2121,10 @@ OP3FUNC(op_msr_imm, op1, CRm, op2)
 		return;
 	}
 
-	PRINTF("msr\t%s, #0x%lx\n",
+	PRINTF("msr\t%s, #0x%"PRIx64"\n",
 	    pstatefield, CRm);
 }
 
-static void
 OP6FUNC(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: mvn */
@@ -2250,7 +2132,6 @@ OP6FUNC(op_orn, sf, shift, Rm, imm6, Rn, Rd)
 	    "orn", "mvn", NULL);
 }
 
-static void
 OP6FUNC(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 {
 	/* ALIAS: neg */
@@ -2258,7 +2139,6 @@ OP6FUNC(op_sub_shiftreg, sf, shift, Rm, imm6, Rn, Rd)
 	    "sub", "neg", NULL);
 }
 
-static void
 OP4FUNC(op_sbc, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: ngc */
@@ -2274,7 +2154,6 @@ OP4FUNC(op_sbc, sf, Rm, Rn, Rd)
 	}
 }
 
-static void
 OP4FUNC(op_sbcs, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: ngcs */
@@ -2290,7 +2169,6 @@ OP4FUNC(op_sbcs, sf, Rm, Rn, Rd)
 	}
 }
 
-static void
 OP3FUNC(op_prfm_imm, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -2298,14 +2176,13 @@ OP3FUNC(op_prfm_imm, imm12, Rn, Rt)
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("prfm\t%s, [%s,#%ld]\n",
+		PRINTF("prfm\t%s, [%s,#%"PRId64"]\n",
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm12, 8));
 	}
 }
 
-static void
 OP2FUNC(op_prfm_literal, imm19, Rt)
 {
 	PRINTF("prfm\t%s, ", PREFETCHNAME(Rt));
@@ -2313,7 +2190,6 @@ OP2FUNC(op_prfm_literal, imm19, Rt)
 	PRINTF("\n");
 }
 
-static void
 OP5FUNC(op_prfm_reg, Rm, option, shift, Rn, Rt)
 {
 	int r;
@@ -2341,7 +2217,6 @@ OP5FUNC(op_prfm_reg, Rm, option, shift, Rn, Rt)
 	}
 }
 
-static void
 OP3FUNC(op_prfum, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2349,14 +2224,13 @@ OP3FUNC(op_prfum, imm9, Rn, Rt)
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("prfum\t%s, [%s,#%ld]\n",
+		PRINTF("prfum\t%s, [%s,#%"PRId64"]\n",
 		    PREFETCHNAME(Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP1FUNC(op_ret, Rn)
 {
 	if (Rn == 30)
@@ -2365,7 +2239,6 @@ OP1FUNC(op_ret, Rn)
 		PRINTF("ret\t%s\n", ZREGNAME(1, Rn));
 }
 
-static void
 OP4FUNC(op_rev, sf, opc, Rn, Rd)
 {
 	/*
@@ -2397,7 +2270,6 @@ OP4FUNC(op_rev, sf, opc, Rn, Rd)
 	    ZREGNAME(sf, Rn));
 }
 
-static void
 OP4FUNC(op_ror_reg, sf, Rm, Rn, Rd)
 {
 	/* ALIAS: rorv */
@@ -2408,7 +2280,6 @@ OP4FUNC(op_ror_reg, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP4FUNC(op_sdiv, sf, Rm, Rn, Rd)
 {
 	PRINTF("sdiv\t%s, %s, %s\n",
@@ -2417,7 +2288,6 @@ OP4FUNC(op_sdiv, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP4FUNC(op_smaddl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: smull */
@@ -2435,13 +2305,11 @@ OP4FUNC(op_smaddl, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP1FUNC(op_smc, imm16)
 {
-	PRINTF("smc\t#0x%lx\n", imm16);
+	PRINTF("smc\t#0x%"PRIx64"\n", imm16);
 }
 
-static void
 OP4FUNC(op_smsubl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: smnegl */
@@ -2459,7 +2327,6 @@ OP4FUNC(op_smsubl, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP3FUNC(op_smulh, Rm, Rn, Rd)
 {
 	PRINTF("smulh\t%s, %s, %s\n",
@@ -2468,7 +2335,6 @@ OP3FUNC(op_smulh, Rm, Rn, Rd)
 	    ZREGNAME(1, Rm));
 }
 
-static void
 OP3FUNC(op_stlr, size, Rn, Rt)
 {
 	PRINTF("stlr\t%s, [%s]\n",
@@ -2476,7 +2342,6 @@ OP3FUNC(op_stlr, size, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_stlrb, Rn, Rt)
 {
 	PRINTF("stlrb\t%s, [%s]\n",
@@ -2484,7 +2349,6 @@ OP2FUNC(op_stlrb, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP2FUNC(op_stlrh, Rn, Rt)
 {
 	PRINTF("stlrh\t%s, [%s]\n",
@@ -2492,7 +2356,6 @@ OP2FUNC(op_stlrh, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP5FUNC(op_stlxp, size, Rs, Rt2, Rn, Rt)
 {
 	PRINTF("stlxp\t%s, %s, [%s]\n",
@@ -2501,7 +2364,6 @@ OP5FUNC(op_stlxp, size, Rs, Rt2, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP4FUNC(op_stlxr, size, Rs, Rn, Rt)
 {
 	PRINTF("stlxr\t%s, [%s]\n",
@@ -2509,7 +2371,6 @@ OP4FUNC(op_stlxr, size, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_stlxrb, Rs, Rn, Rt)
 {
 	PRINTF("stlxrb\t%s, [%s]\n",
@@ -2517,7 +2378,6 @@ OP3FUNC(op_stlxrb, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_stlxrh, Rs, Rn, Rt)
 {
 	PRINTF("stlxrh\t%s, [%s]\n",
@@ -2525,7 +2385,6 @@ OP3FUNC(op_stlxrh, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP5FUNC(op_stnp, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
@@ -2534,7 +2393,7 @@ OP5FUNC(op_stnp, sf, imm7, Rt2, Rn, Rt)
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("stnp\t%s, %s, [%s,#%ld]\n",
+		PRINTF("stnp\t%s, %s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(sf, Rt),
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn),
@@ -2542,27 +2401,24 @@ OP5FUNC(op_stnp, sf, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP5FUNC(op_stp_postidx, sf, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("stp\t%s, %s, [%s],#%ld\n",
+	PRINTF("stp\t%s, %s, [%s],#%"PRId64"\n",
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
-static void
 OP5FUNC(op_stp_preidx, sf, imm7, Rt2, Rn, Rt)
 {
-	PRINTF("stp\t%s, %s, [%s,#%ld]!\n",
+	PRINTF("stp\t%s, %s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(sf, Rt),
 	    ZREGNAME(sf, Rt2),
 	    SREGNAME(1, Rn),
 	    SignExtend(7, imm7, (sf == 0) ? 4 : 8));
 }
 
-static void
 OP5FUNC(op_stp_signed, sf, imm7, Rt2, Rn, Rt)
 {
 	if (imm7 == 0) {
@@ -2571,7 +2427,7 @@ OP5FUNC(op_stp_signed, sf, imm7, Rt2, Rn, Rt)
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("stp\t%s, %s, [%s,#%ld]\n",
+		PRINTF("stp\t%s, %s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(sf, Rt),
 		    ZREGNAME(sf, Rt2),
 		    SREGNAME(1, Rn),
@@ -2579,25 +2435,22 @@ OP5FUNC(op_stp_signed, sf, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP4FUNC(op_str_immpostidx, size, imm9, Rn, Rt)
 {
-	PRINTF("str\t%s, [%s],#%ld\n",
+	PRINTF("str\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(size, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_str_immpreidx, size, imm9, Rn, Rt)
 {
-	PRINTF("str\t%s, [%s,#%ld]!\n",
+	PRINTF("str\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(size, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP4FUNC(op_str_immunsign, size, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -2605,39 +2458,35 @@ OP4FUNC(op_str_immunsign, size, imm12, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("str\t%s, [%s,#%ld]\n",
+		PRINTF("str\t%s, [%s,#%"PRIu64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, (size == 0) ? 4 : 8));
 	}
 }
 
-static void
 OP6FUNC(op_str_reg, size, Rm, option, shift, Rn, Rt)
 {
 	regoffset_x_common(di, pc, insn, size, Rm, option, shift, Rn, Rt,
 	    "str");
 }
 
-static void
 OP3FUNC(op_strb_immpostidx, imm9, Rn, Rt)
 {
-	PRINTF("strb\t%s, [%s],#%ld\n",
+	PRINTF("strb\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_strb_immpreidx, imm9, Rn, Rt)
 {
-	PRINTF("strb\t%s, [%s,#%ld]!\n",
+	PRINTF("strb\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_strb_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -2645,38 +2494,34 @@ OP3FUNC(op_strb_immunsign, imm12, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("strb\t%s, [%s,#%ld]\n",
+		PRINTF("strb\t%s, [%s,#%"PRIu64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 1));
 	}
 }
 
-static void
 OP5FUNC(op_strb_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_b_common(di, pc, insn, Rm, option, shift, Rn, Rt, "strb");
 }
 
-static void
 OP3FUNC(op_strh_immpostidx, imm9, Rn, Rt)
 {
-	PRINTF("strh\t%s, [%s],#%ld\n",
+	PRINTF("strh\t%s, [%s],#%"PRId64"\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_strh_immpreidx, imm9, Rn, Rt)
 {
-	PRINTF("strh\t%s, [%s,#%ld]!\n",
+	PRINTF("strh\t%s, [%s,#%"PRId64"]!\n",
 	    ZREGNAME(0, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP3FUNC(op_strh_immunsign, imm12, Rn, Rt)
 {
 	if (imm12 == 0) {
@@ -2684,20 +2529,18 @@ OP3FUNC(op_strh_immunsign, imm12, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("strh\t%s, [%s,#%ld]\n",
+		PRINTF("strh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    ZeroExtend(12, imm12, 2));
 	}
 }
 
-static void
 OP5FUNC(op_strh_reg, Rm, option, shift, Rn, Rt)
 {
 	regoffset_h_common(di, pc, insn, Rm, option, shift, Rn, Rt, "strh");
 }
 
-static void
 OP4FUNC(op_sttr, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2705,14 +2548,13 @@ OP4FUNC(op_sttr, size, imm9, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("sttr\t%s, [%s,#%ld]\n",
+		PRINTF("sttr\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_sttrb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2720,14 +2562,13 @@ OP3FUNC(op_sttrb, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("sttrb\t%s, [%s,#%ld]\n",
+		PRINTF("sttrb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_sttrh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2735,14 +2576,13 @@ OP3FUNC(op_sttrh, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("sttrh\t%s, [%s,#%ld]\n",
+		PRINTF("sttrh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(12, imm9, 1));
 	}
 }
 
-static void
 OP4FUNC(op_stur, size, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2750,14 +2590,13 @@ OP4FUNC(op_stur, size, imm9, Rn, Rt)
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("stur\t%s, [%s,#%ld]\n",
+		PRINTF("stur\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(size, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_sturb, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2765,14 +2604,13 @@ OP3FUNC(op_sturb, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("sturb\t%s, [%s,#%ld]\n",
+		PRINTF("sturb\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP3FUNC(op_sturh, imm9, Rn, Rt)
 {
 	if (imm9 == 0) {
@@ -2780,14 +2618,13 @@ OP3FUNC(op_sturh, imm9, Rn, Rt)
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("sturh\t%s, [%s,#%ld]\n",
+		PRINTF("sturh\t%s, [%s,#%"PRId64"]\n",
 		    ZREGNAME(0, Rt),
 		    SREGNAME(1, Rn),
 		    SignExtend(9, imm9, 1));
 	}
 }
 
-static void
 OP5FUNC(op_stxp, size, Rs, Rt2, Rn, Rt)
 {
 	PRINTF("stxp\t%s, %s, [%s]\n",
@@ -2796,7 +2633,6 @@ OP5FUNC(op_stxp, size, Rs, Rt2, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP4FUNC(op_stxr, size, Rs, Rn, Rt)
 {
 	PRINTF("stxr\t%s, %s, [%s]\n",
@@ -2805,7 +2641,6 @@ OP4FUNC(op_stxr, size, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_stxrb, Rs, Rn, Rt)
 {
 	PRINTF("stxrb\t%s, %s, [%s]\n",
@@ -2814,7 +2649,6 @@ OP3FUNC(op_stxrb, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP3FUNC(op_stxrh, Rs, Rn, Rt)
 {
 	PRINTF("stxrh\t%s, %s, [%s]\n",
@@ -2823,14 +2657,12 @@ OP3FUNC(op_stxrh, Rs, Rn, Rt)
 	    SREGNAME(1, Rn));
 }
 
-static void
 OP6FUNC(op_sub_extreg, sf, Rm, option, imm3, Rn, Rd)
 {
 	extendreg_common(di, pc, insn, sf, Rm, option, imm3, Rn, Rd,
 	    "sub", NULL);
 }
 
-static void
 OP5FUNC(op_sub_imm, sf, shift, imm12, Rn, Rd)
 {
 	if (shift & 2) {
@@ -2838,24 +2670,22 @@ OP5FUNC(op_sub_imm, sf, shift, imm12, Rn, Rd)
 		return;
 	}
 
-	PRINTF("sub\t%s, %s, #0x%lx%s\n",
+	PRINTF("sub\t%s, %s, #0x%"PRIx64"%s\n",
 	    SREGNAME(sf, Rd),
 	    SREGNAME(sf, Rn),
 	    ZeroExtend(12, imm12, 1),
 	    SHIFTOP2(shift, "", ", lsl #12"));
 }
 
-static void
 OP1FUNC(op_svc, imm16)
 {
-	PRINTF("svc\t#0x%lx\n",
+	PRINTF("svc\t#0x%"PRIx64"\n",
 	    imm16);
 }
 
-static void
 OP5FUNC(op_sysl, op1, CRn, CRm, op2, Rt)
 {
-	PRINTF("sysl\t%s, #%lu, %s, %s, #%lu\n",
+	PRINTF("sysl\t%s, #%"PRIu64", %s, %s, #%"PRIu64"\n",
 	    ZREGNAME(1, Rt),
 	    op1,
 	    CREGNAME(CRn),
@@ -2863,32 +2693,28 @@ OP5FUNC(op_sysl, op1, CRn, CRm, op2, Rt)
 	    op2);
 }
 
-static void
 OP4FUNC(op_tbnz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
-	PRINTF("tbnz\t%s, #%lu, ",
+	PRINTF("tbnz\t%s, #%"PRIu64", ",
 	    ZREGNAME(b5, Rt),
 	    bit);
 	PRINTADDR(SignExtend(14, imm14, 4) + pc);
 	PRINTF("\n");
 }
 
-static void
 OP4FUNC(op_tbz, b5, b40, imm14, Rt)
 {
 	uint64_t bit = (b5 << 5) + b40;
 
-	PRINTF("tbz\t%s, #%lu, ",
+	PRINTF("tbz\t%s, #%"PRIu64", ",
 	    ZREGNAME(b5, Rt),
 	    bit);
-
 	PRINTADDR(SignExtend(14, imm14, 4) + pc);
 	PRINTF("\n");
 }
 
-static void
 OP4FUNC(op_udiv, sf, Rm, Rn, Rd)
 {
 	PRINTF("udiv\t%s, %s, %s\n",
@@ -2897,7 +2723,6 @@ OP4FUNC(op_udiv, sf, Rm, Rn, Rd)
 	    ZREGNAME(sf, Rm));
 }
 
-static void
 OP4FUNC(op_umaddl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: umull */
@@ -2915,7 +2740,6 @@ OP4FUNC(op_umaddl, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP4FUNC(op_umsubl, Rm, Ra, Rn, Rd)
 {
 	/* ALIAS: umnegl */
@@ -2933,7 +2757,6 @@ OP4FUNC(op_umsubl, Rm, Ra, Rn, Rd)
 	}
 }
 
-static void
 OP3FUNC(op_umulh, Rm, Rn, Rd)
 {
 	PRINTF("umulh\t%s, %s, %s\n",
@@ -2945,7 +2768,6 @@ OP3FUNC(op_umulh, Rm, Rn, Rd)
 /*
  * load/store SIMD instructions
  */
-static void
 OP6FUNC(op_simd_ldstnp, opc, l, imm7, Rt2, Rn, Rt)
 {
 	const char *op = (l == 0) ? "stnp" : "ldnp";
@@ -2963,7 +2785,7 @@ OP6FUNC(op_simd_ldstnp, opc, l, imm7, Rt2, Rn, Rt)
 		    FREGNAME(regsz, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("%s\t%s, %s, [%s,#%ld]\n",
+		PRINTF("%s\t%s, %s, [%s,#%"PRId64"]\n",
 		    op,
 		    FREGNAME(regsz, Rt),
 		    FREGNAME(regsz, Rt2),
@@ -2972,13 +2794,12 @@ OP6FUNC(op_simd_ldstnp, opc, l, imm7, Rt2, Rn, Rt)
 	}
 }
 
-static void
 OP6FUNC(op_simd_ldstp_postidx, opc, l, imm7, Rt2, Rn, Rt)
 {
 	const char *op = (l == 0) ? "stp" : "ldp";
 	const int regsz = (opc & 3) + 2;
 
-	PRINTF("%s\t%s, %s, [%s],#%ld\n",
+	PRINTF("%s\t%s, %s, [%s],#%"PRId64"\n",
 	    op,
 	    FREGNAME(regsz, Rt),
 	    FREGNAME(regsz, Rt2),
@@ -2986,13 +2807,12 @@ OP6FUNC(op_simd_ldstp_postidx, opc, l, imm7, Rt2, Rn, Rt)
 	    SignExtend(7, imm7, (4 << opc)));
 }
 
-static void
 OP6FUNC(op_simd_ldstp_preidx, opc, l, imm7, Rt2, Rn, Rt)
 {
 	const char *op = (l == 0) ? "stp" : "ldp";
 	const int regsz = (opc & 3) + 2;
 
-	PRINTF("%s\t%s, %s, [%s,#%ld]!\n",
+	PRINTF("%s\t%s, %s, [%s,#%"PRId64"]!\n",
 	    op,
 	    FREGNAME(regsz, Rt),
 	    FREGNAME(regsz, Rt2),
@@ -3000,7 +2820,6 @@ OP6FUNC(op_simd_ldstp_preidx, opc, l, imm7, Rt2, Rn, Rt)
 	    SignExtend(7, imm7, (4 << opc)));
 }
 
-static void
 OP6FUNC(op_simd_ldstp_signed, opc, l, imm7, Rt2, Rn, Rt)
 {
 	const char *op = (l == 0) ? "stp" : "ldp";
@@ -3018,7 +2837,7 @@ OP6FUNC(op_simd_ldstp_signed, opc, l, imm7, Rt2, Rn, Rt)
 		    FREGNAME(regsz, Rt2),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("%s\t%s, %s, [%s,#%ld]\n",
+		PRINTF("%s\t%s, %s, [%s,#%"PRId64"]\n",
 		    op,
 		    FREGNAME(regsz, Rt),
 		    FREGNAME(regsz, Rt2),
@@ -3037,7 +2856,6 @@ simd_ldstr_regsz(uint64_t size, uint64_t opc)
 	return -1;
 }
 
-static void
 OP5FUNC(op_simd_ldstr_immpostidx, size, opc, imm9, Rn, Rt)
 {
 	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
@@ -3048,14 +2866,13 @@ OP5FUNC(op_simd_ldstr_immpostidx, size, opc, imm9, Rn, Rt)
 		return;
 	}
 
-	PRINTF("%s\t%s, [%s],#%ld\n",
+	PRINTF("%s\t%s, [%s],#%"PRId64"\n",
 	    op,
 	    FREGNAME(regsz, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP5FUNC(op_simd_ldstr_immpreidx, size, opc, imm9, Rn, Rt)
 {
 	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
@@ -3066,14 +2883,13 @@ OP5FUNC(op_simd_ldstr_immpreidx, size, opc, imm9, Rn, Rt)
 		return;
 	}
 
-	PRINTF("%s\t%s, [%s,#%ld]!\n",
+	PRINTF("%s\t%s, [%s,#%"PRId64"]!\n",
 	    op,
 	    FREGNAME(regsz, Rt),
 	    SREGNAME(1, Rn),
 	    SignExtend(9, imm9, 1));
 }
 
-static void
 OP5FUNC(op_simd_ldstr_immunsign, size, opc, imm12, Rn, Rt)
 {
 	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
@@ -3090,7 +2906,7 @@ OP5FUNC(op_simd_ldstr_immunsign, size, opc, imm12, Rn, Rt)
 		    FREGNAME(regsz, Rt),
 		    SREGNAME(1, Rn));
 	} else {
-		PRINTF("%s\t%s, [%s,#%ld]\n",
+		PRINTF("%s\t%s, [%s,#%"PRIu64"]\n",
 		    op,
 		    FREGNAME(regsz, Rt),
 		    SREGNAME(1, Rn),
@@ -3098,7 +2914,6 @@ OP5FUNC(op_simd_ldstr_immunsign, size, opc, imm12, Rn, Rt)
 	}
 }
 
-static void
 OP7FUNC(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
 {
 	const char *op = ((opc & 1) == 0) ? "str" : "ldr";
@@ -3123,8 +2938,8 @@ OP7FUNC(op_simd_ldstr_reg, size, opc, Rm, option, S, Rn, Rt)
 		    SHIFTOP8(option,
 		        "", "", ",uxtw", "", "", "", ",sxtw", ",sxtx"));
 	} else {
-		uint64_t amount = regsz;
-		PRINTF("%s\t%s, [%s,%s,%s #%lu]\n",
+		u_int amount = regsz;
+		PRINTF("%s\t%s, [%s,%s,%s #%u]\n",
 		    op,
 		    FREGNAME(regsz, Rt),
 		    SREGNAME(1, Rn),

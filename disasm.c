@@ -279,7 +279,7 @@ rotate(int bitwidth, uint64_t v, int n)
 	n &= (bitwidth - 1);
 	result = (((v << (bitwidth - n)) | (v >> n)));
 	if (bitwidth < 64)
-		result &= ((1UL << bitwidth) - 1);
+		result &= ((1ULL << bitwidth) - 1);
 	return result;
 }
 
@@ -335,7 +335,9 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 		result |= (result << esize);
 		esize <<= 1;
 	}
-	return (result & ((1UL << bitwidth) - 1));
+	if (sf == 0)
+		result &= ((1ULL << bitwidth) - 1);
+	return result;
 }
 
 static bool

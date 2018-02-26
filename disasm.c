@@ -284,22 +284,6 @@ rotate(int bitwidth, uint64_t v, int n)
 }
 
 static bool
-MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t immr, uint64_t imms)
-{
-	const int bitwidth = (sf == 0) ? 32 : 64;
-
-	if ((sf != 0) && (n == 0))
-		return false;
-	if ((sf == 0) && ((n != 0) || (immr > 0x1f)))
-		return false;
-	if (imms < 16)
-		return ((-immr & 15) <= (15 - imms));
-	if (imms >= (uint64_t)(bitwidth - 15))
-		return ((immr & 15) <= (imms - (bitwidth - 15)));
-	return false;
-}
-
-static bool
 ValidBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 {
 	int esize, len;
@@ -338,6 +322,22 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 	if (sf == 0)
 		result &= ((1ULL << bitwidth) - 1);
 	return result;
+}
+
+static bool
+MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
+{
+	const int bitwidth = (sf == 0) ? 32 : 64;
+
+	if ((sf != 0) && (n == 0))
+		return false;
+	if ((sf == 0) && ((n != 0) || (immr > 0x1f)))
+		return false;
+	if (imms < 16)
+		return ((-immr & 15) <= (15 - imms));
+	if (imms >= (uint64_t)(bitwidth - 15))
+		return ((immr & 15) <= (imms - (bitwidth - 15)));
+	return false;
 }
 
 static bool
@@ -1994,7 +1994,7 @@ OP6FUNC(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 	/* ALIAS: mov_bmimm */
 #if 0
 	/* to distinguish from mov_iwimm */
-	if ((Rn == 31) && !MoveWidePreferred(sf, n, immr, imms)) {
+	if ((Rn == 31) && !MoveWidePreferred(sf, n, imms, immr)) {
 #else
 	/* "orr Rd, XZR, #imm" -> "mov Rd, #imm" */
 	(void)MoveWidePreferred;

@@ -1240,42 +1240,29 @@ OP5FUNC(op_csel, sf, Rm, cond, Rn, Rd)
 }
 
 static void
-OP1FUNC(op_dcps1, imm16)
+OP2FUNC(op_dcps, imm16, ll)
 {
-	if (imm16 == 0)
-		PRINTF("dcps1\n");
-	else
-		PRINTF("dcps1\t#0x%lx\n", imm16);
-}
+	if (ll == 0) {
+		UNDEFINED(pc, insn, "illegal level");
+		return;
+	}
 
-static void
-OP1FUNC(op_dcps2, imm16)
-{
 	if (imm16 == 0)
-		PRINTF("dcps2\n");
+		PRINTF("dcps%lu\n", ll);
 	else
-		PRINTF("dcps2\t#0x%lx\n", imm16);
-}
-
-static void
-OP1FUNC(op_dcps3, imm16)
-{
-	if (imm16 == 0)
-		PRINTF("dcps3\n");
-	else
-		PRINTF("dcps3\t#0x%lx\n", imm16);
-}
-
-static void
-OP1FUNC(op_dmb, CRm)
-{
-	PRINTF("dmb\t%s\n", BARRIERNAME(CRm));
+		PRINTF("dcps%lu\t#0x%lx\n", ll, imm16);
 }
 
 static void
 OP0FUNC(op_drps)
 {
 	PRINTF("drps\n");
+}
+
+static void
+OP1FUNC(op_dmb, CRm)
+{
+	PRINTF("dmb\t%s\n", BARRIERNAME(CRm));
 }
 
 static void

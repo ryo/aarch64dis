@@ -25,6 +25,8 @@
 	{{16, 5}, {13, 3}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_IMM16			\
 	{{ 5,16}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_IMM16_LL			\
+	{{ 5,16}, { 0, 2}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_OP0_OP1_CRN_CRM_OP2_RT	\
 	{{19, 2}, {16, 3}, {12, 4}, { 8, 4}, { 5, 3}, { 0, 5}, { 0, 0}, { 0, 0}}
 #define FMT_IMM7_RT2_RN_RT		\
@@ -170,13 +172,11 @@ static struct insn_info insn_tables[] = {
  { 0xffe00c00, 0x38000000, FMT_IMM9_RN_RT,              op_sturb },
  { 0xffe00c00, 0x78000000, FMT_IMM9_RN_RT,              op_sturh },
  { 0xffe0001f, 0xd4200000, FMT_IMM16,                   op_brk },
- { 0xffe0001f, 0xd4a00001, FMT_IMM16,                   op_dcps1 },
- { 0xffe0001f, 0xd4a00002, FMT_IMM16,                   op_dcps2 },
- { 0xffe0001f, 0xd4a00003, FMT_IMM16,                   op_dcps3 },
  { 0xffe0001f, 0xd4400000, FMT_IMM16,                   op_hlt },
  { 0xffe0001f, 0xd4000002, FMT_IMM16,                   op_hvc },
  { 0xffe0001f, 0xd4000003, FMT_IMM16,                   op_smc },
  { 0xffe0001f, 0xd4000001, FMT_IMM16,                   op_svc },
+ { 0xffe0001c, 0xd4a00000, FMT_IMM16_LL,                op_dcps },
  { 0xffe00000, 0xd5200000, FMT_OP0_OP1_CRN_CRM_OP2_RT,  op_mrs },
  { 0xffe00000, 0xd5000000, FMT_OP0_OP1_CRN_CRM_OP2_RT,  op_msr },
  { 0xffc00000, 0x68c00000, FMT_IMM7_RT2_RN_RT,          op_ldpsw_postidx },

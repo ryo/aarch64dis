@@ -33,7 +33,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <sys/param.h>
 #include <sys/types.h>
-#include <sys/systm.h>
 #include <sys/bitops.h>
 
 #include <arch/aarch64/aarch64/disasm.h>

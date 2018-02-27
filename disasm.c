@@ -41,7 +41,7 @@
 #define PRINTADDR	di->di_printaddr
 
 #define OPFUNC_DECL(func, a, b, c, d, e, f, g, h)		\
-func(disasm_interface_t *di, uint64_t pc, uint32_t insn,	\
+func(const disasm_interface_t *di, uint64_t pc, uint32_t insn,	\
     uint64_t a, uint64_t b, uint64_t c, uint64_t d,		\
     uint64_t e, uint64_t f, uint64_t g, uint64_t h)
 
@@ -377,7 +377,7 @@ DecodeShift(uint64_t shift)
 	PRINTF(".insn\t0x%08x\t# %s\n", insn, comment);
 
 static void
-extendreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+extendreg_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t Rm, uint64_t option, uint64_t imm3,
     uint64_t Rn, uint64_t Rd,
     const char *op, const char *z_op)
@@ -420,7 +420,7 @@ extendreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-shiftreg_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+shiftreg_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t shift, uint64_t Rm, uint64_t imm6,
     uint64_t Rn, uint64_t Rd,
     const char *dnm_op, const char *dzm_op, const char *znm_op)
@@ -468,7 +468,7 @@ regoffset_option_to_r(uint64_t option)
 }
 
 static void
-regoffset_b_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+regoffset_b_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
     const char *op)
 {
@@ -500,7 +500,7 @@ regoffset_b_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-regoffset_h_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+regoffset_h_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
     const char *op)
 {
@@ -538,7 +538,7 @@ regoffset_h_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-regoffset_w_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+regoffset_w_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t Rm, uint64_t option, uint64_t shift, uint64_t Rn, uint64_t Rt,
     const char *op)
 {
@@ -576,7 +576,7 @@ regoffset_w_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-regoffset_x_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+regoffset_x_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t size, uint64_t Rm, uint64_t option, uint64_t shift,
     uint64_t Rn, uint64_t Rt,
     const char *op)
@@ -610,7 +610,7 @@ regoffset_x_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-addsub_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+addsub_imm_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t shift, uint64_t imm12, uint64_t Rn, uint64_t Rd,
     const char *op, const char *zop)
 {
@@ -636,7 +636,7 @@ addsub_imm_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
 }
 
 static void
-csetsel_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+csetsel_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t Rm, uint64_t cond, uint64_t Rn, uint64_t Rd,
     const char *op, const char *op2, const char *op3)
 {
@@ -1168,7 +1168,7 @@ OP5FUNC(op_csneg, sf, Rm, cond, Rn, Rd)
 }
 
 static void
-crc32_common(disasm_interface_t *di, uint64_t pc, uint32_t insn,
+crc32_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,
     uint64_t sf, uint64_t Rm, uint64_t sz, uint64_t Rn, uint64_t Rd,
     const char *op)
 {
@@ -2975,7 +2975,7 @@ struct insn_info {
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))
 
 void
-disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn)
+disasm_insn(const disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 {
 	uint64_t args[INSN_MAXARG];
 	unsigned int i, j;
@@ -2999,7 +2999,7 @@ disasm_insn(disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 }
 
 int
-disasm(disasm_interface_t *di, uintptr_t loc)
+disasm(const disasm_interface_t *di, uintptr_t loc)
 {
 	uint32_t insn;
 

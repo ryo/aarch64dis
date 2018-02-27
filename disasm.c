@@ -345,6 +345,28 @@ DecodeBitMasks(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 static bool
 MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 {
+#if 1
+	uint64_t x = DecodeBitMasks(sf, n, imms, immr);
+
+	if (sf == 0)
+		x &= 0xffffffff;
+	if (((x & 0xffffffffffff0000UL) == 0) ||
+	    ((x & 0xffffffff0000ffffUL) == 0) ||
+	    ((x & 0xffff0000ffffffffUL) == 0) ||
+	    ((x & 0x0000ffffffffffffUL) == 0))
+		return true;
+
+	x = ~x;
+	if (sf == 0)
+		x &= 0xffffffff;
+	if (((x & 0xffffffffffff0000UL) == 0) ||
+	    ((x & 0xffffffff0000ffffUL) == 0) ||
+	    ((x & 0xffff0000ffffffffUL) == 0) ||
+	    ((x & 0x0000ffffffffffffUL) == 0))
+		return true;
+
+	return false;
+#else
 	const int bitwidth = (sf == 0) ? 32 : 64;
 
 	if ((sf != 0) && (n == 0))
@@ -356,6 +378,7 @@ MoveWidePreferred(uint64_t sf, uint64_t n, uint64_t imms, uint64_t immr)
 	if (imms >= (uint64_t)(bitwidth - 15))
 		return ((immr & 15) <= (imms - (bitwidth - 15)));
 	return false;
+#endif
 }
 
 static bool
@@ -2010,7 +2033,7 @@ OP6FUNC(op_orr_imm, sf, n, immr, imms, Rn, Rd)
 	}
 
 	/* ALIAS: mov_bmimm */
-#if 0
+#if 1
 	/* to distinguish from mov_iwimm */
 	if ((Rn == 31) && !MoveWidePreferred(sf, n, imms, immr)) {
 #else

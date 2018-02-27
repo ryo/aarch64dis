@@ -36,6 +36,6 @@ typedef struct {
 } disasm_interface_t;
 
 void disasm_insn(const disasm_interface_t *, uintptr_t, uint32_t);
-int disasm(const disasm_interface_t *, uintptr_t);
+uintptr_t disasm(const disasm_interface_t *, uintptr_t);
 
 #endif /* _AARCH64_DISASM_H_ */

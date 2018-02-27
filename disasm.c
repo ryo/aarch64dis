@@ -25,6 +25,21 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifdef _KERNEL
+
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
+
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/systm.h>
+#include <sys/bitops.h>
+
+#include <arch/aarch64/aarch64/disasm.h>
+
+#else /* _KERNEL */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +51,9 @@
 #include <machine/int_fmtio.h>
 
 #include "disasm.h"
+
+#endif /* _KERNEL */
+
 
 #define PRINTF		di->di_printf
 #define PRINTADDR	di->di_printaddr
@@ -2998,7 +3016,7 @@ disasm_insn(const disasm_interface_t *di, uintptr_t loc, uint32_t insn)
 	}
 }
 
-int
+uintptr_t
 disasm(const disasm_interface_t *di, uintptr_t loc)
 {
 	uint32_t insn;

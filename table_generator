@@ -154,7 +154,7 @@ print @fmt_output;
 print "\n";
 
 print <<__HEADER__;
-static struct insn_info insn_tables[] = {
+static const struct insn_info insn_tables[] = {
  /* mask,      pattern,    opcode format,               opfunc             */
  /* ---------  ----------  ---------------------------  ------------------ */
 __HEADER__

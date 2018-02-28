@@ -218,7 +218,7 @@ static const char *prefetchop[32] = {
 static const char *
 sysregname_bsearch(uint32_t code)
 {
-	struct sysreg_table *base, *p;
+	const struct sysreg_table *base, *p;
 	unsigned int lim;
 	int32_t cmp;
 

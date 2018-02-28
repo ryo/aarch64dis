@@ -797,9 +797,9 @@ OP3FUNC(op_adrp, immlo, immhi, Rd)
 {
 	uint64_t imm = ((immhi << 2) | immlo);
 
-	PRINTF("adrp\t%s, %"PRIx64"\n",
-	    ZREGNAME(1, Rd),
-	    SignExtend(21, imm, 4096) + (pc & -4096));
+	PRINTF("adrp\t%s, ", ZREGNAME(1, Rd));
+	PRINTADDR(SignExtend(21, imm, 4096) + (pc & -4096));
+	PRINTF("\n");
 }
 
 OP6FUNC(op_and_imm, sf, n, immr, imms, Rn, Rd)

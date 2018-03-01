@@ -27,6 +27,7 @@ CFLAGS +=-Wall \
 CXXAGS	= ${CFLAGS:S/-Wno-traditional//}
 LD	= ${CC}
 MKDEP	= mkdep
+PERL	= perl
 LIBS	= -L/usr/local/lib
 
 PROGRAM	= disasm_test
@@ -46,6 +47,10 @@ OBJS	:= $(OBJS:.cxx=.o)
 
 $(PROGRAM): $(OBJS)
 	$(LD) $(OBJS) -o $(PROGRAM) $(LIBS)
+
+mkheaders:
+	$(PERL) table_generator asm.defs > disasm_table.h
+	$(PERL) sysreg_gen > disasm_sysreg.h
 
 depend:
 	$(MKDEP) $(SRCS)

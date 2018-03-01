@@ -213,7 +213,7 @@ static const char *prefetchop[32] = {
 #define PREFETCHNAME(op)	prefetchop[(op) & 31]
 
 
-#include "sysreg.h"
+#include "disasm_sysreg.h"
 
 static const char *
 sysregname_bsearch(uint32_t code)
@@ -3010,7 +3010,7 @@ struct insn_info {
 	OPFUNC_DECL(void (*opfunc),,,,,,,,);
 };
 
-#include "table.h"
+#include "disasm_table.h"
 
 #define WIDTHMASK(w)	(0xffffffff >> (32 - (w)))
 

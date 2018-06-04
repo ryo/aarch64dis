@@ -5,6 +5,16 @@
 
 
 knownbugs:
+	.word	0x0ee0e000
+	.word	0x4e284800
+	.word	0x5e280800
+	.word	0x5e282800
+
+	.word	0x00e0e00e
+	.word	0x0048284e
+	.word	0x0008285e
+	.word	0x0028285e
+
 	nop
 
 objdump_bug:
@@ -24,6 +34,15 @@ testpattern:
 	rev16	w0, w1
 	rev16	x0, x1
 	rev32	x0, x1
+
+	ret	x0
+	ret	x1
+	ret	x2
+	ret	x3
+	ret	x4
+	ret	x30
+	ret	x31
+
 
 
 	clrex

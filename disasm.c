@@ -273,7 +273,7 @@ sysregname(char *buf, size_t buflen, uint32_t rw,
 static uint64_t
 SignExtend(int bitwidth, uint64_t imm, unsigned int multiply)
 {
-	const uint64_t signbit = (1 << (bitwidth - 1));
+	const uint64_t signbit = ((uint64_t)1 << (bitwidth - 1));
 	const uint64_t immmax = signbit << 1;
 
 	if (imm & signbit)

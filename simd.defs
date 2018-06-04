@@ -1,6 +1,22 @@
 
-abs(scalar)	:	0 1	0	11110	size<2>	10000	01011	10	Rn<5>	Rd<5>
-abs(vector)	:	0 Q<1>	0	01110	size<2>	10000	01011	10	Rn<5>	Rd<5>
+#PREFIX=simd_
 
-add(scalar)	:	0 1	0	11110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>
-add(vector)	:	0 Q<1>	0	01110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>
+abs_s		:	0 1	0	11110	size<2>	10000	01011		10	Rn<5>	Rd<5>
+abs_v		:	0 Q<1>	0	01110	size<2>	10000	01011		10	Rn<5>	Rd<5>
+
+addsub_s	:	0 1	U<1>	11110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>	# =add=sub
+addsub_v	:	0 Q<1>	U<1>	01110	size<2>	1	Rm<5>	10000	1	Rn<5>	Rd<5>	# =add=sub
+
+addhn		:	0 Q<1>	U<1>	01110	size<2>	1	Rm<5>	01 o1<1> 000	Rn<5>	Rd<5>	# =addhn2=subhn=subhn2=raddhn=raddhn2=rsubhn=rsubhn2=
+
+addp_s		:	01	0	11110	size<2>	11000	11011		10	Rn<5>	Rd<5>
+addp_v		:	0 Q<1>	0	01110	size<2>	1	Rm<5>	10111	1	Rn<5>	Rd<5>
+
+addv		:	0 Q<1>	0	01110	size<2>	11000	11011		10	Rn<5>	Rd<5>
+
+aes		:	01001110	00	10100	0010	D<1>		10	Rn<5>	Rd<5>	# =aesd=aese
+aesmc		:	01001110	00	10100	0011	D<1>		10	Rn<5>	Rd<5>	# =aesmc=aesimc
+
+and_v		:	0 Q<1>	0	01110	size<2>	1	Rm<5>	00011	1	Rn<5>	Rd<5>
+
+bic_v_i		:	0 Q<1>	1	0111100000

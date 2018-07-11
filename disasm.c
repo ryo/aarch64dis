@@ -413,8 +413,13 @@ DecodeShift(uint64_t shift)
 	return SHIFTOP4(shift, "lsl", "lsr", "asr", "ror");
 }
 
+#ifdef DISASM_WITH_COMMENT
 #define UNDEFINED(pc, insn, comment)	\
 	PRINTF(".insn\t0x%08x\t# %s\n", insn, comment);
+#else
+#define UNDEFINED(pc, insn, comment)	\
+	PRINTF(".insn\t0x%08x\n", insn);
+#endif
 
 static void
 extendreg_common(const disasm_interface_t *di, uint64_t pc, uint32_t insn,

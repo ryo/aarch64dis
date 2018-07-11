@@ -24,6 +24,8 @@ CFLAGS +=-Wall \
 	-Wno-format-nonliteral \
 	-Wno-format-zero-length \
 	-Werror
+CFLAGS +=-DDISASM_WITH_COMMENT
+
 CXXAGS	= ${CFLAGS:S/-Wno-traditional//}
 LD	= ${CC}
 MKDEP	= mkdep

@@ -4,16 +4,37 @@
 .text
 
 
-knownbugs:
-	.word	0x0ee0e000
-	.word	0x4e284800
-	.word	0x5e280800
-	.word	0x5e282800
+testinsn:
+//	ic	ialluis, xzr
+//	ic	ialluis, x0
+	ic	ialluis
+	.word	0xd508711f & ~1
 
-	.word	0x00e0e00e
-	.word	0x0048284e
-	.word	0x0008285e
-	.word	0x0028285e
+	dc	ivac, x0
+	dc	ivac, x31
+//	dc	ivac
+	ic	ivau, x0
+	ic	ivau, x31
+//	ic	ivau
+
+	at	s1e1w, x0
+	at	s1e1w, x8
+	at	s1e1w, x31
+
+	tlbi	vale2, x0
+	tlbi	vale2, x8
+	tlbi	vale2, x31
+//	tlbi	vale2
+
+	tlbi	vmalle1is
+	.word	0xd508831f
+	.word	0xd508831f & ~1
+
+	.word	0x0d508711f
+	.word	0x0d508711f & ~1
+
+	nop
+knownbugs:
 
 	nop
 
@@ -25,10 +46,17 @@ objdump_bug:
 objdump_dif:
 	mov	w1, #0x20002
 	mov	w8, #0x10001
+	.word	0x0d508711f
 	.word	0x0d508711f & ~1
+
 	nop
 
 testpattern:
+//	pmull	v0.1q, v0.1d, v0.1d
+//	aese	v0.16b, v0.16b
+//	sha1h	s0, s0
+//	sha256su0	v0.4s, v0.4s
+
 	rev	w0, w1
 	rev	x0, x1
 	rev16	w0, w1

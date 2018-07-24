@@ -383,3 +383,27 @@ simd_ldstr_immpostidx:	size<2> 111 1 00 opc<2> 0	imm9<9>	01		Rn<5>	Rt<5>			# MAI
 simd_ldstr_immpreidx:	size<2> 111 1 00 opc<2> 0	imm9<9>	11		Rn<5>	Rt<5>			# MAINNAME
 simd_ldstr_immunsign:	size<2> 111 1 01 opc<2>		imm12<12>		Rn<5>	Rt<5>			# MAINNAME
 simd_ldstr_reg:		size<2> 111 1 00 opc<2> 1	Rm<5> opt<3> S<1> 10	Rn<5>	Rt<5>			# MAINNAME
+
+simd_aes	:	01001110	00	10100	001 M<1>	D<1>		10	Rn<5>	Rd<5>	# =aesd=aese=aesmc=aesimc
+
+
+simd_sha_reg3	:	01011110	00	0	Rm<5>	0 OP<3>	00	Rn<5>	Rd<5>
+#simd_sha1c	:	01011110	00	0	Rm<5>	0 000	00	Rn<5>	Rd<5>	# Qd, Sn, Vm.4s
+#simd_sha1p	:	01011110	00	0	Rm<5>	0 001	00	Rn<5>	Rd<5>	# Qd, Sn, Vm.4s
+#simd_sha1m	:	01011110	00	0	Rm<5>	0 010	00	Rn<5>	Rd<5>	# Qd, Sn, Vm.4s
+
+#simd_sha256h	:	01011110	00	0	Rm<5>	0 100	00	Rn<5>	Rd<5>	# Qd, Qn, Vm.4s
+#simd_sha256h2	:	01011110	00	0	Rm<5>	0 101	00	Rn<5>	Rd<5>	# Qd, Qn, Vm.4s
+
+#simd_sha1su0	:	01011110	00	0	Rm<5>	0 011	00	Rn<5>	Rd<5>	# Vd.4s, Vn.4s, Vm.4s
+#simd_sha256su1	:	01011110	00	0	Rm<5>	0 110	00	Rn<5>	Rd<5>	# Vd.4s, Vn.4s, Vm.4s
+
+simd_sha_reg2	:	01011110	00	1	0100 0	0 OP<3>	10	Rn<5>	Rd<5>
+#simd_sha1h	:	01011110	00	1	0100 0	0 000	10	Rn<5>	Rd<5>	# Sd,Sn
+#simd_sha1su1	:	01011110	00	1	0100 0	0 001	10	Rn<5>	Rd<5>	# Vd.4s, Vn.4s
+#simd_sha256su0	:	01011110	00	1	0100 0	0 010	10	Rn<5>	Rd<5>	# Vd.4s, Vn.4s
+
+
+simd_pmull	:	0 Q<1> 0 01110	size<2>	1	Rm<5>	1 110	00	Rn<5>	Rd<5>	# =pmull2
+
+

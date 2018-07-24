@@ -9,6 +9,10 @@
 	{{ 8, 4}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_CRM_OP2			\
 	{{ 8, 4}, { 5, 3}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_M_D_RN_RD			\
+	{{13, 1}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_OP_RN_RD			\
+	{{12, 3}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_OP1_CRM_OP2			\
 	{{16, 3}, { 8, 4}, { 5, 3}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_OP1_CRN_CRM_OP2_RT		\
@@ -17,6 +21,8 @@
 	{{16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_RS_RN_RT			\
 	{{16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_RM_OP_RN_RD			\
+	{{16, 5}, {12, 3}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_RM_RA_RN_RD			\
 	{{16, 5}, {10, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_IMM9_RN_RT			\
@@ -59,6 +65,8 @@
 	{{30, 1}, {16, 5}, {13, 3}, {12, 1}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}}
 #define FMT_SIZE_IMM12_RN_RT		\
 	{{30, 1}, {10,12}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
+#define FMT_Q_SIZE_RM_RN_RD		\
+	{{30, 1}, {22, 2}, {16, 5}, { 5, 5}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_SIZE_IMM19_RT		\
 	{{30, 1}, { 5,19}, { 0, 5}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}}
 #define FMT_IMMLO_IMMHI_RD		\
@@ -131,6 +139,8 @@ static const struct insn_info insn_tables[] = {
  { 0xfffff0ff, 0xd503309f, FMT_CRM,                     op_dsb },
  { 0xfffff0ff, 0xd50330df, FMT_CRM,                     op_isb },
  { 0xfffff01f, 0xd503201f, FMT_CRM_OP2,                 op_hint },
+ { 0xffffcc00, 0x4e284800, FMT_M_D_RN_RD,               op_simd_aes },
+ { 0xffff8c00, 0x5e280800, FMT_OP_RN_RD,                op_simd_sha_reg2 },
  { 0xfff8f01f, 0xd500401f, FMT_OP1_CRM_OP2,             op_msr_imm },
  { 0xfff80000, 0xd5080000, FMT_OP1_CRN_CRM_OP2_RT,      op_sys },
  { 0xfff80000, 0xd5280000, FMT_OP1_CRN_CRM_OP2_RT,      op_sysl },
@@ -140,6 +150,7 @@ static const struct insn_info insn_tables[] = {
  { 0xffe0fc00, 0x08007c00, FMT_RS_RN_RT,                op_stxrb },
  { 0xffe0fc00, 0x48007c00, FMT_RS_RN_RT,                op_stxrh },
  { 0xffe0fc00, 0x9bc07c00, FMT_RM_RN_RD,                op_umulh },
+ { 0xffe08c00, 0x5e000000, FMT_RM_OP_RN_RD,             op_simd_sha_reg3 },
  { 0xffe08000, 0x9b208000, FMT_RM_RA_RN_RD,             op_smsubl },
  { 0xffe08000, 0x9ba08000, FMT_RM_RA_RN_RD,             op_umsubl },
  { 0xffe08000, 0x9b200000, FMT_RM_RA_RN_RD,             op_smaddl },
@@ -227,6 +238,7 @@ static const struct insn_info insn_tables[] = {
  { 0xbfe00c00, 0xb8000000, FMT_SIZE_IMM9_RN_RT,         op_stur },
  { 0xbfc00000, 0xb9400000, FMT_SIZE_IMM12_RN_RT,        op_ldr_immunsign },
  { 0xbfc00000, 0xb9000000, FMT_SIZE_IMM12_RN_RT,        op_str_immunsign },
+ { 0xbf20fc00, 0x0e20e000, FMT_Q_SIZE_RM_RN_RD,         op_simd_pmull },
  { 0xbf000000, 0x18000000, FMT_SIZE_IMM19_RT,           op_ldr_literal },
  { 0x9f000000, 0x10000000, FMT_IMMLO_IMMHI_RD,          op_adr },
  { 0x9f000000, 0x90000000, FMT_IMMLO_IMMHI_RD,          op_adrp },

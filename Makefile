@@ -75,6 +75,7 @@ testnn:
 
 testb:
 	aarch64--netbsd-clang -mcrc -c bin.S
+	aarch64--netbsd-strip bin.o
 	aarch64--netbsd-objdump -Dr bin.o | ./disasm_test | less -r
 
 testc:

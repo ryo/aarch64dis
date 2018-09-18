@@ -26,8 +26,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef _KERNEL
-
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
@@ -35,24 +33,12 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <sys/types.h>
 #include <sys/bitops.h>
 
-#include <arch/aarch64/aarch64/disasm.h>
-
-#else /* _KERNEL */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <fcntl.h>
-#include <sys/bitops.h>
-#include <machine/int_fmtio.h>
-
 #include "disasm.h"
 
-#endif /* _KERNEL */
-
+#ifndef _KERNEL
+#include <stdio.h>
+#include <stdbool.h>
+#endif
 
 #define PRINTF		di->di_printf
 #define PRINTADDR	di->di_printaddr

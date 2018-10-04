@@ -5,6 +5,9 @@
 
 
 testinsn:
+	.word	0xcec08000
+
+
 //	ic	ialluis, xzr
 //	ic	ialluis, x0
 	ic	ialluis

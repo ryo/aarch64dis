@@ -118,8 +118,12 @@ if (exists($opts{A})) {
 			$opcode_alias{$opcode_pattern} = $insn->{sym};
 		}
 
+		if (exists($fmt_seen{$insn->{symbol}}) &&
+		    ($fmt_seen{$insn->{symbol}} ne insn_fragment_fmt($insn))) {
+			die "$insn->{sym}: $insn->{symbol}: same FMT but illegal bitmaps\n";
+		}
 		unless (exists($fmt_seen{$insn->{symbol}})) {
-			$fmt_seen{$insn->{symbol}}++;
+			$fmt_seen{$insn->{symbol}} = insn_fragment_fmt($insn);
 			push(@fmt_output, insn_fragment_fmt($insn));
 		}
 
@@ -163,8 +167,6 @@ __HEADER__
 
 	print " { 0x00000000, 0x00000000, FMT_NOARG,                   op_undefined }\n";
 	print "};\n";
-
-	print "\n";
 }
 
 

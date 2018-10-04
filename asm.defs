@@ -398,11 +398,23 @@ simd_sha_reg3	:	01011110	00	0	Rm<5>	0 OP<3>	00	Rn<5>	Rd<5>
 #simd_sha1su0	:	01011110	00	0	Rm<5>	0 011	00	Rn<5>	Rd<5>	# Vd.4s, Vn.4s, Vm.4s
 #simd_sha256su1	:	01011110	00	0	Rm<5>	0 110	00	Rn<5>	Rd<5>	# Vd.4s, Vn.4s, Vm.4s
 
-simd_sha_reg2	:	01011110	00	1	0100 0	0 OP<3>	10	Rn<5>	Rd<5>
+
+simd_sha_reg2	:	01011110	00	1	0100 0	0 OP3<3>	10	Rn<5>	Rd<5>
 #simd_sha1h	:	01011110	00	1	0100 0	0 000	10	Rn<5>	Rd<5>	# Sd,Sn
 #simd_sha1su1	:	01011110	00	1	0100 0	0 001	10	Rn<5>	Rd<5>	# Vd.4s, Vn.4s
 #simd_sha256su0	:	01011110	00	1	0100 0	0 010	10	Rn<5>	Rd<5>	# Vd.4s, Vn.4s
 
+
+simd_sha512_reg3:	11001110	01	1	Rm<5>	1 000	OP2<2>	Rn<5>	Rd<5>	#ARMv8.2
+#simd_sha512h	:	11001110	01	1	Rm<5>	1 000	00	Rn<5>	Rd<5>	# Qd, Qn, Vm.2d
+#simd_sha512h2	:	11001110	01	1	Rm<5>	1 000	01	Rn<5>	Rd<5>	# Qd, Qn, Vm.2d
+#simd_sha512su1	:	11001110	01	1	Rm<5>	1 000	10	Rn<5>	Rd<5>	# Vd.2d, Vn.2d, Vm.2d
+#simd_rax1	:	11001110	01	1	Rm<5>	1 000	11	Rn<5>	Rd<5>	# Vd.2d, Vn.2d, Vm.2d
+
+
+simd_sha512_reg2:	11001110	11	0	00000	1 000	OP2<2>	Rn<5>	Rd<5>	#ARMv8.2
+#simd_sha512su0	:	11001110	11	0	00000	1 000	00	Rn<5>	Rd<5>	# Vd.2d, Vn.2d
+#simd_sm4e	:	11001110	11	0	00000	1 000	01	Rn<5>	Rd<5>	# Vd.2d, Vn.2d
 
 simd_pmull	:	0 Q<1> 0 01110	size<2>	1	Rm<5>	1 110	00	Rn<5>	Rd<5>	# =pmull2
 

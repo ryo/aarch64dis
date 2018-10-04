@@ -3068,6 +3068,52 @@ OP3FUNC(op_simd_sha_reg2, op, Rn, Rd)
 	}
 }
 
+OP4FUNC(op_simd_sha512_reg3, Rm, op, Rn, Rd)
+{
+	const char *shaop[4] = {
+		"sha512h", "sha512h2", "sha512su1", "rax1"
+	};
+
+	switch (op) {
+	case 0:
+	case 1:
+		PRINTF("%s\t%s, %s, %s.2d\n",
+		    shaop[op],
+		    FREGNAME(FREGSZ_Q, Rd),
+		    FREGNAME(FREGSZ_Q, Rn),
+		    VREGNAME(Rm));
+		break;
+	case 2:
+	case 3:
+		PRINTF("%s\t%s.2d, %s,.2d %s.2d\n",
+		    shaop[op],
+		    VREGNAME(Rd),
+		    VREGNAME(Rn),
+		    VREGNAME(Rm));
+		break;
+	}
+}
+
+OP3FUNC(op_simd_sha512_reg2, op, Rn, Rd)
+{
+	const char *shaop[4] = {
+		"sha512su0", "sm4e", NULL, NULL
+	};
+
+	switch (op) {
+	case 0:
+	case 1:
+		PRINTF("%s\t%s.2d, %s.2d\n",
+		    shaop[op],
+		    VREGNAME(Rd),
+		    VREGNAME(Rn));
+		break;
+	default:
+		UNDEFINED(pc, insn, "illegal sha512 operation");
+		break;
+	}
+}
+
 OP5FUNC(op_simd_pmull, q, size, Rm, Rn, Rd)
 {
 	const char *op = (q == 0) ? "pmull" : "pmull2";

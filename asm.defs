@@ -462,7 +462,8 @@ pacda		:	1 1 0 11010110 00001 0 0 z<1>	01 M<1>	Rn<5> Rd<5>								# =pacdb=pacdz
 pacga		:	1 0 0 11010110 Rm<5> 0 0 1	10 0	Rn<5> Rd<5>
 pacia		:	1 1 0 11010110 00001 0 0 z<1>	00 M<1>	Rn<5> Rd<5>								# =pacia1716=paciasp=paciaz=paciza=pacib1716=pacibsp=pacibz=pacizb
 
-xpac		:	1 1 0 11010110 00001 0 1 0	00 d<1>	11111 Rd<5>								# =xpacd=xpaci
+xpaci		:	1 1 0 11010110 00001 0 1 0	00 0	11111 Rd<5>								#
+xpacd		:	1 1 0 11010110 00001 0 1 0	00 1	11111 Rd<5>								#
 xpaclri		:	1101010100 0 00 011 0010 0000 111 11111
 
 #	rmif		:	1 0 1 11010000 imm6<6> 00001 Rn<5> 0 mask<4>

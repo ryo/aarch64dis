@@ -1323,27 +1323,50 @@ OP6FUNC(op_ror_imm, sf, n, Rm, imms, Rn, Rd)
 
 OP2FUNC(op_hint, CRm, op2)
 {
-	const uint64_t op = CRm << 3 | op2;
+#define CRm_OP2(crm,op)	((crm) << 3 | (op))
+
+	const uint64_t op = CRm_OP2(CRm, op2);
 
 	/* ALIAS: nop,sev,sevl,wfe,wfi,yield */
 	switch (op) {
-	case 0:
+	case CRm_OP2(0, 0):
 		PRINTF("nop\n");
 		break;
-	case 1:
+	case CRm_OP2(0, 1):
 		PRINTF("yield\n");
 		break;
-	case 2:
+	case CRm_OP2(0, 2):
 		PRINTF("wfe\n");
 		break;
-	case 3:
+	case CRm_OP2(0, 3):
 		PRINTF("wfi\n");
 		break;
-	case 4:
+	case CRm_OP2(0, 4):
 		PRINTF("sev\n");
 		break;
-	case 5:
+	case CRm_OP2(0, 5):
 		PRINTF("sevl\n");
+		break;
+	case CRm_OP2(0, 7):
+		PRINTF("xpaclri\n");
+		break;
+	case CRm_OP2(1, 0):
+		PRINTF("pacia1716\n");
+		break;
+	case CRm_OP2(1, 2):
+		PRINTF("pacib1716\n");
+		break;
+	case CRm_OP2(3, 0):
+		PRINTF("paciaz\n");
+		break;
+	case CRm_OP2(3, 1):
+		PRINTF("paciasp\n");
+		break;
+	case CRm_OP2(3, 2):
+		PRINTF("pacibz\n");
+		break;
+	case CRm_OP2(3, 3):
+		PRINTF("pacibsp\n");
 		break;
 	default:
 		PRINTF("hint\t#0x%"PRIx64"\n", op);
@@ -3135,6 +3158,120 @@ OP5FUNC(op_simd_pmull, q, size, Rm, Rn, Rd)
 	} else {
 		UNDEFINED(pc, insn, "illegal pmull size");
 	}
+}
+
+OP1FUNC(op_eretaa, m)
+{
+	if (m == 0)
+		PRINTF("eretaa\n");
+	else
+		PRINTF("eretab\n");
+
+}
+
+OP1FUNC(op_retaa, m)
+{
+	if (m == 0)
+		PRINTF("retaa\n");
+	else
+		PRINTF("retab\n");
+}
+
+OP4FUNC(op_blraa, z, m, Rn, Rm)
+{
+	if (z == 0) {
+		if (Rm != 31) {
+			UNDEFINED(pc, insn, "undefined");
+		} else {
+			PRINTF("%s\t%s\n",
+			    SHIFTOP2(m, "blraaz", "blrabz"),
+			    SREGNAME(1, Rn));
+		}
+	} else {
+		PRINTF("%s\t%s, %s\n",
+		    SHIFTOP2(m, "blraa", "blrab"),
+		    SREGNAME(1, Rn),
+		    SREGNAME(1, Rm));
+	}
+}
+
+OP4FUNC(op_braa, z, m, Rn, Rm)
+{
+	if (z == 0) {
+		if (Rm != 31) {
+			UNDEFINED(pc, insn, "undefined");
+		} else {
+			PRINTF("%s\t%s\n",
+			    SHIFTOP2(m, "braaz", "brabz"),
+			    SREGNAME(1, Rn));
+		}
+	} else {
+		PRINTF("%s\t%s, %s\n",
+		    SHIFTOP2(m, "braa", "brab"),
+		    SREGNAME(1, Rn),
+		    SREGNAME(1, Rm));
+	}
+}
+
+OP4FUNC(op_pacda, z, m, Rn, Rd)
+{
+	if (z != 0) {
+		if (Rn != 31) {
+			UNDEFINED(pc, insn, "undefined");
+		} else {
+			PRINTF("%s\t%s\n",
+			    SHIFTOP2(m, "pacdza", "pacdzb"),
+			    SREGNAME(1, Rd));
+		}
+	} else {
+		PRINTF("%s\t%s, %s\n",
+		    SHIFTOP2(m, "pacda", "pacdb"),
+		    ZREGNAME(1, Rd),
+		    SREGNAME(1, Rn));
+	}
+}
+
+OP4FUNC(op_pacia, z, m, Rn, Rd)
+{
+	if (z != 0) {
+		if (Rn != 31) {
+			UNDEFINED(pc, insn, "undefined");
+		} else {
+			PRINTF("%s\t%s\n",
+			    SHIFTOP2(m, "paciza", "pacizb"),
+			    SREGNAME(1, Rd));
+		}
+	} else {
+		PRINTF("%s\t%s, %s\n",
+		    SHIFTOP2(m, "pacia", "pacib"),
+		    ZREGNAME(1, Rd),
+		    SREGNAME(1, Rn));
+	}
+}
+
+OP3FUNC(op_pacga, Rm, Rn, Rd)
+{
+	PRINTF("pacga\t%s, %s, %s\n",
+	    ZREGNAME(1, Rd),
+	    ZREGNAME(1, Rn),
+	    SREGNAME(1, Rm));
+}
+
+OP1FUNC(op_xpaci, Rd)
+{
+	PRINTF("xpaci\t%s\n",
+	    ZREGNAME(1, Rd));
+}
+
+OP1FUNC(op_xpacd, Rd)
+{
+	PRINTF("xpacd\t%s\n",
+	    ZREGNAME(1, Rd));
+}
+
+OP0FUNC(op_xpaclri)
+{
+	PRINTF("xpaclri\n");
 }
 
 /*

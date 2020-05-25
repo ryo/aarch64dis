@@ -52,17 +52,25 @@ armv83_ptrauth:
 	retab
 
 	pacda	x5, x6
+	pacda	x5, sp
+	pacda	x31, sp
 	pacdza	x5
 	pacdb	x5, x6
 	pacdzb	x5
 	pacga	x5, x6, x7
+	pacga	xzr, x6, x7
+	pacga	x5, xzr, x7
+	pacga	x5, x6, sp
 
 	pacia		x0, x1
+	pacia		xzr, x1
+	pacia		x0, sp
 	pacia1716
 	paciasp
 	paciaz
 	paciza		x2
 
+	pacib		x0, sp
 	pacib		x0, x1
 	pacib1716
 	pacibsp
@@ -70,7 +78,9 @@ armv83_ptrauth:
 	pacizb		x2
 
 	xpacd		x3
+	xpacd		xzr
 	xpaci		x3
+	xpaci		xzr
 	xpaclri
 
 

@@ -4,8 +4,83 @@
 .text
 
 
-testinsn:
-	.word	0xcec08000
+universal_cpu_start:
+	.word	0xea000000	/* ARM: b pc+8 (IamARMhere),  AARCH64: ands x0,x0,x0 (meaningless) */
+	b	IamAARCH64
+IamARMhere:
+	// ARM BINARY CODE HERE
+
+	// jump to cortex_mpstart (in arm binary)
+	.word	0xea000000 + (cortex_mpstart - 1f - 4) / 4
+1:
+
+IamAARCH64:
+	// AARCH64 BINARY CODE HERE
+
+	// drop to EL1/SYS32 mode, and return to cortex_mpstart...
+	// here is locore_EL2 but SPSR=SPSR_M_SYS32
+//	...
+
+	/* Set the address to return to our cpu startup */
+	adrp	x15, cortex_mpstart
+	add	x15, x15, #:lo12:cortex_mpstart
+	msr	elr_el2, x15
+	eret
+
+
+
+	nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;
+
+armv83_ptrauth:
+	blraa	x5,x29
+	blraa	x5,sp
+	blrab	x5,x29
+	blrab	x5,sp
+	blraaz	x5
+	blrabz	x4
+
+	braa	x5,x29
+	braa	x5,sp
+	brab	x5,x29
+	brab	x5,sp
+	braaz	x5
+	brabz	x4
+
+	eretaa
+	eretab
+	retaa
+	retab
+
+	pacda	x5, x6
+	pacdza	x5
+	pacdb	x5, x6
+	pacdzb	x5
+	pacga	x5, x6, x7
+
+	pacia		x0, x1
+	pacia1716
+	paciasp
+	paciaz
+	paciza		x2
+
+	pacib		x0, x1
+	pacib1716
+	pacibsp
+	pacibz
+	pacizb		x2
+
+	xpacd		x3
+	xpaci		x3
+	xpaclri
+
+
+cortex_mpstart:
+	.word	0x99999999
+	.word	0x99999999
+	.word	0x99999999
+	.word	0x99999999
+	.word	0x99999999
+	.word	0x99999999
 
 
 //	ic	ialluis, xzr
@@ -14,19 +89,23 @@ testinsn:
 	.word	0xd508711f & ~1
 
 	dc	ivac, x0
-	dc	ivac, x31
+	dc	ivac, x30
+//	dc	ivac, x31	//CLANG only
 //	dc	ivac
 	ic	ivau, x0
-	ic	ivau, x31
+	ic	ivau, x30
+//	ic	ivau, x31	//CLANG only
 //	ic	ivau
 
 	at	s1e1w, x0
 	at	s1e1w, x8
-	at	s1e1w, x31
+	at	s1e1w, x30
+//	at	s1e1w, x31	//CLANG only
 
 	tlbi	vale2, x0
 	tlbi	vale2, x8
-	tlbi	vale2, x31
+	tlbi	vale2, x30
+//	tlbi	vale2, x31	//CLANG only
 //	tlbi	vale2
 
 	tlbi	vmalle1is
@@ -56,6 +135,7 @@ objdump_dif:
 
 testpattern:
 //	pmull	v0.1q, v0.1d, v0.1d
+//	pmull2	v1.1q, v3.2d, v18.2d
 //	aese	v0.16b, v0.16b
 //	sha1h	s0, s0
 //	sha256su0	v0.4s, v0.4s
@@ -72,7 +152,7 @@ testpattern:
 	ret	x3
 	ret	x4
 	ret	x30
-	ret	x31
+//	ret	x31	//CLANG only
 
 
 
@@ -718,7 +798,7 @@ testpattern:
 	cmn	x0, w0, uxtw
 
 	add	sp, sp, w0, uxtw
-	add	x9, sp, w0, lsl #0
+//	add	x9, sp, w0, lsl #0
 
 	nop
 
@@ -726,16 +806,16 @@ testpattern:
 	add	sp, sp, w0, uxtw
 
 	hlt	#0
-	add	x0, x1, w0, lsl #4
+//	add	x0, x1, w0, lsl #4	//CLANG only
 
 	nop
-	add	x9, sp, w0, lsl #0
-	add	x9, x9, w0, lsl #0
+//	add	x9, sp, w0, lsl #0
+//	add	x9, x9, w0, lsl #0	//CLANG only
 	add	x9, sp, w0, sxtb #0
 	add	x9, x9, w0, sxtb #0
 	nop
 
-	add	x0, x1, w0, lsl #4
+//	add	x0, x1, w0, lsl #4	//CLANG only
 	add	w0, w1, w2, lsl #4
 
 	add	sp, sp, w0, sxtb #0
@@ -760,8 +840,8 @@ testpattern:
 	blt	1f
 	bgt	1f
 	ble	1f
-	bal	1f
-	bnv	1f
+//	bal	1f	//CLANG only
+//	bnv	1f	//CLANG only
 	nop
 1:
 

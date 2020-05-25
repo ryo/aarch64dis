@@ -73,8 +73,22 @@ testnn:
 	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | egrep '^(ORIG|ERR)' > r
 	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
 
+testxx:
+	aarch64--netbsd-clang -march=armv8.5-a -mcrc -c bin.S
+	aarch64--netbsd-strip bin.o
+	aarch64--netbsd-objcopy bin.o bin.bin
+	arm--netbsdelf-objdump -D -b binary -m arm bin.bin | ./disasm_test | egrep '^(ORIG|ERR)' > r
+	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
+
+testx:
+	aarch64--netbsd-clang -march=armv8.5-a  -mcrc -c bin.S
+	aarch64--netbsd-strip bin.o
+	aarch64--netbsd-objcopy bin.o bin.bin
+	arm--netbsdelf-objdump -D -b binary -m arm /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | egrep '^(ORIG|ERR)' > r
+	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
+
 testb:
-	aarch64--netbsd-clang -mcrc -c bin.S
+	aarch64--netbsd-clang -march=armv8.5-a -mcrc -c bin.S
 	aarch64--netbsd-strip bin.o
 	aarch64--netbsd-objdump -Dr bin.o | ./disasm_test | less -r
 

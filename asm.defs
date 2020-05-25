@@ -25,7 +25,7 @@ asr_imm		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
 asrv		:	sf<1>	00		11010 11		0	Rm<5>	0010	10		Rn<5>	Rd<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-at		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+at		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys=cfp
 
 b_cond		:	0	10		10100		imm19<19>					0	cond<4>
 b		:	0	00		101				imm26<26>				
@@ -96,7 +96,7 @@ eor_shiftreg	:	sf<1>	10		01010 shift<2>		0	Rm<5>	imm6<6>			Rn<5>	Rd<5>
 
 extr		:	sf<1>	00		10011 1 n<1>		0	Rm<5>	imms<6>			Rn<5>	Rd<5>
 
-hint		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =nop	MAINNAME
+hint		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =nop=psbcsync	MAINNAME
 
 hlt		:	1	10		10100 010			imm16<16>				00000
 hvc		:	1	10		10100 000			imm16<16>				00010
@@ -336,14 +336,14 @@ sxth		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx
 sxtw		:	sf<1>	00		10011 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>	# =asr=sbfiz=sbfx=sxtb=sxth=sxtw
 
 #--------------------------------------------------------------------------          16|15          -------------------------
-sys		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys	MAINNAME
+sys		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys=cfp MAINNAME
 sysl		:	1	10		10101 00	1 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 tbnz		:	b5<1>	01		10111 b40<5>			imm14<14>				Rt<5>
 tbz		:	b5<1>	01		10110 b40<5>			imm14<14>				Rt<5>
 
-tlbi		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys
+tlbi		:	1	10		10101 00	0 01	op1<3>		CRn<4>	CRm<4>	op2<3>		Rt<5>	# =at=dc=ic=tlbi=sys=cfp
 
 #--------------------------------------------------------------------------          16|15          -------------------------
 tst_imm		:	sf<1>	11		10010 0 n<1>		immr<6>		imms<6>			Rn<5>	Rd<5>
@@ -369,6 +369,146 @@ umull		:	1	00		11011 10	1		Rm<5>	0	Ra<5>		Rn<5>	Rd<5>	# =umaddl
 wfe		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 wfi		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 yield		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
+
+
+#
+# ARMv8.x
+#
+#	addg		:	1	00		10001 10		immr<6>	00	imms<4>			Rn<5>	Rd<5>	# 
+#	autda		:	1	10		11010 11	0 00		001	00 z<1>	110		Rn<5>	Rd<5>	# =autdza	MAINNAME
+#	autdb		:	1	10		11010 11	0 00		001	00 z<1>	111		Rn<5>	Rd<5>	# =autdzb	MAINNAME
+#	autia		:	1	10		11010 11	0 00		001	00 z<1>	100		Rn<5>	Rd<5>	# =autia1716=autiasp=autiaz=autiza	MAINNAME
+#	autib		:	1	10		11010 11	0 00		001	00 z<1>	101		Rn<5>	Rd<5>	# =autib1716=autibsp=autibz=autizb	MAINNAME
+#	
+#	axflag		:	1	10		10101 00	0 00		000	0100	0000	010	11111
+#	
+#	#bfc		:	sf<1>	01		10011 0 n<1>		immr<6>		imms<6>			11111	Rd<5>	# =bfi
+
+blraa		:	1101011	z<1>	0	01	11111	0000	1	M<1>				Rn<5>	Rm<5>	# =blraaz=blrab=blrabz
+braa		:	1101011	z<1>	0	00	11111	0000	1	M<1>				Rn<5>	Rm<5>	# =braaz=brab=brabz
+
+#bti		:	1	10		10101 00		0 00 011	0010	CRm<4>	op<2> 0	11111		# =hint?
+
+#	casb		:	00	001000	1	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =casab=casalb=caslb
+#	cash		:	01	001000	1	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =casah=casalh=caslh
+#	casp		:	0 size<1> 001000 0	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =caspa=caspal=caspl
+#	cas		:	1 size<1> 001000 1	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =casa=casal=casl
+#	
+#	cfinv		:	1	10		10101 00	0 0 0	000		0100	0000	000		11111
+#	cfp		:	1	10		10101 00	0 01	011		0111	0011	100		Rt<5>	# =at=dc=ic=tlbi=sys=cfp
+#	
+#	cpp		:	1	10		10101 00		0 01 op1<3>	CRn<4>	CRm<4>	op2<3>		Rt<5>
+
+eretaa		:	1	10		10110 10		0 11 111	0000	1 m<1>	11111		11111	# =eretab MAINNAME
+retaa		:	1	10		10110 01		0 11 111	0000	1 m<1>	11111		11111	# =retab
+
+#	esb		:	1	10		10101 00		0 00 011	0010	0010	000	11111
+#	
+#	subps		:	1	0	1	11010 1 1			0 Rm<5> 0	00000		Rn<5>	Rd<5>	# =cmpp MAINNAME
+#	irg		:	1	0	0	11010 1 1			0 Rm<5> 0	00100		Rn<5>	Rd<5>
+#	gmi		:	1	0	0	11010 1 1			0 Rm<5> 0	00101		Rn<5>	Rd<5>
+#	
+#	ldaddb		:	0	0 111 0 00 a<1> r<1> 1		Rs<5>	0 000 00 Rn<5> Rt<5>					# =ldaddab=ldaddalb=ldaddb=ldaddlb=staddb=staddlb MAINNAME
+#	ldaddh		:	0	1 111 0 00 a<1> r<1> 1		Rs<5>	0 000 00 Rn<5> Rt<5>					# =ldaddah=ldaddalh=ldaddh=ldaddlh=staddh=staddlh MAINNAME
+#	ldadd		:	1 size<1> 111 0 00 a<1> r<1> 1		Rs<5>	0 000 00 Rn<5> Rt<5>					# =ldadd=ldadda=ldaddal=ldaddl=ldadd=ldadda MAINNAME
+#	
+#	ldapr		:	1 size<1> 111 0 00 1 0 1		11111	1 100 00 Rn<5> Rt<5>
+#	ldaprb		:	0	0 111 0 00 1 0 1		11111	1 100 00 Rn<5> Rt<5>
+#	ldaprh		:	0	1 111 0 00 1 0 1		11111	1 100 00 Rn<5> Rt<5>
+#	
+#	ldapur		:	1 size<1>	011 0 01 01			0 imm9<9> 00			Rn<5>	Rt<5>
+#	ldapurb		:	0 0		011 0 01 01			0 imm9<9> 00			Rn<5>	Rt<5>
+#	ldapurh		:	0 1		011 0 01 01			0 imm9<9> 00			Rn<5>	Rt<5>
+#	ldapursb	:	0 0		011 0 01 1 opc<1>		0 imm9<9> 00			Rn<5>	Rt<5>
+#	ldapursh	:	0 1		011 0 01 1 opc<1>		0 imm9<9> 00			Rn<5>	Rt<5>
+#	ldapursw	:	1 0		011 0 01 10			0 imm9<9> 00			Rn<5>	Rt<5>
+#	
+#	ldclrb		:	0	0 111 0 00 a<1> r<1> 1		Rs<5>	0 001 00 Rn<5> Rt<5>					# =ldclrab=ldclralb=ldclrb=ldclrlb=stclrb=stclrlb
+#	ldclrh		:	0	1 111 0 00 a<1> r<1> 1		Rs<5>	0 001 00 Rn<5> Rt<5>					# =ldclrah=ldclralh=ldclrh=ldclrlh=stclrh=stclrlh
+#	ldclr		:	1 size<1> 111 0 00 a<1> r<1> 1		Rs<5>	0 001 00 Rn<5> Rt<5>					# =ldclra=ldclral=ldclrl=stclr=stclrl MAINNAME
+#	
+#	ldeorb		:	0	0 111 0 00 a<1> r<1> 1		Rs<5>	0 010 00 Rn<5> Rt<5>					# =ldeorab=ldeoralb=ldeorb=ldeorlb=steorb=steorlb
+#	ldeorh		:	0	1 111 0 00 a<1> r<1> 1		Rs<5>	0 010 00 Rn<5> Rt<5>					# =ldeorah=ldeoralh=ldeorh=ldeorlh=steorh=steorlh
+#	ldeor		:	1 size<1> 111 0 00 a<1> r<1> 1		Rs<5>	0 010 00 Rn<5> Rt<5>					# =ldeora=ldeoral=ldeorl=steor=steorl
+#	
+#	ldg		:	11011001 0 1 1	imm9<9> 0 0 Rn<5> Rt<5>
+#	ldgm		:	11011001 1 1 1 0 0 0 0 0 0 0 0 0 0 0 Rn<5> Rt<5>
+#	
+#	ldlarb		:	0	0 001000 1 1 0 11111 0 11111 Rn<5> Rt<5>
+#	ldlarh		:	0	1 001000 1 1 0 11111 0 11111 Rn<5> Rt<5>
+#	ldlar		:	1 size<1> 001000 1 1 0 11111 0 11111 Rn<5> Rt<5>
+#	
+#	ldra		:	11 111 0 00 m<1> s<1> 1 imm9<9> w<1> 1 Rn<5> Rt<5>							# =ldraa=ldrab MAINNAME
+#	
+#	ldsetb		:	0	0 111 0 00 a<1> r<1> 1 Rs<5> 0 011 00 Rn<5> Rt<5>							# =ldsetab=ldsetalb=ldsetlb=stsetb=stsetlb MAINNAME
+#	ldseth		:	0	1 111 0 00 a<1> r<1> 1 Rs<5> 0 011 00 Rn<5> Rt<5>							# =ldsetah=ldsetalh=ldsetlh=stseth=stsetlh MAINNAME
+#	ldset		:	1 size<1> 111 0 00 a<1> r<1> 1 Rs<5> 0 011 00 Rn<5> Rt<5>							# =ldseta=ldsetal=ldsetl=stset=stsetl MAINNAME
+#	
+#	ldsmaxb		:	0	0 111 0 00 a<1> r<1> 1 Rs<5> 0 100 00 Rn<5> Rt<5>							# =ldsmaxab=ldsmaxalb=ldsmaxlb=stsmaxb=stsmaxlb MAINNAME
+#	ldsmaxh		:	0	1 111 0 00 a<1> r<1> 1 Rs<5> 0 100 00 Rn<5> Rt<5>							# =ldsmaxah=ldsmaxalh=ldsmaxlh=stsmaxh=stsmaxlh MAINNAME
+#	ldsmax		:	1 size<1> 111 0 00 a<1> r<1> 1 Rs<5> 0 100 00 Rn<5> Rt<5>							# =ldsmaxa=ldsmaxal=ldsmaxl=stsmax=stsmaxl MAINNAME
+#	ldsminb		:	0	0 111 0 00 a<1> r<1> 1 Rs<5> 0 101 00 Rn<5> Rt<5>							# =ldsminab=ldsminalb=ldsminlb=stsminb=stsminlb MAINNAME
+#	ldsminh		:	0	1 111 0 00 a<1> r<1> 1 Rs<5> 0 101 00 Rn<5> Rt<5>							# =ldsminah=ldsminalh=ldsminlh=stsminh=stsminlh MAINNAME
+#	ldsmin		:	1 size<1> 111 0 00 a<1> r<1> 1 Rs<5> 0 101 00 Rn<5> Rt<5>							# =ldsmina=ldsminal=ldsminl=stsmin=stsminl
+#	
+#	ldumaxb		:	0	0 111 0 00 a<1> r<1> 1 Rs<5> 0 110 00 Rn<5> Rt<5>							# =ldumaxab=ldumaxalb=ldumaxlb=stumaxb=stumaxlb
+#	ldumaxh		:	0	1 111 0 00 a<1> r<1> 1 Rs<5> 0 110 00 Rn<5> Rt<5>							# =ldumaxah=ldumaxalh=ldumaxlh=stumaxh=stumaxlh
+#	ldumax		:	1 size<1> 111 0 00 a<1> r<1> 1 Rs<5> 0 110 00 Rn<5> Rt<5>							# =ldumaxa=ldumaxal=ldumaxl=stumax=stumaxl
+#	lduminb		:	0	0 111 0 00 a<1> r<1> 1 Rs<5> 0 111 00 Rn<5> Rt<5>							# =lduminab=lduminalb=lduminlb=stuminb=stuminlb
+#	lduminh		:	0	1 111 0 00 a<1> r<1> 1 Rs<5> 0 111 00 Rn<5> Rt<5>							# =lduminah=lduminalh=lduminlh=stuminh=stuminlh
+#	ldumin		:	1 size<1> 111 0 00 a<1> r<1> 1 Rs<5> 0 111 00 Rn<5> Rt<5>							# =ldumina=lduminal=lduminl=stumin=stuminl
+
+pacda		:	1 1 0 11010110 00001 0 0 z<1>	01 M<1>	Rn<5> Rd<5>								# =pacdb=pacdza=pacdzb
+pacga		:	1 0 0 11010110 Rm<5> 0 0 1	10 0	Rn<5> Rd<5>
+pacia		:	1 1 0 11010110 00001 0 0 z<1>	00 M<1>	Rn<5> Rd<5>								# =pacia1716=paciasp=paciaz=paciza=pacib1716=pacibsp=pacibz=pacizb
+
+xpac		:	1 1 0 11010110 00001 0 1 0	00 d<1>	11111 Rd<5>								# =xpacd=xpaci
+xpaclri		:	1101010100 0 00 011 0010 0000 111 11111
+
+#	rmif		:	1 0 1 11010000 imm6<6> 00001 Rn<5> 0 mask<4>
+#	setf		:	0 0 1 11010000 000000 sz<1> 0010 Rn<5> 0 1101									# =setf8=setf16 MAINNAME
+#	
+#	stg_postidx	:	11011001 0 0 1	imm9<9>		0 1	Rn<5> Rt<5>
+#	stg_preidx	:	11011001 0 0 1	imm9<9>		1 1	Rn<5> Rt<5>
+#	stg_signed	:	11011001 0 0 1	imm9<9>		1 0	Rn<5> Rt<5>
+#	
+#	stzg_postidx	:	11011001 0 1 1	imm9<9>		0 1	Rn<5> Rt<5>
+#	stzg_preidx	:	11011001 0 1 1	imm9<9>		1 1	Rn<5> Rt<5>
+#	stzg_signed	:	11011001 0 1 1	imm9<9>		1 0	Rn<5> Rt<5>
+#	
+#	st2g_postidx	:	11011001 1 0 1	imm9<9>		0 1	Rn<5> Rt<5>
+#	st2g_preidx	:	11011001 1 0 1	imm9<9>		1 1	Rn<5> Rt<5>
+#	st2g_signed	:	11011001 1 0 1	imm9<9>		1 0	Rn<5> Rt<5>
+#	
+#	stz2g_postidx	:	11011001 1 1 1	imm9<9>		0 1	Rn<5> Rt<5>
+#	stz2g_preidx	:	11011001 1 1 1	imm9<9>		1 1	Rn<5> Rt<5>
+#	stz2g_signed	:	11011001 1 1 1	imm9<9>		1 0	Rn<5> Rt<5>
+#	
+#	stgm		:	11011001 1 0 1	000000000	0 0	Rn<5> Rt<5>
+#	stzgm		:	11011001 0 0 1	000000000	0 0	Rn<5> Rt<5>
+#	
+#	
+#	stgp_postidx	:	0 1 101 0 001 0			imm7<7> Rt2<5>			Rn<5>	Rt<5>
+#	stgp_preidx	:	0 1 101 0 011 0			imm7<7> Rt2<5>			Rn<5>	Rt<5>
+#	stgp_signed	:	0 1 101 0 010 0			imm7<7> Rt2<5>			Rn<5>	Rt<5>
+#	
+#	stllrb		:	0 0		001000 1 0 0 11111 0 11111	Rn<5> Rt<5>
+#	stllrh		:	0 1		001000 1 0 0 11111 0 11111	Rn<5> Rt<5>
+#	stllr		:	1 size<1>	001000 1 0 0 11111 0 11111	Rn<5> Rt<5>
+#	stlurb		:	0 0		011001 0 0 0 imm9<9> 0 0	Rn<5> Rt<5>
+#	stlurh		:	0 1		011001 0 0 0 imm9<9> 0 0	Rn<5> Rt<5>
+#	stlur		:	1 size<1>	011001 0 0 0 imm9<9> 0 0	Rn<5> Rt<5>
+#	
+#	subg		:	1 1 0 100011 0 imm6<6> 0 0 imm4<4>		Rn<5> Rd<5>
+#	subp		:	1 0 0 11010110 Rm<5> 0 0 0 0 0 0		Rn<5> Rd<5>
+#	subps		:	1 0 1 11010110 Rm<5> 0 0 0 0 0 0		Rn<5> Rd<5>
+#	
+#	swpb		:	0 0		111 0 00 a<1> r<1> 1 Rs<5> 1 000 00 Rn<5> Rt<5>						# =swpab=swpalb=swplb
+#	swph		:	0 1		111 0 00 a<1> r<1> 1 Rs<5> 1 000 00 Rn<5> Rt<5>						# =swpah=swpalh=swplh
+#	swp		:	1 size<1>	111 0 00 a<1> r<1> 1 Rs<5> 1 000 00 Rn<5> Rt<5>						# =swpa=swpal=swpl
+#	
+#	xaflag		:	1	10		10101 00	0 0 0	  000		0100	0000	001	11111		# =msr_imm
+
 
 
 

@@ -387,7 +387,7 @@ yield		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 blraa		:	1101011	z<1>	0	01	11111	0000	1	M<1>				Rn<5>	Rm<5>	# =blraaz=blrab=blrabz
 braa		:	1101011	z<1>	0	00	11111	0000	1	M<1>				Rn<5>	Rm<5>	# =braaz=brab=brabz
 
-#bti		:	1	10		10101 00		0 00 011	0010	CRm<4>	op<2> 0	11111		# =hint?
+bti		:	1	10		10101 00	0 00		011	0010		CRm<4>	op2<3>	11111	# =hint
 
 #	casb		:	00	001000	1	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =casab=casalb=caslb
 #	cash		:	01	001000	1	l<1>	1	Rs<5>	o0<1>	11111				Rn<5>	Rd<5>	# =casah=casalh=caslh

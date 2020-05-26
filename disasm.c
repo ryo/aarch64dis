@@ -1368,6 +1368,18 @@ OP2FUNC(op_hint, CRm, op2)
 	case CRm_OP2(3, 3):
 		PRINTF("pacibsp\n");
 		break;
+	case CRm_OP2(4, 0):
+		PRINTF("bti\n");
+		break;
+	case CRm_OP2(4, 2):
+		PRINTF("bti\tc\n");
+		break;
+	case CRm_OP2(4, 4):
+		PRINTF("bti\tj\n");
+		break;
+	case CRm_OP2(4, 6):
+		PRINTF("bti\tjc\n");
+		break;
 	default:
 		PRINTF("hint\t#0x%"PRIx64"\n", op);
 		break;

@@ -64,14 +64,14 @@ cleandir: clean
 	-rm -f .depend
 
 test:
-	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/work.evbarm64-el/tree/sbin/init | ./disasm_test | less -r
+	aarch64--netbsd-objdump -Dr /usr/src/work.evbarm64-el/tree/sbin/init | ./disasm_test | less -r
 
 testn:
-	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | less -r
+	aarch64--netbsd-objdump -Dr /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | less -r
 
 testnn:
-	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/sys/arch/evbarm//compile/RPI64/netbsd | ./disasm_test | egrep '^(ORIG|ERR)' > r
-	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
+	aarch64--netbsd-objdump -Dr /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | egrep '^(binutil|MYdisasm)' > r
+	grep -v 'binutil.*\.word' r | less -r -p 'binutil............................'
 
 testxx:
 	aarch64--netbsd-clang -march=armv8.5-a -mcrc -c bin.S

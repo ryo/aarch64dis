@@ -244,8 +244,8 @@ parse_disasm(char *p)
 		printf("%s\n", asmbuf);
 #endif
 	} else {
-		printf("ORIG	%s\n", origbuf);
-		printf("ERR?	%s\n", asmbuf);
+		printf("binutils:	%s\n", origbuf);
+		printf("MYdisasm:	%s\n", asmbuf);
 	}
 
 	return true;

@@ -2,6 +2,7 @@
 # test file
 #
 .text
+.arch armv8.5-a
 
 
 universal_cpu_start:
@@ -13,6 +14,1229 @@ IamARMhere:
 	// jump to cortex_mpstart (in arm binary)
 	.word	0xea000000 + (cortex_mpstart - 1f - 4) / 4
 1:
+
+test:
+	sys #0, c7, c0, 0, x0
+	sys #0, c7, c0, 1, x0
+	sys #0, c7, c0, 2, x0
+	sys #0, c7, c0, 3, x0
+	sys #0, c7, c0, 4, x0
+	sys #0, c7, c0, 5, x0
+	sys #0, c7, c0, 6, x0
+	sys #0, c7, c0, 7, x0
+	sys #0, c7, c1, 0, x0
+	sys #0, c7, c1, 1, x0
+	sys #0, c7, c1, 2, x0
+	sys #0, c7, c1, 3, x0
+	sys #0, c7, c1, 4, x0
+	sys #0, c7, c1, 5, x0
+	sys #0, c7, c1, 6, x0
+	sys #0, c7, c1, 7, x0
+	sys #0, c7, c2, 0, x0
+	sys #0, c7, c2, 1, x0
+	sys #0, c7, c2, 2, x0
+	sys #0, c7, c2, 3, x0
+	sys #0, c7, c2, 4, x0
+	sys #0, c7, c2, 5, x0
+	sys #0, c7, c2, 6, x0
+	sys #0, c7, c2, 7, x0
+	sys #0, c7, c3, 0, x0
+	sys #0, c7, c3, 1, x0
+	sys #0, c7, c3, 2, x0
+	sys #0, c7, c3, 3, x0
+	sys #0, c7, c3, 4, x0
+	sys #0, c7, c3, 5, x0
+	sys #0, c7, c3, 6, x0
+	sys #0, c7, c3, 7, x0
+	sys #0, c7, c4, 0, x0
+	sys #0, c7, c4, 1, x0
+	sys #0, c7, c4, 2, x0
+	sys #0, c7, c4, 3, x0
+	sys #0, c7, c4, 4, x0
+	sys #0, c7, c4, 5, x0
+	sys #0, c7, c4, 6, x0
+	sys #0, c7, c4, 7, x0
+	sys #0, c7, c5, 0, x0
+	sys #0, c7, c5, 1, x0
+	sys #0, c7, c5, 2, x0
+	sys #0, c7, c5, 3, x0
+	sys #0, c7, c5, 4, x0
+	sys #0, c7, c5, 5, x0
+	sys #0, c7, c5, 6, x0
+	sys #0, c7, c5, 7, x0
+	sys #0, c7, c6, 0, x0
+	sys #0, c7, c6, 1, x0
+	sys #0, c7, c6, 2, x0
+	sys #0, c7, c6, 3, x0
+	sys #0, c7, c6, 4, x0
+	sys #0, c7, c6, 5, x0
+	sys #0, c7, c6, 6, x0
+	sys #0, c7, c6, 7, x0
+	sys #0, c7, c7, 0, x0
+	sys #0, c7, c7, 1, x0
+	sys #0, c7, c7, 2, x0
+	sys #0, c7, c7, 3, x0
+	sys #0, c7, c7, 4, x0
+	sys #0, c7, c7, 5, x0
+	sys #0, c7, c7, 6, x0
+	sys #0, c7, c7, 7, x0
+	sys #0, c7, c8, 0, x0
+	sys #0, c7, c8, 1, x0
+	sys #0, c7, c8, 2, x0
+	sys #0, c7, c8, 3, x0
+	sys #0, c7, c8, 4, x0
+	sys #0, c7, c8, 5, x0
+	sys #0, c7, c8, 6, x0
+	sys #0, c7, c8, 7, x0
+	sys #0, c7, c9, 0, x0
+	sys #0, c7, c9, 1, x0
+	sys #0, c7, c9, 2, x0
+	sys #0, c7, c9, 3, x0
+	sys #0, c7, c9, 4, x0
+	sys #0, c7, c9, 5, x0
+	sys #0, c7, c9, 6, x0
+	sys #0, c7, c9, 7, x0
+	sys #0, c7, c10, 0, x0
+	sys #0, c7, c10, 1, x0
+	sys #0, c7, c10, 2, x0
+	sys #0, c7, c10, 3, x0
+	sys #0, c7, c10, 4, x0
+	sys #0, c7, c10, 5, x0
+	sys #0, c7, c10, 6, x0
+	sys #0, c7, c10, 7, x0
+	sys #0, c7, c11, 0, x0
+	sys #0, c7, c11, 1, x0
+	sys #0, c7, c11, 2, x0
+	sys #0, c7, c11, 3, x0
+	sys #0, c7, c11, 4, x0
+	sys #0, c7, c11, 5, x0
+	sys #0, c7, c11, 6, x0
+	sys #0, c7, c11, 7, x0
+	sys #0, c7, c12, 0, x0
+	sys #0, c7, c12, 1, x0
+	sys #0, c7, c12, 2, x0
+	sys #0, c7, c12, 3, x0
+	sys #0, c7, c12, 4, x0
+	sys #0, c7, c12, 5, x0
+	sys #0, c7, c12, 6, x0
+	sys #0, c7, c12, 7, x0
+	sys #0, c7, c13, 0, x0
+	sys #0, c7, c13, 1, x0
+	sys #0, c7, c13, 2, x0
+	sys #0, c7, c13, 3, x0
+	sys #0, c7, c13, 4, x0
+	sys #0, c7, c13, 5, x0
+	sys #0, c7, c13, 6, x0
+	sys #0, c7, c13, 7, x0
+	sys #0, c7, c14, 0, x0
+	sys #0, c7, c14, 1, x0
+	sys #0, c7, c14, 2, x0
+	sys #0, c7, c14, 3, x0
+	sys #0, c7, c14, 4, x0
+	sys #0, c7, c14, 5, x0
+	sys #0, c7, c14, 6, x0
+	sys #0, c7, c14, 7, x0
+	sys #0, c7, c15, 0, x0
+	sys #0, c7, c15, 1, x0
+	sys #0, c7, c15, 2, x0
+	sys #0, c7, c15, 3, x0
+	sys #0, c7, c15, 4, x0
+	sys #0, c7, c15, 5, x0
+	sys #0, c7, c15, 6, x0
+	sys #0, c7, c15, 7, x0
+	sys #1, c7, c0, 0, x0
+	sys #1, c7, c0, 1, x0
+	sys #1, c7, c0, 2, x0
+	sys #1, c7, c0, 3, x0
+	sys #1, c7, c0, 4, x0
+	sys #1, c7, c0, 5, x0
+	sys #1, c7, c0, 6, x0
+	sys #1, c7, c0, 7, x0
+	sys #1, c7, c1, 0, x0
+	sys #1, c7, c1, 1, x0
+	sys #1, c7, c1, 2, x0
+	sys #1, c7, c1, 3, x0
+	sys #1, c7, c1, 4, x0
+	sys #1, c7, c1, 5, x0
+	sys #1, c7, c1, 6, x0
+	sys #1, c7, c1, 7, x0
+	sys #1, c7, c2, 0, x0
+	sys #1, c7, c2, 1, x0
+	sys #1, c7, c2, 2, x0
+	sys #1, c7, c2, 3, x0
+	sys #1, c7, c2, 4, x0
+	sys #1, c7, c2, 5, x0
+	sys #1, c7, c2, 6, x0
+	sys #1, c7, c2, 7, x0
+	sys #1, c7, c3, 0, x0
+	sys #1, c7, c3, 1, x0
+	sys #1, c7, c3, 2, x0
+	sys #1, c7, c3, 3, x0
+	sys #1, c7, c3, 4, x0
+	sys #1, c7, c3, 5, x0
+	sys #1, c7, c3, 6, x0
+	sys #1, c7, c3, 7, x0
+	sys #1, c7, c4, 0, x0
+	sys #1, c7, c4, 1, x0
+	sys #1, c7, c4, 2, x0
+	sys #1, c7, c4, 3, x0
+	sys #1, c7, c4, 4, x0
+	sys #1, c7, c4, 5, x0
+	sys #1, c7, c4, 6, x0
+	sys #1, c7, c4, 7, x0
+	sys #1, c7, c5, 0, x0
+	sys #1, c7, c5, 1, x0
+	sys #1, c7, c5, 2, x0
+	sys #1, c7, c5, 3, x0
+	sys #1, c7, c5, 4, x0
+	sys #1, c7, c5, 5, x0
+	sys #1, c7, c5, 6, x0
+	sys #1, c7, c5, 7, x0
+	sys #1, c7, c6, 0, x0
+	sys #1, c7, c6, 1, x0
+	sys #1, c7, c6, 2, x0
+	sys #1, c7, c6, 3, x0
+	sys #1, c7, c6, 4, x0
+	sys #1, c7, c6, 5, x0
+	sys #1, c7, c6, 6, x0
+	sys #1, c7, c6, 7, x0
+	sys #1, c7, c7, 0, x0
+	sys #1, c7, c7, 1, x0
+	sys #1, c7, c7, 2, x0
+	sys #1, c7, c7, 3, x0
+	sys #1, c7, c7, 4, x0
+	sys #1, c7, c7, 5, x0
+	sys #1, c7, c7, 6, x0
+	sys #1, c7, c7, 7, x0
+	sys #1, c7, c8, 0, x0
+	sys #1, c7, c8, 1, x0
+	sys #1, c7, c8, 2, x0
+	sys #1, c7, c8, 3, x0
+	sys #1, c7, c8, 4, x0
+	sys #1, c7, c8, 5, x0
+	sys #1, c7, c8, 6, x0
+	sys #1, c7, c8, 7, x0
+	sys #1, c7, c9, 0, x0
+	sys #1, c7, c9, 1, x0
+	sys #1, c7, c9, 2, x0
+	sys #1, c7, c9, 3, x0
+	sys #1, c7, c9, 4, x0
+	sys #1, c7, c9, 5, x0
+	sys #1, c7, c9, 6, x0
+	sys #1, c7, c9, 7, x0
+	sys #1, c7, c10, 0, x0
+	sys #1, c7, c10, 1, x0
+	sys #1, c7, c10, 2, x0
+	sys #1, c7, c10, 3, x0
+	sys #1, c7, c10, 4, x0
+	sys #1, c7, c10, 5, x0
+	sys #1, c7, c10, 6, x0
+	sys #1, c7, c10, 7, x0
+	sys #1, c7, c11, 0, x0
+	sys #1, c7, c11, 1, x0
+	sys #1, c7, c11, 2, x0
+	sys #1, c7, c11, 3, x0
+	sys #1, c7, c11, 4, x0
+	sys #1, c7, c11, 5, x0
+	sys #1, c7, c11, 6, x0
+	sys #1, c7, c11, 7, x0
+	sys #1, c7, c12, 0, x0
+	sys #1, c7, c12, 1, x0
+	sys #1, c7, c12, 2, x0
+	sys #1, c7, c12, 3, x0
+	sys #1, c7, c12, 4, x0
+	sys #1, c7, c12, 5, x0
+	sys #1, c7, c12, 6, x0
+	sys #1, c7, c12, 7, x0
+	sys #1, c7, c13, 0, x0
+	sys #1, c7, c13, 1, x0
+	sys #1, c7, c13, 2, x0
+	sys #1, c7, c13, 3, x0
+	sys #1, c7, c13, 4, x0
+	sys #1, c7, c13, 5, x0
+	sys #1, c7, c13, 6, x0
+	sys #1, c7, c13, 7, x0
+	sys #1, c7, c14, 0, x0
+	sys #1, c7, c14, 1, x0
+	sys #1, c7, c14, 2, x0
+	sys #1, c7, c14, 3, x0
+	sys #1, c7, c14, 4, x0
+	sys #1, c7, c14, 5, x0
+	sys #1, c7, c14, 6, x0
+	sys #1, c7, c14, 7, x0
+	sys #1, c7, c15, 0, x0
+	sys #1, c7, c15, 1, x0
+	sys #1, c7, c15, 2, x0
+	sys #1, c7, c15, 3, x0
+	sys #1, c7, c15, 4, x0
+	sys #1, c7, c15, 5, x0
+	sys #1, c7, c15, 6, x0
+	sys #1, c7, c15, 7, x0
+	sys #2, c7, c0, 0, x0
+	sys #2, c7, c0, 1, x0
+	sys #2, c7, c0, 2, x0
+	sys #2, c7, c0, 3, x0
+	sys #2, c7, c0, 4, x0
+	sys #2, c7, c0, 5, x0
+	sys #2, c7, c0, 6, x0
+	sys #2, c7, c0, 7, x0
+	sys #2, c7, c1, 0, x0
+	sys #2, c7, c1, 1, x0
+	sys #2, c7, c1, 2, x0
+	sys #2, c7, c1, 3, x0
+	sys #2, c7, c1, 4, x0
+	sys #2, c7, c1, 5, x0
+	sys #2, c7, c1, 6, x0
+	sys #2, c7, c1, 7, x0
+	sys #2, c7, c2, 0, x0
+	sys #2, c7, c2, 1, x0
+	sys #2, c7, c2, 2, x0
+	sys #2, c7, c2, 3, x0
+	sys #2, c7, c2, 4, x0
+	sys #2, c7, c2, 5, x0
+	sys #2, c7, c2, 6, x0
+	sys #2, c7, c2, 7, x0
+	sys #2, c7, c3, 0, x0
+	sys #2, c7, c3, 1, x0
+	sys #2, c7, c3, 2, x0
+	sys #2, c7, c3, 3, x0
+	sys #2, c7, c3, 4, x0
+	sys #2, c7, c3, 5, x0
+	sys #2, c7, c3, 6, x0
+	sys #2, c7, c3, 7, x0
+	sys #2, c7, c4, 0, x0
+	sys #2, c7, c4, 1, x0
+	sys #2, c7, c4, 2, x0
+	sys #2, c7, c4, 3, x0
+	sys #2, c7, c4, 4, x0
+	sys #2, c7, c4, 5, x0
+	sys #2, c7, c4, 6, x0
+	sys #2, c7, c4, 7, x0
+	sys #2, c7, c5, 0, x0
+	sys #2, c7, c5, 1, x0
+	sys #2, c7, c5, 2, x0
+	sys #2, c7, c5, 3, x0
+	sys #2, c7, c5, 4, x0
+	sys #2, c7, c5, 5, x0
+	sys #2, c7, c5, 6, x0
+	sys #2, c7, c5, 7, x0
+	sys #2, c7, c6, 0, x0
+	sys #2, c7, c6, 1, x0
+	sys #2, c7, c6, 2, x0
+	sys #2, c7, c6, 3, x0
+	sys #2, c7, c6, 4, x0
+	sys #2, c7, c6, 5, x0
+	sys #2, c7, c6, 6, x0
+	sys #2, c7, c6, 7, x0
+	sys #2, c7, c7, 0, x0
+	sys #2, c7, c7, 1, x0
+	sys #2, c7, c7, 2, x0
+	sys #2, c7, c7, 3, x0
+	sys #2, c7, c7, 4, x0
+	sys #2, c7, c7, 5, x0
+	sys #2, c7, c7, 6, x0
+	sys #2, c7, c7, 7, x0
+	sys #2, c7, c8, 0, x0
+	sys #2, c7, c8, 1, x0
+	sys #2, c7, c8, 2, x0
+	sys #2, c7, c8, 3, x0
+	sys #2, c7, c8, 4, x0
+	sys #2, c7, c8, 5, x0
+	sys #2, c7, c8, 6, x0
+	sys #2, c7, c8, 7, x0
+	sys #2, c7, c9, 0, x0
+	sys #2, c7, c9, 1, x0
+	sys #2, c7, c9, 2, x0
+	sys #2, c7, c9, 3, x0
+	sys #2, c7, c9, 4, x0
+	sys #2, c7, c9, 5, x0
+	sys #2, c7, c9, 6, x0
+	sys #2, c7, c9, 7, x0
+	sys #2, c7, c10, 0, x0
+	sys #2, c7, c10, 1, x0
+	sys #2, c7, c10, 2, x0
+	sys #2, c7, c10, 3, x0
+	sys #2, c7, c10, 4, x0
+	sys #2, c7, c10, 5, x0
+	sys #2, c7, c10, 6, x0
+	sys #2, c7, c10, 7, x0
+	sys #2, c7, c11, 0, x0
+	sys #2, c7, c11, 1, x0
+	sys #2, c7, c11, 2, x0
+	sys #2, c7, c11, 3, x0
+	sys #2, c7, c11, 4, x0
+	sys #2, c7, c11, 5, x0
+	sys #2, c7, c11, 6, x0
+	sys #2, c7, c11, 7, x0
+	sys #2, c7, c12, 0, x0
+	sys #2, c7, c12, 1, x0
+	sys #2, c7, c12, 2, x0
+	sys #2, c7, c12, 3, x0
+	sys #2, c7, c12, 4, x0
+	sys #2, c7, c12, 5, x0
+	sys #2, c7, c12, 6, x0
+	sys #2, c7, c12, 7, x0
+	sys #2, c7, c13, 0, x0
+	sys #2, c7, c13, 1, x0
+	sys #2, c7, c13, 2, x0
+	sys #2, c7, c13, 3, x0
+	sys #2, c7, c13, 4, x0
+	sys #2, c7, c13, 5, x0
+	sys #2, c7, c13, 6, x0
+	sys #2, c7, c13, 7, x0
+	sys #2, c7, c14, 0, x0
+	sys #2, c7, c14, 1, x0
+	sys #2, c7, c14, 2, x0
+	sys #2, c7, c14, 3, x0
+	sys #2, c7, c14, 4, x0
+	sys #2, c7, c14, 5, x0
+	sys #2, c7, c14, 6, x0
+	sys #2, c7, c14, 7, x0
+	sys #2, c7, c15, 0, x0
+	sys #2, c7, c15, 1, x0
+	sys #2, c7, c15, 2, x0
+	sys #2, c7, c15, 3, x0
+	sys #2, c7, c15, 4, x0
+	sys #2, c7, c15, 5, x0
+	sys #2, c7, c15, 6, x0
+	sys #2, c7, c15, 7, x0
+	sys #3, c7, c0, 0, x0
+	sys #3, c7, c0, 1, x0
+	sys #3, c7, c0, 2, x0
+	sys #3, c7, c0, 3, x0
+	sys #3, c7, c0, 4, x0
+	sys #3, c7, c0, 5, x0
+	sys #3, c7, c0, 6, x0
+	sys #3, c7, c0, 7, x0
+	sys #3, c7, c1, 0, x0
+	sys #3, c7, c1, 1, x0
+	sys #3, c7, c1, 2, x0
+	sys #3, c7, c1, 3, x0
+	sys #3, c7, c1, 4, x0
+	sys #3, c7, c1, 5, x0
+	sys #3, c7, c1, 6, x0
+	sys #3, c7, c1, 7, x0
+	sys #3, c7, c2, 0, x0
+	sys #3, c7, c2, 1, x0
+	sys #3, c7, c2, 2, x0
+	sys #3, c7, c2, 3, x0
+	sys #3, c7, c2, 4, x0
+	sys #3, c7, c2, 5, x0
+	sys #3, c7, c2, 6, x0
+	sys #3, c7, c2, 7, x0
+	sys #3, c7, c3, 0, x0
+	sys #3, c7, c3, 1, x0
+	sys #3, c7, c3, 2, x0
+	sys #3, c7, c3, 3, x0
+	sys #3, c7, c3, 4, x0
+	sys #3, c7, c3, 5, x0
+	sys #3, c7, c3, 6, x0
+	sys #3, c7, c3, 7, x0
+	sys #3, c7, c4, 0, x0
+	sys #3, c7, c4, 1, x0
+	sys #3, c7, c4, 2, x0
+	sys #3, c7, c4, 3, x0
+	sys #3, c7, c4, 4, x0
+	sys #3, c7, c4, 5, x0
+	sys #3, c7, c4, 6, x0
+	sys #3, c7, c4, 7, x0
+	sys #3, c7, c5, 0, x0
+	sys #3, c7, c5, 1, x0
+	sys #3, c7, c5, 2, x0
+	sys #3, c7, c5, 3, x0
+	sys #3, c7, c5, 4, x0
+	sys #3, c7, c5, 5, x0
+	sys #3, c7, c5, 6, x0
+	sys #3, c7, c5, 7, x0
+	sys #3, c7, c6, 0, x0
+	sys #3, c7, c6, 1, x0
+	sys #3, c7, c6, 2, x0
+	sys #3, c7, c6, 3, x0
+	sys #3, c7, c6, 4, x0
+	sys #3, c7, c6, 5, x0
+	sys #3, c7, c6, 6, x0
+	sys #3, c7, c6, 7, x0
+	sys #3, c7, c7, 0, x0
+	sys #3, c7, c7, 1, x0
+	sys #3, c7, c7, 2, x0
+	sys #3, c7, c7, 3, x0
+	sys #3, c7, c7, 4, x0
+	sys #3, c7, c7, 5, x0
+	sys #3, c7, c7, 6, x0
+	sys #3, c7, c7, 7, x0
+	sys #3, c7, c8, 0, x0
+	sys #3, c7, c8, 1, x0
+	sys #3, c7, c8, 2, x0
+	sys #3, c7, c8, 3, x0
+	sys #3, c7, c8, 4, x0
+	sys #3, c7, c8, 5, x0
+	sys #3, c7, c8, 6, x0
+	sys #3, c7, c8, 7, x0
+	sys #3, c7, c9, 0, x0
+	sys #3, c7, c9, 1, x0
+	sys #3, c7, c9, 2, x0
+	sys #3, c7, c9, 3, x0
+	sys #3, c7, c9, 4, x0
+	sys #3, c7, c9, 5, x0
+	sys #3, c7, c9, 6, x0
+	sys #3, c7, c9, 7, x0
+	sys #3, c7, c10, 0, x0
+	sys #3, c7, c10, 1, x0
+	sys #3, c7, c10, 2, x0
+	sys #3, c7, c10, 3, x0
+	sys #3, c7, c10, 4, x0
+	sys #3, c7, c10, 5, x0
+	sys #3, c7, c10, 6, x0
+	sys #3, c7, c10, 7, x0
+	sys #3, c7, c11, 0, x0
+	sys #3, c7, c11, 1, x0
+	sys #3, c7, c11, 2, x0
+	sys #3, c7, c11, 3, x0
+	sys #3, c7, c11, 4, x0
+	sys #3, c7, c11, 5, x0
+	sys #3, c7, c11, 6, x0
+	sys #3, c7, c11, 7, x0
+	sys #3, c7, c12, 0, x0
+	sys #3, c7, c12, 1, x0
+	sys #3, c7, c12, 2, x0
+	sys #3, c7, c12, 3, x0
+	sys #3, c7, c12, 4, x0
+	sys #3, c7, c12, 5, x0
+	sys #3, c7, c12, 6, x0
+	sys #3, c7, c12, 7, x0
+	sys #3, c7, c13, 0, x0
+	sys #3, c7, c13, 1, x0
+	sys #3, c7, c13, 2, x0
+	sys #3, c7, c13, 3, x0
+	sys #3, c7, c13, 4, x0
+	sys #3, c7, c13, 5, x0
+	sys #3, c7, c13, 6, x0
+	sys #3, c7, c13, 7, x0
+	sys #3, c7, c14, 0, x0
+	sys #3, c7, c14, 1, x0
+	sys #3, c7, c14, 2, x0
+	sys #3, c7, c14, 3, x0
+	sys #3, c7, c14, 4, x0
+	sys #3, c7, c14, 5, x0
+	sys #3, c7, c14, 6, x0
+	sys #3, c7, c14, 7, x0
+	sys #3, c7, c15, 0, x0
+	sys #3, c7, c15, 1, x0
+	sys #3, c7, c15, 2, x0
+	sys #3, c7, c15, 3, x0
+	sys #3, c7, c15, 4, x0
+	sys #3, c7, c15, 5, x0
+	sys #3, c7, c15, 6, x0
+	sys #3, c7, c15, 7, x0
+	sys #4, c7, c0, 0, x0
+	sys #4, c7, c0, 1, x0
+	sys #4, c7, c0, 2, x0
+	sys #4, c7, c0, 3, x0
+	sys #4, c7, c0, 4, x0
+	sys #4, c7, c0, 5, x0
+	sys #4, c7, c0, 6, x0
+	sys #4, c7, c0, 7, x0
+	sys #4, c7, c1, 0, x0
+	sys #4, c7, c1, 1, x0
+	sys #4, c7, c1, 2, x0
+	sys #4, c7, c1, 3, x0
+	sys #4, c7, c1, 4, x0
+	sys #4, c7, c1, 5, x0
+	sys #4, c7, c1, 6, x0
+	sys #4, c7, c1, 7, x0
+	sys #4, c7, c2, 0, x0
+	sys #4, c7, c2, 1, x0
+	sys #4, c7, c2, 2, x0
+	sys #4, c7, c2, 3, x0
+	sys #4, c7, c2, 4, x0
+	sys #4, c7, c2, 5, x0
+	sys #4, c7, c2, 6, x0
+	sys #4, c7, c2, 7, x0
+	sys #4, c7, c3, 0, x0
+	sys #4, c7, c3, 1, x0
+	sys #4, c7, c3, 2, x0
+	sys #4, c7, c3, 3, x0
+	sys #4, c7, c3, 4, x0
+	sys #4, c7, c3, 5, x0
+	sys #4, c7, c3, 6, x0
+	sys #4, c7, c3, 7, x0
+	sys #4, c7, c4, 0, x0
+	sys #4, c7, c4, 1, x0
+	sys #4, c7, c4, 2, x0
+	sys #4, c7, c4, 3, x0
+	sys #4, c7, c4, 4, x0
+	sys #4, c7, c4, 5, x0
+	sys #4, c7, c4, 6, x0
+	sys #4, c7, c4, 7, x0
+	sys #4, c7, c5, 0, x0
+	sys #4, c7, c5, 1, x0
+	sys #4, c7, c5, 2, x0
+	sys #4, c7, c5, 3, x0
+	sys #4, c7, c5, 4, x0
+	sys #4, c7, c5, 5, x0
+	sys #4, c7, c5, 6, x0
+	sys #4, c7, c5, 7, x0
+	sys #4, c7, c6, 0, x0
+	sys #4, c7, c6, 1, x0
+	sys #4, c7, c6, 2, x0
+	sys #4, c7, c6, 3, x0
+	sys #4, c7, c6, 4, x0
+	sys #4, c7, c6, 5, x0
+	sys #4, c7, c6, 6, x0
+	sys #4, c7, c6, 7, x0
+	sys #4, c7, c7, 0, x0
+	sys #4, c7, c7, 1, x0
+	sys #4, c7, c7, 2, x0
+	sys #4, c7, c7, 3, x0
+	sys #4, c7, c7, 4, x0
+	sys #4, c7, c7, 5, x0
+	sys #4, c7, c7, 6, x0
+	sys #4, c7, c7, 7, x0
+	sys #4, c7, c8, 0, x0
+	sys #4, c7, c8, 1, x0
+	sys #4, c7, c8, 2, x0
+	sys #4, c7, c8, 3, x0
+	sys #4, c7, c8, 4, x0
+	sys #4, c7, c8, 5, x0
+	sys #4, c7, c8, 6, x0
+	sys #4, c7, c8, 7, x0
+	sys #4, c7, c9, 0, x0
+	sys #4, c7, c9, 1, x0
+	sys #4, c7, c9, 2, x0
+	sys #4, c7, c9, 3, x0
+	sys #4, c7, c9, 4, x0
+	sys #4, c7, c9, 5, x0
+	sys #4, c7, c9, 6, x0
+	sys #4, c7, c9, 7, x0
+	sys #4, c7, c10, 0, x0
+	sys #4, c7, c10, 1, x0
+	sys #4, c7, c10, 2, x0
+	sys #4, c7, c10, 3, x0
+	sys #4, c7, c10, 4, x0
+	sys #4, c7, c10, 5, x0
+	sys #4, c7, c10, 6, x0
+	sys #4, c7, c10, 7, x0
+	sys #4, c7, c11, 0, x0
+	sys #4, c7, c11, 1, x0
+	sys #4, c7, c11, 2, x0
+	sys #4, c7, c11, 3, x0
+	sys #4, c7, c11, 4, x0
+	sys #4, c7, c11, 5, x0
+	sys #4, c7, c11, 6, x0
+	sys #4, c7, c11, 7, x0
+	sys #4, c7, c12, 0, x0
+	sys #4, c7, c12, 1, x0
+	sys #4, c7, c12, 2, x0
+	sys #4, c7, c12, 3, x0
+	sys #4, c7, c12, 4, x0
+	sys #4, c7, c12, 5, x0
+	sys #4, c7, c12, 6, x0
+	sys #4, c7, c12, 7, x0
+	sys #4, c7, c13, 0, x0
+	sys #4, c7, c13, 1, x0
+	sys #4, c7, c13, 2, x0
+	sys #4, c7, c13, 3, x0
+	sys #4, c7, c13, 4, x0
+	sys #4, c7, c13, 5, x0
+	sys #4, c7, c13, 6, x0
+	sys #4, c7, c13, 7, x0
+	sys #4, c7, c14, 0, x0
+	sys #4, c7, c14, 1, x0
+	sys #4, c7, c14, 2, x0
+	sys #4, c7, c14, 3, x0
+	sys #4, c7, c14, 4, x0
+	sys #4, c7, c14, 5, x0
+	sys #4, c7, c14, 6, x0
+	sys #4, c7, c14, 7, x0
+	sys #4, c7, c15, 0, x0
+	sys #4, c7, c15, 1, x0
+	sys #4, c7, c15, 2, x0
+	sys #4, c7, c15, 3, x0
+	sys #4, c7, c15, 4, x0
+	sys #4, c7, c15, 5, x0
+	sys #4, c7, c15, 6, x0
+	sys #4, c7, c15, 7, x0
+	sys #5, c7, c0, 0, x0
+	sys #5, c7, c0, 1, x0
+	sys #5, c7, c0, 2, x0
+	sys #5, c7, c0, 3, x0
+	sys #5, c7, c0, 4, x0
+	sys #5, c7, c0, 5, x0
+	sys #5, c7, c0, 6, x0
+	sys #5, c7, c0, 7, x0
+	sys #5, c7, c1, 0, x0
+	sys #5, c7, c1, 1, x0
+	sys #5, c7, c1, 2, x0
+	sys #5, c7, c1, 3, x0
+	sys #5, c7, c1, 4, x0
+	sys #5, c7, c1, 5, x0
+	sys #5, c7, c1, 6, x0
+	sys #5, c7, c1, 7, x0
+	sys #5, c7, c2, 0, x0
+	sys #5, c7, c2, 1, x0
+	sys #5, c7, c2, 2, x0
+	sys #5, c7, c2, 3, x0
+	sys #5, c7, c2, 4, x0
+	sys #5, c7, c2, 5, x0
+	sys #5, c7, c2, 6, x0
+	sys #5, c7, c2, 7, x0
+	sys #5, c7, c3, 0, x0
+	sys #5, c7, c3, 1, x0
+	sys #5, c7, c3, 2, x0
+	sys #5, c7, c3, 3, x0
+	sys #5, c7, c3, 4, x0
+	sys #5, c7, c3, 5, x0
+	sys #5, c7, c3, 6, x0
+	sys #5, c7, c3, 7, x0
+	sys #5, c7, c4, 0, x0
+	sys #5, c7, c4, 1, x0
+	sys #5, c7, c4, 2, x0
+	sys #5, c7, c4, 3, x0
+	sys #5, c7, c4, 4, x0
+	sys #5, c7, c4, 5, x0
+	sys #5, c7, c4, 6, x0
+	sys #5, c7, c4, 7, x0
+	sys #5, c7, c5, 0, x0
+	sys #5, c7, c5, 1, x0
+	sys #5, c7, c5, 2, x0
+	sys #5, c7, c5, 3, x0
+	sys #5, c7, c5, 4, x0
+	sys #5, c7, c5, 5, x0
+	sys #5, c7, c5, 6, x0
+	sys #5, c7, c5, 7, x0
+	sys #5, c7, c6, 0, x0
+	sys #5, c7, c6, 1, x0
+	sys #5, c7, c6, 2, x0
+	sys #5, c7, c6, 3, x0
+	sys #5, c7, c6, 4, x0
+	sys #5, c7, c6, 5, x0
+	sys #5, c7, c6, 6, x0
+	sys #5, c7, c6, 7, x0
+	sys #5, c7, c7, 0, x0
+	sys #5, c7, c7, 1, x0
+	sys #5, c7, c7, 2, x0
+	sys #5, c7, c7, 3, x0
+	sys #5, c7, c7, 4, x0
+	sys #5, c7, c7, 5, x0
+	sys #5, c7, c7, 6, x0
+	sys #5, c7, c7, 7, x0
+	sys #5, c7, c8, 0, x0
+	sys #5, c7, c8, 1, x0
+	sys #5, c7, c8, 2, x0
+	sys #5, c7, c8, 3, x0
+	sys #5, c7, c8, 4, x0
+	sys #5, c7, c8, 5, x0
+	sys #5, c7, c8, 6, x0
+	sys #5, c7, c8, 7, x0
+	sys #5, c7, c9, 0, x0
+	sys #5, c7, c9, 1, x0
+	sys #5, c7, c9, 2, x0
+	sys #5, c7, c9, 3, x0
+	sys #5, c7, c9, 4, x0
+	sys #5, c7, c9, 5, x0
+	sys #5, c7, c9, 6, x0
+	sys #5, c7, c9, 7, x0
+	sys #5, c7, c10, 0, x0
+	sys #5, c7, c10, 1, x0
+	sys #5, c7, c10, 2, x0
+	sys #5, c7, c10, 3, x0
+	sys #5, c7, c10, 4, x0
+	sys #5, c7, c10, 5, x0
+	sys #5, c7, c10, 6, x0
+	sys #5, c7, c10, 7, x0
+	sys #5, c7, c11, 0, x0
+	sys #5, c7, c11, 1, x0
+	sys #5, c7, c11, 2, x0
+	sys #5, c7, c11, 3, x0
+	sys #5, c7, c11, 4, x0
+	sys #5, c7, c11, 5, x0
+	sys #5, c7, c11, 6, x0
+	sys #5, c7, c11, 7, x0
+	sys #5, c7, c12, 0, x0
+	sys #5, c7, c12, 1, x0
+	sys #5, c7, c12, 2, x0
+	sys #5, c7, c12, 3, x0
+	sys #5, c7, c12, 4, x0
+	sys #5, c7, c12, 5, x0
+	sys #5, c7, c12, 6, x0
+	sys #5, c7, c12, 7, x0
+	sys #5, c7, c13, 0, x0
+	sys #5, c7, c13, 1, x0
+	sys #5, c7, c13, 2, x0
+	sys #5, c7, c13, 3, x0
+	sys #5, c7, c13, 4, x0
+	sys #5, c7, c13, 5, x0
+	sys #5, c7, c13, 6, x0
+	sys #5, c7, c13, 7, x0
+	sys #5, c7, c14, 0, x0
+	sys #5, c7, c14, 1, x0
+	sys #5, c7, c14, 2, x0
+	sys #5, c7, c14, 3, x0
+	sys #5, c7, c14, 4, x0
+	sys #5, c7, c14, 5, x0
+	sys #5, c7, c14, 6, x0
+	sys #5, c7, c14, 7, x0
+	sys #5, c7, c15, 0, x0
+	sys #5, c7, c15, 1, x0
+	sys #5, c7, c15, 2, x0
+	sys #5, c7, c15, 3, x0
+	sys #5, c7, c15, 4, x0
+	sys #5, c7, c15, 5, x0
+	sys #5, c7, c15, 6, x0
+	sys #5, c7, c15, 7, x0
+	sys #6, c7, c0, 0, x0
+	sys #6, c7, c0, 1, x0
+	sys #6, c7, c0, 2, x0
+	sys #6, c7, c0, 3, x0
+	sys #6, c7, c0, 4, x0
+	sys #6, c7, c0, 5, x0
+	sys #6, c7, c0, 6, x0
+	sys #6, c7, c0, 7, x0
+	sys #6, c7, c1, 0, x0
+	sys #6, c7, c1, 1, x0
+	sys #6, c7, c1, 2, x0
+	sys #6, c7, c1, 3, x0
+	sys #6, c7, c1, 4, x0
+	sys #6, c7, c1, 5, x0
+	sys #6, c7, c1, 6, x0
+	sys #6, c7, c1, 7, x0
+	sys #6, c7, c2, 0, x0
+	sys #6, c7, c2, 1, x0
+	sys #6, c7, c2, 2, x0
+	sys #6, c7, c2, 3, x0
+	sys #6, c7, c2, 4, x0
+	sys #6, c7, c2, 5, x0
+	sys #6, c7, c2, 6, x0
+	sys #6, c7, c2, 7, x0
+	sys #6, c7, c3, 0, x0
+	sys #6, c7, c3, 1, x0
+	sys #6, c7, c3, 2, x0
+	sys #6, c7, c3, 3, x0
+	sys #6, c7, c3, 4, x0
+	sys #6, c7, c3, 5, x0
+	sys #6, c7, c3, 6, x0
+	sys #6, c7, c3, 7, x0
+	sys #6, c7, c4, 0, x0
+	sys #6, c7, c4, 1, x0
+	sys #6, c7, c4, 2, x0
+	sys #6, c7, c4, 3, x0
+	sys #6, c7, c4, 4, x0
+	sys #6, c7, c4, 5, x0
+	sys #6, c7, c4, 6, x0
+	sys #6, c7, c4, 7, x0
+	sys #6, c7, c5, 0, x0
+	sys #6, c7, c5, 1, x0
+	sys #6, c7, c5, 2, x0
+	sys #6, c7, c5, 3, x0
+	sys #6, c7, c5, 4, x0
+	sys #6, c7, c5, 5, x0
+	sys #6, c7, c5, 6, x0
+	sys #6, c7, c5, 7, x0
+	sys #6, c7, c6, 0, x0
+	sys #6, c7, c6, 1, x0
+	sys #6, c7, c6, 2, x0
+	sys #6, c7, c6, 3, x0
+	sys #6, c7, c6, 4, x0
+	sys #6, c7, c6, 5, x0
+	sys #6, c7, c6, 6, x0
+	sys #6, c7, c6, 7, x0
+	sys #6, c7, c7, 0, x0
+	sys #6, c7, c7, 1, x0
+	sys #6, c7, c7, 2, x0
+	sys #6, c7, c7, 3, x0
+	sys #6, c7, c7, 4, x0
+	sys #6, c7, c7, 5, x0
+	sys #6, c7, c7, 6, x0
+	sys #6, c7, c7, 7, x0
+	sys #6, c7, c8, 0, x0
+	sys #6, c7, c8, 1, x0
+	sys #6, c7, c8, 2, x0
+	sys #6, c7, c8, 3, x0
+	sys #6, c7, c8, 4, x0
+	sys #6, c7, c8, 5, x0
+	sys #6, c7, c8, 6, x0
+	sys #6, c7, c8, 7, x0
+	sys #6, c7, c9, 0, x0
+	sys #6, c7, c9, 1, x0
+	sys #6, c7, c9, 2, x0
+	sys #6, c7, c9, 3, x0
+	sys #6, c7, c9, 4, x0
+	sys #6, c7, c9, 5, x0
+	sys #6, c7, c9, 6, x0
+	sys #6, c7, c9, 7, x0
+	sys #6, c7, c10, 0, x0
+	sys #6, c7, c10, 1, x0
+	sys #6, c7, c10, 2, x0
+	sys #6, c7, c10, 3, x0
+	sys #6, c7, c10, 4, x0
+	sys #6, c7, c10, 5, x0
+	sys #6, c7, c10, 6, x0
+	sys #6, c7, c10, 7, x0
+	sys #6, c7, c11, 0, x0
+	sys #6, c7, c11, 1, x0
+	sys #6, c7, c11, 2, x0
+	sys #6, c7, c11, 3, x0
+	sys #6, c7, c11, 4, x0
+	sys #6, c7, c11, 5, x0
+	sys #6, c7, c11, 6, x0
+	sys #6, c7, c11, 7, x0
+	sys #6, c7, c12, 0, x0
+	sys #6, c7, c12, 1, x0
+	sys #6, c7, c12, 2, x0
+	sys #6, c7, c12, 3, x0
+	sys #6, c7, c12, 4, x0
+	sys #6, c7, c12, 5, x0
+	sys #6, c7, c12, 6, x0
+	sys #6, c7, c12, 7, x0
+	sys #6, c7, c13, 0, x0
+	sys #6, c7, c13, 1, x0
+	sys #6, c7, c13, 2, x0
+	sys #6, c7, c13, 3, x0
+	sys #6, c7, c13, 4, x0
+	sys #6, c7, c13, 5, x0
+	sys #6, c7, c13, 6, x0
+	sys #6, c7, c13, 7, x0
+	sys #6, c7, c14, 0, x0
+	sys #6, c7, c14, 1, x0
+	sys #6, c7, c14, 2, x0
+	sys #6, c7, c14, 3, x0
+	sys #6, c7, c14, 4, x0
+	sys #6, c7, c14, 5, x0
+	sys #6, c7, c14, 6, x0
+	sys #6, c7, c14, 7, x0
+	sys #6, c7, c15, 0, x0
+	sys #6, c7, c15, 1, x0
+	sys #6, c7, c15, 2, x0
+	sys #6, c7, c15, 3, x0
+	sys #6, c7, c15, 4, x0
+	sys #6, c7, c15, 5, x0
+	sys #6, c7, c15, 6, x0
+	sys #6, c7, c15, 7, x0
+	sys #7, c7, c0, 0, x0
+	sys #7, c7, c0, 1, x0
+	sys #7, c7, c0, 2, x0
+	sys #7, c7, c0, 3, x0
+	sys #7, c7, c0, 4, x0
+	sys #7, c7, c0, 5, x0
+	sys #7, c7, c0, 6, x0
+	sys #7, c7, c0, 7, x0
+	sys #7, c7, c1, 0, x0
+	sys #7, c7, c1, 1, x0
+	sys #7, c7, c1, 2, x0
+	sys #7, c7, c1, 3, x0
+	sys #7, c7, c1, 4, x0
+	sys #7, c7, c1, 5, x0
+	sys #7, c7, c1, 6, x0
+	sys #7, c7, c1, 7, x0
+	sys #7, c7, c2, 0, x0
+	sys #7, c7, c2, 1, x0
+	sys #7, c7, c2, 2, x0
+	sys #7, c7, c2, 3, x0
+	sys #7, c7, c2, 4, x0
+	sys #7, c7, c2, 5, x0
+	sys #7, c7, c2, 6, x0
+	sys #7, c7, c2, 7, x0
+	sys #7, c7, c3, 0, x0
+	sys #7, c7, c3, 1, x0
+	sys #7, c7, c3, 2, x0
+	sys #7, c7, c3, 3, x0
+	sys #7, c7, c3, 4, x0
+	sys #7, c7, c3, 5, x0
+	sys #7, c7, c3, 6, x0
+	sys #7, c7, c3, 7, x0
+	sys #7, c7, c4, 0, x0
+	sys #7, c7, c4, 1, x0
+	sys #7, c7, c4, 2, x0
+	sys #7, c7, c4, 3, x0
+	sys #7, c7, c4, 4, x0
+	sys #7, c7, c4, 5, x0
+	sys #7, c7, c4, 6, x0
+	sys #7, c7, c4, 7, x0
+	sys #7, c7, c5, 0, x0
+	sys #7, c7, c5, 1, x0
+	sys #7, c7, c5, 2, x0
+	sys #7, c7, c5, 3, x0
+	sys #7, c7, c5, 4, x0
+	sys #7, c7, c5, 5, x0
+	sys #7, c7, c5, 6, x0
+	sys #7, c7, c5, 7, x0
+	sys #7, c7, c6, 0, x0
+	sys #7, c7, c6, 1, x0
+	sys #7, c7, c6, 2, x0
+	sys #7, c7, c6, 3, x0
+	sys #7, c7, c6, 4, x0
+	sys #7, c7, c6, 5, x0
+	sys #7, c7, c6, 6, x0
+	sys #7, c7, c6, 7, x0
+	sys #7, c7, c7, 0, x0
+	sys #7, c7, c7, 1, x0
+	sys #7, c7, c7, 2, x0
+	sys #7, c7, c7, 3, x0
+	sys #7, c7, c7, 4, x0
+	sys #7, c7, c7, 5, x0
+	sys #7, c7, c7, 6, x0
+	sys #7, c7, c7, 7, x0
+	sys #7, c7, c8, 0, x0
+	sys #7, c7, c8, 1, x0
+	sys #7, c7, c8, 2, x0
+	sys #7, c7, c8, 3, x0
+	sys #7, c7, c8, 4, x0
+	sys #7, c7, c8, 5, x0
+	sys #7, c7, c8, 6, x0
+	sys #7, c7, c8, 7, x0
+	sys #7, c7, c9, 0, x0
+	sys #7, c7, c9, 1, x0
+	sys #7, c7, c9, 2, x0
+	sys #7, c7, c9, 3, x0
+	sys #7, c7, c9, 4, x0
+	sys #7, c7, c9, 5, x0
+	sys #7, c7, c9, 6, x0
+	sys #7, c7, c9, 7, x0
+	sys #7, c7, c10, 0, x0
+	sys #7, c7, c10, 1, x0
+	sys #7, c7, c10, 2, x0
+	sys #7, c7, c10, 3, x0
+	sys #7, c7, c10, 4, x0
+	sys #7, c7, c10, 5, x0
+	sys #7, c7, c10, 6, x0
+	sys #7, c7, c10, 7, x0
+	sys #7, c7, c11, 0, x0
+	sys #7, c7, c11, 1, x0
+	sys #7, c7, c11, 2, x0
+	sys #7, c7, c11, 3, x0
+	sys #7, c7, c11, 4, x0
+	sys #7, c7, c11, 5, x0
+	sys #7, c7, c11, 6, x0
+	sys #7, c7, c11, 7, x0
+	sys #7, c7, c12, 0, x0
+	sys #7, c7, c12, 1, x0
+	sys #7, c7, c12, 2, x0
+	sys #7, c7, c12, 3, x0
+	sys #7, c7, c12, 4, x0
+	sys #7, c7, c12, 5, x0
+	sys #7, c7, c12, 6, x0
+	sys #7, c7, c12, 7, x0
+	sys #7, c7, c13, 0, x0
+	sys #7, c7, c13, 1, x0
+	sys #7, c7, c13, 2, x0
+	sys #7, c7, c13, 3, x0
+	sys #7, c7, c13, 4, x0
+	sys #7, c7, c13, 5, x0
+	sys #7, c7, c13, 6, x0
+	sys #7, c7, c13, 7, x0
+	sys #7, c7, c14, 0, x0
+	sys #7, c7, c14, 1, x0
+	sys #7, c7, c14, 2, x0
+	sys #7, c7, c14, 3, x0
+	sys #7, c7, c14, 4, x0
+	sys #7, c7, c14, 5, x0
+	sys #7, c7, c14, 6, x0
+	sys #7, c7, c14, 7, x0
+	sys #7, c7, c15, 0, x0
+	sys #7, c7, c15, 1, x0
+	sys #7, c7, c15, 2, x0
+	sys #7, c7, c15, 3, x0
+	sys #7, c7, c15, 4, x0
+	sys #7, c7, c15, 5, x0
+	sys #7, c7, c15, 6, x0
+	sys #7, c7, c15, 7, x0
+
+	hint #0
+	hint #1
+	hint #2
+	hint #3
+	hint #4
+	hint #5
+	hint #6
+	hint #7
+	hint #8
+	hint #9
+	hint #10
+	hint #11
+	hint #12
+	hint #13
+	hint #14
+	hint #15
+	hint #16
+	hint #17
+	hint #18
+	hint #19
+	hint #20
+	hint #21
+	hint #22
+	hint #23
+	hint #24
+	hint #25
+	hint #26
+	hint #27
+	hint #28
+	hint #29
+	hint #30
+	hint #31
+	hint #32
+	hint #33
+	hint #34
+	hint #35
+	hint #36
+	hint #37
+	hint #38
+	hint #39
+	hint #40
+	hint #41
+	hint #42
+	hint #43
+	hint #44
+	hint #45
+	hint #46
+	hint #47
+	hint #48
+	hint #49
+	hint #50
+	hint #51
+	hint #52
+	hint #53
+	hint #54
+	hint #55
+	hint #56
+	hint #57
+	hint #58
+	hint #59
+	hint #60
+	hint #61
+	hint #62
+	hint #63
+	hint #64
+	hint #65
+	hint #66
+	hint #67
+	hint #68
+	hint #69
+	hint #70
+	hint #71
+	hint #72
+	hint #73
+	hint #74
+	hint #75
+	hint #76
+	hint #77
+	hint #78
+	hint #79
+	hint #80
+	hint #81
+	hint #82
+	hint #83
+	hint #84
+	hint #85
+	hint #86
+	hint #87
+	hint #88
+	hint #89
+	hint #90
+	hint #91
+	hint #92
+	hint #93
+	hint #94
+	hint #95
+	hint #96
+	hint #97
+	hint #98
+	hint #99
+	hint #100
+	hint #101
+	hint #102
+	hint #103
+	hint #104
+	hint #105
+	hint #106
+	hint #107
+	hint #108
+	hint #109
+	hint #110
+	hint #111
+	hint #112
+	hint #113
+	hint #114
+	hint #115
+	hint #116
+	hint #117
+	hint #118
+	hint #119
+	hint #120
+	hint #121
+	hint #122
+	hint #123
+	hint #124
+	hint #125
+	hint #126
+	hint #127
+
+	sys	#0, C7, C6, #3, x0
+	sys	#0, C7, C6, #4, x0
+	sys	#0, C7, C6, #5, x0
+	sys	#0, C7, C6, #6, x0
+	sys	#0, C7, C10, #4, x0
+	sys	#0, C7, C10, #6, x0
+	sys	#0, C7, C14, #4, x0
+	sys	#0, C7, C14, #6, x0
+	sys	#3, C7, C4, #3, x0
+	sys	#3, C7, C4, #4, x0
+	sys	#3, C7, C10, #3, x0
+	sys	#3, C7, C10, #5, x0
+	sys	#3, C7, C12, #3, x0
+	sys	#3, C7, C12, #5, x0
+	sys	#3, C7, C13, #3, x0
+	sys	#3, C7, C13, #5, x0
+	sys	#3, C7, C14, #3, x0
+	sys	#3, C7, C14, #5, x0
+	sys	#3, C7, C12, #1, x0
+	sys	#3, C7, C13, #1, x0
+
+	sys	#3, c7, c3, #4, x0
+	sys	#3, c7, c3, #5, x0
+	sys	#3, c7, c3, #7, x0
+
+	msr	pan, #0x0
+	mrs	x0, pan
+	mrs	x0, uao
+	mrs	x0, spsel
+//	mrs	x0, ssbs
+	mrs	x0, dit
+//	mrs	x0, tco
+	mrs	x0, pan
+
+	mrs	x0, ctr_el0
+	mrs	x1, ctr_el0
+	mrs	x2, ctr_el0
+	mrs	x3, ctr_el0
+	mrs	x4, ctr_el0
+	mrs	x5, ctr_el0
+	mrs	x6, ctr_el0
+	mrs	x7, ctr_el0
+	mrs	x8, ctr_el0
+	mrs	x9, ctr_el0
+	mrs	x10, ctr_el0
+	mrs	x11, ctr_el0
+	mrs	x12, ctr_el0
+	mrs	x13, ctr_el0
+	mrs	x14, ctr_el0
+	mrs	x15, ctr_el0
+	mrs	x16, ctr_el0
+	mrs	x17, ctr_el0
+	mrs	x18, ctr_el0
+	mrs	x19, ctr_el0
+	mrs	x20, ctr_el0
+	mrs	x21, ctr_el0
+	mrs	x22, ctr_el0
+	mrs	x23, ctr_el0
+	mrs	x24, ctr_el0
+	mrs	x25, ctr_el0
+	mrs	x26, ctr_el0
+	mrs	x27, ctr_el0
+	mrs	x28, ctr_el0
+	mrs	x29, ctr_el0
+	mrs	x30, ctr_el0
+//	mrs	x31, ctr_el0
+	mrs	xzr, ctr_el0
 
 IamAARCH64:
 	// AARCH64 BINARY CODE HERE
@@ -53,7 +1277,7 @@ armv83_ptrauth:
 
 	pacda	x5, x6
 	pacda	x5, sp
-	pacda	x31, sp
+//	pacda	x31, sp
 	pacdza	x5
 	pacdb	x5, x6
 	pacdzb	x5

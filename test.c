@@ -146,6 +146,55 @@ fetch_hex(char *p, uint64_t *hex)
 	return p;
 }
 
+static inline void
+strfuzzy(char *str)
+{
+	char c;
+	char *p;
+
+	p = str;
+
+	for (;;) {
+		c = *str;
+		if (c == '\0') {
+			*p++ = '\0';
+			return;
+		}
+		if (c == ' ' || c == '\t') {
+			*str++ = ' ';
+			while (*str == ' ' || *str == '\t')
+				str++;
+		} else if (c == '#') {
+			*str++ = ';';
+		} else {
+			*p++ = c;
+			str++;
+		}
+	}
+}
+
+
+static int
+strfuzzycmp(const char *s1, const char *s2)
+{
+	int result;
+	char *p1 = strdup(s1);
+	char *p2 = strdup(s2);
+	char *p;
+
+	strfuzzy(p1);
+	strfuzzy(p2);
+
+	p = strstr(p2, ".insn");
+	if (p != NULL)
+		p[4] = 't';
+
+	result = strcmp(p1, p2);
+	free(p1);
+	free(p2);
+	return result;
+}
+
 static bool
 parse_disasm(char *p)
 {
@@ -224,8 +273,9 @@ parse_disasm(char *p)
 	}
 	if (p != NULL) {
 		p = strstr(p + 1, "\t#");
-		if (p != NULL)
+		if (p != NULL) {
 			*p = '\0';
+		}
 	}
 
 	/*
@@ -238,7 +288,16 @@ parse_disasm(char *p)
 		*p = '\0';
 	}
 
-	if (strcmp(origbuf_cmp, asmbuf_cmp) == 0) {
+	/*
+	 * cut "; xxx" from original
+	 */
+	p = strstr(origbuf_cmp, " ; ");
+	if (p != NULL) {
+		*p = '\0';
+	}
+
+
+	if (strfuzzycmp(origbuf_cmp, asmbuf_cmp) == 0) {
 #if 1
 		printf("%s\n", origbuf);
 		printf("%s\n", asmbuf);

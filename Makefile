@@ -58,40 +58,33 @@ depend:
 	$(MKDEP) $(SRCS)
 
 clean:
-	-rm -f *.o $(PROGRAM)
+	-rm -f *.o $(PROGRAM) *.tmp
 
 cleandir: clean
 	-rm -f .depend
 
-test:
-	aarch64--netbsd-objdump -Dr /usr/src/work.evbarm64-el/tree/sbin/init | ./disasm_test | less -r
+test_netbsd:
+	aarch64--netbsd-objdump -d /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | less -r
 
-testn:
-	aarch64--netbsd-objdump -Dr /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | less -r
+diff_netbsd:
+	aarch64--netbsd-objdump -d /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | egrep '^(binutil|MYdisasm)' > netbsd.tmp
+	grep -v 'binutil.*\.word' netbsd.tmp | less -r -p 'binutil.*'
 
-testnn:
-	aarch64--netbsd-objdump -Dr /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | egrep '^(binutil|MYdisasm)' > r
-	grep -v 'binutil.*\.word' r | less -r -p 'binutil............................'
+test_init:
+	aarch64--netbsd-objdump -d /usr/src/work.evbarm64-el/tree/sbin/init | ./disasm_test | less -r
 
-testxx:
-	aarch64--netbsd-clang -march=armv8.5-a -mcrc -c bin.S
-	aarch64--netbsd-strip bin.o
-	aarch64--netbsd-objcopy bin.o bin.bin
-	arm--netbsdelf-objdump -D -b binary -m arm bin.bin | ./disasm_test | egrep '^(ORIG|ERR)' > r
-	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
+test_libc:
+	aarch64--netbsd-objdump -d /usr/src/work.evbarm64-el/obj/lib/libc/libc.a | ./disasm_test | less -r
 
-testx:
-	aarch64--netbsd-clang -march=armv8.5-a  -mcrc -c bin.S
-	aarch64--netbsd-strip bin.o
-	aarch64--netbsd-objcopy bin.o bin.bin
-	arm--netbsdelf-objdump -D -b binary -m arm /usr/src/sys/arch/evbarm/compile/GENERIC64/netbsd | ./disasm_test | egrep '^(ORIG|ERR)' > r
-	grep -v 'ORIG.*\.word' r | less -r -p 'ORIG............................'
-
-testb:
-	aarch64--netbsd-clang -march=armv8.5-a -mcrc -c bin.S
+test_bin:
+	aarch64--netbsd-gcc -msign-return-address=all -c bin.S
 	aarch64--netbsd-strip bin.o
 	aarch64--netbsd-objdump -Dr bin.o | ./disasm_test | less -r
 
-testc:
-	aarch64--netbsd-objdump -Dr ~/tmp/netbsd/work.evbarm64-el/tree/lib/libc.so | ./disasm_test | less -r
+diff_bin:
+	aarch64--netbsd-gcc -msign-return-address=all -c bin.S
+	aarch64--netbsd-objdump -D bin.o | ./disasm_test | egrep '^(binutil|MYdisasm)' > bin.tmp
+	grep -v 'binutil.*\.word' bin.tmp | less -r -p 'binutil.*'
 
+install:
+	perl local2netbsd.pl disasm.c > /usr/src/sys/arch/aarch64/aarch64/disasm.c

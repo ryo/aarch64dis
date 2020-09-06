@@ -3369,7 +3369,7 @@ disasm(const disasm_interface_t *di, uintptr_t loc)
 {
 	uint32_t insn;
 
-	insn = di->di_readword(loc);
+	insn = le32toh(di->di_readword(loc));
 	disasm_insn(di, loc, insn);
 
 	/* return next address */

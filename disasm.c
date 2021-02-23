@@ -2421,13 +2421,13 @@ OP4FUNC(op_smsubl, Rm, Ra, Rn, Rd)
 	if (Ra == 31) {
 		PRINTF("smnegl\t%s, %s, %s\n",
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm));
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm));
 	} else {
 		PRINTF("smsubl\t%s, %s, %s, %s\n",
 		    ZREGNAME(1, Rd),
-		    ZREGNAME(1, Rn),
-		    ZREGNAME(1, Rm),
+		    ZREGNAME(0, Rn),
+		    ZREGNAME(0, Rm),
 		    ZREGNAME(1, Ra));
 	}
 }
